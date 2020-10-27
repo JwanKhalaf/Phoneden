@@ -1,0 +1,17 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.SaleOrderInvoiceViewModel
+
+@{
+  ViewBag.Title = "Create Sale Order Invoice";
+}
+
+<div class="page-title">
+  <h3>Create New Sale Order Invoice</h3>
+</div>
+
+@Html.EditorFor(m => m)
+
+@section Scripts {
+  @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+  <script src="~/js/create-invoice-credit.js"></script>
+}

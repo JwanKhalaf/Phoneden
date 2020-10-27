@@ -1,0 +1,19 @@
+@using Phoneden.ViewModels.PurchaseOrders
+@model Phoneden.ViewModels.PurchaseOrders.PurchaseOrderViewModel
+
+@{
+  ViewBag.Title = "Update Purchase Order PC" + Model.Id;
+}
+
+<div class="page-title">
+  <h3>Update Purchase Order</h3>
+</div>
+
+@Html.EditorFor(m => m)
+
+@section Scripts {
+  @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+  <script src="~/lib/jquery-autocomplete/jquery.autocomplete.min.js"></script>
+  <script src="~/js/conversion-rate.js"></script>
+  <script src="~/js/purchase-orders.js"></script>
+}

@@ -1,0 +1,16 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.BrandViewModel
+
+@{
+    ViewBag.Title = "Add Brand";
+}
+
+<div class="page-title">
+  <h3>Add Brand</h3>
+</div>
+
+@Html.EditorFor(m => m)
+
+@section Scripts {
+  @{   await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

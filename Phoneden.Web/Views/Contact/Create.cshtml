@@ -1,0 +1,15 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.ContactViewModel
+
+@{
+  ViewBag.Title = "Add New Contact";
+}
+
+<div class="page-title">
+  <h3>Add Contact</h3>
+</div>
+
+@Html.EditorFor(m => m)
+
+@section Scripts {
+}

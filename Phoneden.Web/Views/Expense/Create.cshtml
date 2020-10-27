@@ -1,0 +1,16 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.ExpenseViewModel
+
+@{
+  ViewBag.Title = "Add New Expense";
+}
+
+<div class="page-title">
+  <h3>Add Expense</h3>
+</div>
+
+@Html.EditorFor(m => m)
+
+@section Scripts {
+  @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

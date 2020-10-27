@@ -1,0 +1,56 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.CustomerViewModel
+
+@{
+  ViewBag.Title = "Delete " + Model.Name;
+}
+
+<div class="page-title">
+  <h3>Delete Customer</h3>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="grid simple">
+      <div class="grid-body no-border">
+        <h2 class="all-caps">Delete <span class="semi-bold">@Model.Name</span>?</h2>
+        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+        {
+          <div class="alert alert-block alert-error fade in">
+            <h4 class="alert-heading">Sorry!</h4>
+            <p>@ViewBag.ErrorMessage</p>
+          </div>
+        }
+        else
+        {
+          <p>Are you sure you want to delete @Model.Name from your customers?</p>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    @if (string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+      <form asp-controller="Customer" asp-action="Delete" method="post">
+        <input asp-for="Id" type="hidden" />
+        <input type="submit" value="Yes, Delete" class="btn btn-danger pull-right" />
+        <a asp-controller="Customer"
+           asp-action="Page"
+           asp-route-showDeleted="false"
+           class="btn btn-default pull-right">
+          No, Go Back
+        </a>
+      </form>
+    }
+    else
+    {
+      <a asp-controller="Customer"
+         asp-action="Page"
+         asp-route-showDeleted="false"
+         class="btn btn-default pull-right">
+        Ok, Go Back
+      </a>
+    }
+  </div>
+</div>

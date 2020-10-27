@@ -1,0 +1,140 @@
+@using Phoneden.ViewModels.SaleOrders
+@model Phoneden.ViewModels.SaleOrders.SaleOrderViewModel
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="grid simple">
+      <div class="grid-body no-border">
+        <br>
+        <div class="row">
+          <div class="col-md-12">
+            <h3 class="all-caps">
+              <span class="semi-bold">General</span> Details
+            </h3>
+            <hr />
+          </div>
+
+          <div class="col-md-6">
+            <h1 class="all-caps">Sale Order</h1>
+            <h3><strong>@string.Format("SO{0}", Model.Id)</strong></h3>
+            <h3 class="all-caps">@Model.CustomerName</h3>
+          </div>
+
+          <div class="col-md-6">
+            <table class="table shipping-tax-display-table">
+              <tr>
+                <td><h3>POSTAGE</h3></td>
+                <td><h3><strong>@string.Format("{0:F2} GBP", Model.PostageCost)</strong></h3></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="grid simple">
+      <div class="grid-body no-border">
+        <br />
+        <div class="row">
+          <div class="col-md-12">
+            <h3 class="all-caps">
+              <span class="semi-bold">Order</span> Line Items
+            </h3>
+            <hr />
+          </div>
+
+          <div class="col-md-12">
+            <table class="table table-striped table-flip-scroll cf">
+              <thead class="cf">
+                <tr>
+                  <th>
+                    Product ID
+                  </th>
+                  <th>
+                    Name
+                  </th>
+                  <th>
+                    Colour
+                  </th>
+                  <th>
+                    Quality
+                  </th>
+                  <th>
+                    Quantity
+                  </th>
+                  <th>
+                    Price
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach (var item in Model.LineItems)
+                {
+                  <tr>
+                    <td>
+                      @item.ProductId
+                    </td>
+                    <td>
+                      @item.Name
+                    </td>
+                    <td>
+                      @item.Colour
+                    </td>
+                    <td>
+                      @item.Quality
+                    </td>
+                    <td>
+                      @item.Quantity
+                    </td>
+                    <td>
+                      @string.Format("{0:F2} GBP", item.Price)
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    @if (!Model.IsDeleted)
+    {
+      if (!Model.IsInvoiced)
+      {
+        <a asp-controller="SaleOrderInvoice"
+           asp-action="Create"
+           asp-route-orderId="@Model.Id"
+           asp-route-isSaleOrder="true"
+           class="btn pull-right btn-success">
+          Generate Invoice
+        </a>
+      }
+      else
+      {
+
+        <a asp-controller="SaleOrderInvoice"
+           asp-action="Details"
+           asp-route-saleOrderInvoiceId="@Model.Invoice.Id"
+           class="btn pull-right btn-primary">
+          View Invoice
+        </a>
+      }
+    }
+
+    <a asp-controller="SaleOrder"
+       asp-action="Page"
+       asp-route-showDeleted="false"
+       class="btn btn-default pull-right">
+      Back to Sale Orders
+    </a>
+  </div>
+</div>

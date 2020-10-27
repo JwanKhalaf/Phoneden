@@ -1,0 +1,177 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.PartnerViewModel
+
+
+<form asp-controller="Partner" asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post" role="form">
+  <div asp-validation-summary="All" class="text-danger"></div>
+
+  @if (Model.Id != 0)
+  {
+    <input asp-for="Id" type="hidden" />
+  }
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="grid simple">
+        <div class="grid-body no-border">
+          <br>
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">General</span> Details
+              </h3>
+              <hr />
+            </div>
+
+            <div class="col-md-6">
+              <div class="row">
+                <div class="col-md-2">
+                  <div class="form-group">
+                    <label asp-for="Title" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="Title" class="form-control" />
+                      <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-10">
+                  <div class="form-group">
+                    <label asp-for="FirstName" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="FirstName" class="form-control" />
+                      <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label asp-for="Phone" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="Phone" class="form-control" />
+                      <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label asp-for="LastName" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="LastName" class="form-control" />
+                  <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label asp-for="Email" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="Email" class="form-control" />
+                  <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="grid simple">
+        <div class="grid-body no-border">
+          <br />
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">Primary</span> Address
+              </h3>
+              <hr />
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label asp-for="AddressLine1" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="AddressLine1" class="form-control" />
+                  <span asp-validation-for="AddressLine1" class="text-danger"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label asp-for="AddressLine2" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="AddressLine2" class="form-control" />
+                  <span asp-validation-for="AddressLine2" class="text-danger"></span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="Area" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="Area" class="form-control" />
+                      <span asp-validation-for="Area" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="City" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="City" class="form-control" />
+                      <span asp-validation-for="City" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label asp-for="County" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="County" class="form-control" />
+                  <span asp-validation-for="County" class="text-danger"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label asp-for="PostCode" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="PostCode" class="form-control" />
+                  <span asp-validation-for="PostCode" class="text-danger"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label asp-for="Country" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="County" class="form-control" />
+                  <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <input type="submit" value="@Model.ButtonText" class="btn btn-primary pull-right" />
+
+      <a asp-controller="Partner"
+         asp-action="page"
+         asp-route-showDeleted="false"
+         class="btn btn-default pull-right">
+        Back to Partners
+      </a>
+    </div>
+  </div>
+</form>

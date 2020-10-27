@@ -1,0 +1,16 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.QualityViewModel
+
+@{
+  ViewBag.Title = "Add Product Quality";
+}
+
+<div class="page-title">
+  <h3>Add Quality</h3>
+</div>
+
+@Html.EditorFor(m => m)
+
+@section Scripts {
+  @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

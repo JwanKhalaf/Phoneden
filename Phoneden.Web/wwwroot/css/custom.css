@@ -1,0 +1,99 @@
+.product-description {
+  height: 128px;
+}
+
+.btn-mini.pull-right {
+  margin-left: 5px;
+  margin-bottom: 0;
+}
+
+.btn.pull-right {
+  margin-left: 10px;
+}
+
+.line-order,
+.control,
+.product-name-field,
+.line-item-conversion-rate-read {
+  font-weight: bold;  
+}
+
+.line-order .form-group {
+  margin: 0;
+}
+
+.line-order .poli-product-conversion-rate-read,
+.line-order .control {
+  height: 37px;
+}
+
+.line-order .poli-product-conversion-rate-read p {
+  line-height: 37px;
+  margin: 0;
+}
+
+.line-order .control .material-icons {
+  line-height: 37px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.autocomplete-suggestions {
+  border: 1px solid #e5e9ec;
+  background: #FFF;
+  overflow: auto;
+}
+
+.autocomplete-suggestion {
+  padding: 2px 5px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.autocomplete-selected {
+  background: #F0F0F0;
+}
+
+.autocomplete-suggestions strong {
+  font-weight: bold;
+}
+
+.autocomplete-group {
+  padding: 2px 5px;
+}
+
+.autocomplete-group strong {
+  display: block;
+  border-bottom: 1px solid #000;
+}
+
+#logout-form {
+  display: inline-block;
+}
+
+.days-overdue-credit {
+  color: red;
+}
+
+.shipping-tax-display-table tr:first-child td {
+  border-top: 0;
+}
+
+.line-order-items td.control {
+  text-align: center;
+}
+
+.delete-line-order-btn {
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 45px;
+}
+
+.delete-line-order-btn:hover {
+  color: #F012BE;
+}
+
+#customer-credit-help {
+  display: inline-block;
+  float: right;
+}

@@ -1,0 +1,352 @@
+@model Phoneden.ViewModels.SaleOrderInvoiceDetailsViewModel
+
+<div class="row">
+  <div class="col-md-11">
+    <div class="grid simple">
+      <div class="grid-body no-border invoice-body">
+        <br>
+        <div class="pull-left">
+          <img src="@Url.Content("~/Content/assets/img/invoicelogo.png")" data-src="@Url.Content("~/Content/assets/img/invoicelogo.png")" data-src-retina="@Url.Content("~/Content/assets/img/invoicelogo.png")" class="invoice-logo" alt="">
+          <address>
+            <strong>Phoneden Ltd</strong><br />
+            Unit 402 Batley Enterprise Centre<br />
+            513 Bradford Road<br />
+            Batley, WF17 8LL<br />
+            <abbr title="Phone">P:</abbr> (123) 456-7890
+          </address>
+        </div>
+        <div class="pull-right">
+          <h2>invoice</h2>
+        </div>
+        <div class="clearfix"></div>
+        <br>
+        <br>
+        <div class="row">
+          <div class="col-md-9">
+            <h4 class="semi-bold">@Model.Invoice.Business.ContactFullName</h4>
+            <address>
+              <strong>@Model.Invoice.Business.Name</strong><br>
+              @Model.Invoice.Business.AddressLine1<br>
+              @Model.Invoice.Business.AddressLine2<br>
+              @Model.Invoice.Business.Area<br>
+              @Model.Invoice.Business.City, @Model.Invoice.Business.PostCode<br>
+              @Model.Invoice.Business.Country
+            </address>
+          </div>
+          <div class="col-md-3">
+            <br>
+            <div>
+              <div class="pull-left"> INVOICE NO: </div>
+              <div class="pull-right">@string.Format("PDI{0}", Model.Invoice.Id)</div>
+              <div class="clearfix"></div>
+            </div>
+            <div>
+              <div class="pull-left"> INVOICE DATE: </div>
+              <div class="pull-right">@string.Format("{0:dd MMM yyyy}", Model.Invoice.CreatedOn)</div>
+              <div class="clearfix"></div>
+              <br />
+            </div>
+            <div>
+              <div class="pull-left">INVOICE STATUS: </div>
+              <div class="pull-right">
+                @if (Model.Invoice.IsOutstanding())
+                {
+                  <span class="label label-danger">OUTSTANDING</span>
+                }
+                else if (Model.Invoice.IsOverpaid())
+                {
+                  <span class="label label-danger">OVERPAID</span>
+                }
+                else if (Model.Invoice.IsPartiallyPaid())
+                {
+                  <span class="label label-danger">PARTIAL PAYMENT</span>
+                }
+                else
+                {
+                  <span class="label label-success">SETTLED</span>
+                }
+              </div>
+              <div class="clearfix"></div>
+            </div>
+            <br>
+            <div class="well well-small green">
+              <div class="pull-left"> Total Due: </div>
+              <div class="pull-right">@Model.Invoice.Amount.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))</div>
+              <div class="clearfix"></div>
+            </div>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+        <br>
+        <br>
+        <br>
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width: 60px" class="unseen text-center">QTY</th>
+              <th class="text-left">DESCRIPTION</th>
+              <th style="width: 140px" class="text-right">UNIT PRICE</th>
+              <th style="width: 90px" class="text-right">TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (var lineItem in Model.Invoice.LineItems)
+            {
+              <tr>
+                <td class="unseen text-center">@lineItem.Quantity</td>
+                <td>@lineItem.ProductName - @lineItem.ProductColour - @lineItem.ProductQuality</td>
+                <td class="text-right">@lineItem.Price.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))</td>
+                <td class="text-right">@lineItem.CalculateTotal().ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))</td>
+              </tr>
+            }
+
+            <tr>
+              <td colspan="2" rowspan="7">
+                <h4 class="semi-bold">Terms and Conditions</h4>
+                <p>Thank you for your business. We do expect payment within 21 days, so please process this invoice within that time.</p>
+              </td>
+              <td class="text-right"><strong>Subtotal</strong></td>
+              <td class="text-right">
+                @Model.SaleOrder.CalculateLineItemsTotal().ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+              </td>
+            </tr>
+
+            @if (Model.Invoice.Returns.Any())
+            {
+              <tr>
+                <td class="text-right no-border"><strong>Returns</strong></td>
+                <td class="text-right">
+                  -@Model.Invoice.GetTotalReturns().ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+                </td>
+              </tr>
+            }
+
+            <tr>
+              <td class="text-right no-border"><strong>Shipping</strong></td>
+              <td class="text-right">
+                @Model.SaleOrder.PostageCost.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+              </td>
+            </tr>
+            <tr>
+              <td class="text-right no-border">
+                <div class="well well-small green">
+                  <strong>Total</strong>
+                </div>
+              </td>
+              <td class="text-right"><strong>@Model.Invoice.CalculateTotal().ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-1">
+    <div class="invoice-button-action-set">
+      <p>
+        <button class="btn btn-primary" type="button" onclick="window.print();" title="Print"><i class="far fa-file-alt"></i></button>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-11">
+    <div class="grid simple">
+      <div class="grid-body no-border invoice-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">Payment</span> Details
+              </h3>
+              <hr />
+            </div>
+            <div class="col-md-12">
+              <table class="table table-striped table-flip-scroll cf">
+                <thead class="cf">
+                  <tr>
+                    <th>
+                      Date
+                    </th>
+                    <th>
+                      Payment Method
+                    </th>
+                    <th>
+                      Currency
+                    </th>
+                    <th>
+                      Amount
+                    </th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach (var payment in Model.Invoice.Payments)
+                  {
+                    if (!payment.IsDeleted)
+                    {
+                      <tr>
+                        <td>
+                          @string.Format("{0:dd MMM yyyy}", payment.Date)
+                        </td>
+                        <td>
+                          @payment.Method
+                        </td>
+                        <td>
+                          @payment.Currency
+                        </td>
+                        <td>
+                          @payment.Amount.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+                        </td>
+                        <td>
+                          <a asp-controller="SaleOrderPayment"
+                             asp-action="Edit"
+                             asp-route-id="@payment.Id"
+                             class="btn btn-mini btn-success pull-right">
+                            Edit
+                          </a>
+
+                          <a asp-controller="SaleOrderPayment"
+                             asp-action="Delete"
+                             asp-route-id="@payment.Id"
+                             class="btn btn-mini btn-warning pull-right">
+                            Delete
+                          </a>
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="col-md-12">
+              @if (!Model.Invoice.IsDeleted)
+              {
+                <a asp-controller="SaleOrderPayment"
+                   asp-action="Create"
+                   asp-route-invoiceId="@Model.Invoice.Id"
+                   class="btn btn-primary pull-right">
+                  Record New Payment
+                </a>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-11">
+    <div class="grid simple">
+      <div class="grid-body no-border invoice-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">Returns</span> Details
+              </h3>
+              <hr />
+            </div>
+            <div class="col-md-12">
+              <table class="table table-striped table-flip-scroll cf">
+                <thead class="cf">
+                  <tr>
+                    <th>
+                      Created On
+                    </th>
+                    <th>
+                      Quantity
+                    </th>
+                    <th>
+                      Product
+                    </th>
+                    <th>
+                      Fault Verified
+                    </th>
+                    <th>
+                      Resolution
+                    </th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach (var item in Model.Invoice.Returns)
+                  {
+                    if (!item.IsDeleted)
+                    {
+                      <tr>
+                        <td>
+                          @string.Format("{0:dd MMM yyyy}", item.CreatedOn)
+                        </td>
+                        <td>
+                          @item.Quantity
+                        </td>
+                        <td>
+                          @item.ProductName
+                        </td>
+                        <td>
+                          @if (item.IsVerified)
+                          {
+                            <span class="label label-success">Fault Verified</span>
+                          }
+                          else
+                          {
+                            <span class="label label-danger">Fault Unverified</span>
+                          }
+                        </td>
+                        <td>
+                          @item.Resolution
+                        </td>
+                        <td>
+                          <a asp-controller="SaleOrderReturn"
+                             asp-action="Edit"
+                             asp-route-id="@item.Id"
+                             class="btn btn-mini btn-success pull-right">
+                            Edit
+                          </a>
+
+                          <a asp-controller="SaleOrderReturn"
+                             asp-action="Delete"
+                             asp-route-id="@item.Id"
+                             class="btn btn-mini btn-warning pull-right">
+                            Delete
+                          </a>
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <div class="col-md-12">
+              @if (!Model.Invoice.IsDeleted)
+              {
+                <a asp-controller="SaleOrderReturn"
+                   asp-action="Create"
+                   asp-route-invoiceId="@Model.Invoice.Id"
+                   class="btn btn-primary pull-right">
+                  Record New Return
+                </a>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-11">
+    <a asp-controller="SaleOrderInvoice"
+       asp-action="Page"
+       asp-route-showDeleted="false"
+       class="btn btn-default pull-right">
+      Back to Invoices
+    </a>
+  </div>
+</div>

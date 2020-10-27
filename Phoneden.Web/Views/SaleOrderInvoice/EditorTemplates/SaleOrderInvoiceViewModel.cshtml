@@ -1,0 +1,86 @@
+@model Phoneden.ViewModels.SaleOrderInvoiceViewModel
+
+@if (!ViewData.ModelState.IsValid)
+{
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert"></button>
+    <h4 class="alert-heading">Error!</h4>
+    <div asp-validation-summary="All" class="text-danger"></div>
+  </div>
+}
+
+<form asp-controller="SaleOrderInvoice" asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post" role="form">
+  <input asp-for="SaleOrderId" type="hidden" id="order-id" />
+
+  @if (Model.Id != 0)
+  {
+    <input asp-for="Id" type="hidden" />
+  }
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="grid simple">
+        <div class="grid-body no-border">
+          <br>
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">Invoice</span> Details
+              </h3>
+              <hr />
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group">
+                <label asp-for="DueDate" class="form-label"></label>
+                <div class="controls">
+                  <div class="input-group">
+                    <input asp-for="DueDate" class="form-control" />
+                    <span class="input-group-addon">
+                      <i class="far fa-calendar-alt"></i>
+                    </span>
+                    <span asp-validation-for="DueDate" class="text-danger"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group">
+                <label asp-for="Amount" class="form-label"></label>
+                <div class="controls">
+                  <input type="text" class="form-control" value="@Model.Amount.ToString("0.##")" disabled="disabled" />
+                  <input asp-for="Amount" id="amount" type="hidden" />
+                  <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group">
+                <label asp-for="Discount" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="Discount" class="form-control" />
+                  <span asp-validation-for="Discount" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <input type="submit" value="@Model.ButtonText" class="btn btn-primary pull-right" />
+
+      <a asp-controller="SaleOrderInvoice"
+         asp-action="Page"
+         asp-route-showDeleted="false"
+         class="btn btn-default pull-right">
+        Back to Invoices
+      </a>
+    </div>
+  </div>
+</form>

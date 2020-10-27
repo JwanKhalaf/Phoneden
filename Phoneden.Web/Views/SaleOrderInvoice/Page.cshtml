@@ -1,0 +1,155 @@
+@model Phoneden.ViewModels.SaleOrderInvoicePageViewModel
+
+@{
+  ViewBag.Title = "Sale Order Invoices";
+}
+
+<div class="page-title">
+  <h3>Sale Order Invoices</h3>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="grid simple">
+      <div class="grid-body no-border">
+        <br>
+        <div class="row">
+          <div class="col-md-12">
+            <h3 class="all-caps">
+              <span class="semi-bold">Filter</span> Invoices
+            </h3>
+            <hr />
+          </div>
+        </div>
+
+        <form asp-controller="SaleOrderInvoice" asp-action="Page" method="get" role="form">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label class="form-label" for="Search_SearchTerm">Invoice Id</label>
+                <div class="controls">
+                  <input asp-for="Search.SearchTerm" class="form-control" />
+                  <span asp-validation-for="Search.SearchTerm" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <div class="checkbox check-success">
+                  <input asp-for="Search.ShowDeleted" type="checkbox" />
+                  <label asp-for="Search.ShowDeleted"></label>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <button type="submit" class="btn btn-primary pull-right">Update Results</button>
+              <a asp-controller="SaleOrderInvoice" asp-action="Page" class="btn btn-default pull-right">Reset</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="grid simple">
+      <div class="grid-body no-border">
+        <table class="table table-striped table-flip-scroll cf">
+          <thead class="cf">
+            <tr>
+              <th>
+                Invoice Id
+              </th>
+              <th>
+                Business
+              </th>
+              <th>
+                Amount
+              </th>
+              <th>
+                Status
+              </th>
+              <th>
+                Remaining Amount
+              </th>
+              <th>
+                Created On
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (var invoice in Model.Invoices)
+            {
+              <tr>
+                <td>
+                  @invoice.Id
+                  @if (invoice.IsDeleted)
+                  {
+                    <span class="label label-inverse">DELETED</span>
+                  }
+                </td>
+                <td>
+                  @invoice.Business.Name
+                </td>
+                <td>
+                  @invoice.Amount.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+                </td>
+                <td>
+                  @if (invoice.IsOutstanding())
+                  {
+                    <span class="label label-danger">OUTSTANDING</span>
+                  }
+                  else if (invoice.IsOverpaid())
+                  {
+                    <span class="label label-danger">OVERPAID</span>
+                  }
+                  else if (invoice.IsPartiallyPaid())
+                  {
+                    <span class="label label-danger">PARTIAL PAYMENT</span>
+                  }
+                  else
+                  {
+                    <span class="label label-success">SETTLED</span>
+                  }
+                </td>
+                <td>
+                  @invoice.RemainingAmount.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+                </td>
+                <td>
+                  @string.Format("{0:dd MMM yyyy}", invoice.CreatedOn)
+                </td>
+                <td>
+                  <a asp-controller="SaleOrderInvoice"
+                     asp-action="Details"
+                     asp-route-saleOrderInvoiceId="@invoice.Id"
+                     class="btn btn-mini btn-success pull-right">
+                    View
+                  </a>
+
+                  @if (!invoice.IsDeleted)
+                  {
+                    <a asp-controller="SaleOrderInvoice"
+                       asp-action="Delete"
+                       asp-route-id="@invoice.Id"
+                       class="btn btn-mini btn-danger pull-right">
+                      Delete
+                    </a>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <cs-pager cs-paging-pagesize="10"
+                  cs-paging-pagenumber="@Model.Pagination.CurrentPage"
+                  cs-paging-totalitems="@Model.Pagination.TotalRecords"
+                  cs-pagenumber-param="page"
+                  asp-controller="SaleOrderInvoice"
+                  asp-action="Page">
+        </cs-pager>
+      </div>
+    </div>
+  </div>
+</div>

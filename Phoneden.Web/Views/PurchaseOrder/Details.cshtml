@@ -1,0 +1,12 @@
+@using Phoneden.ViewModels.PurchaseOrders
+@model Phoneden.ViewModels.PurchaseOrders.PurchaseOrderViewModel
+
+@{
+    ViewBag.Title = "Purchase Order " + Model.Id;
+}
+
+<div class="page-title">
+  <h3>Purchase Order Details</h3>
+</div>
+
+@Html.DisplayFor(m => m)

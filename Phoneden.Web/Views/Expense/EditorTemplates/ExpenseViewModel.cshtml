@@ -1,0 +1,86 @@
+@using  Phoneden.Entities
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.ExpenseViewModel
+
+<form asp-controller="Expense" asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post" role="form">
+  <div asp-validation-summary="All" class="text-danger"></div>
+
+  @if (Model.Id != 0)
+  {
+    <input asp-for="Id" type="hidden" />
+  }
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="grid simple">
+        <div class="grid-body no-border">
+          <br>
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">Expense</span> Details
+              </h3>
+              <hr />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label asp-for="Date" class="form-label"></label>
+                <div class="controls">
+                  <div class="input-group">
+                    <input asp-for="Date" class="form-control" />
+                    <span class="input-group-addon"><i class="fa fa-th"></i></span>
+                  </div>
+                  <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label asp-for="Method" class="form-label"></label>
+                <div class="controls">
+                  <select asp-for="Method" asp-items="Html.GetEnumSelectList<PaymentMethod>()" class="form-control">
+                    <option>Select a method</option>
+                  </select>
+                  <span asp-validation-for="Method" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label asp-for="Amount" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="Amount" class="form-control" />
+                  <span asp-validation-for="Amount" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group">
+                <label asp-for="Reason" class="form-label"></label>
+                <div class="controls">
+                  <textarea asp-for="Reason" class="form-control"></textarea>
+                  <span asp-validation-for="Reason" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <input type="submit" value="@Model.ButtonText" class="btn btn-primary pull-right" />
+
+      <a asp-controller="Expense"
+         asp-action="Page"
+         asp-route-showDeleted="false"
+         class="btn btn-default pull-right">
+        Back to Expenses
+      </a>
+    </div>
+  </div>
+</form>

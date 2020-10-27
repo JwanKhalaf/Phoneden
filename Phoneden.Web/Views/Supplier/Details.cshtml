@@ -1,0 +1,12 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.SupplierViewModel
+
+@{
+  ViewBag.Title = @Model.Name + " Details";
+}
+
+<div class="page-title">
+  <h3>Supplier Details</h3>
+</div>
+
+@Html.DisplayFor(m => m)

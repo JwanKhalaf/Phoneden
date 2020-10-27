@@ -1,0 +1,58 @@
+@using Phoneden.Entities
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.LoginViewModel
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+  ViewData["Title"] = "Log in";
+  Layout = "_LoginLayout";
+}
+
+
+<div class="row login-container column-seperation">
+  <div class="col-md-5 col-md-offset-1">
+    <h2>Sign in to Phoneden</h2>
+
+    <p>Welcome to Phoneden. If you do not have your login details, please contact your system administrator and ask them to issue you with a new login.</p>
+
+    <p>Once you have your login details, simply log in to gain access to the system.</p>
+  </div>
+  <div class="col-md-5">
+    <br>
+    <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+      <div class="row">
+        <div class="form-group col-md-10">
+          <label asp-for="Email"></label>
+          <input asp-for="Email" class="form-control" />
+          <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col-md-10">
+          <label asp-for="Password"></label>
+          <input asp-for="Password" class="form-control" />
+          <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="control-group col-md-10">
+          <div class="checkbox checkbox check-success">
+            <label asp-for="RememberMe">
+              <input asp-for="RememberMe" />
+              @Html.DisplayNameFor(m => m.RememberMe)
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-10">
+          <button class="btn btn-primary pull-right" type="submit">Login</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+@section Scripts {
+  @await Html.PartialAsync("_ValidationScriptsPartial")
+}

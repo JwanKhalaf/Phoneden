@@ -1,0 +1,66 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.CategoryViewModel
+
+<form asp-controller="Category" asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post" role="form">
+
+  @if (Model.Id != 0)
+  {
+    <input asp-for="Id" type="hidden" />
+  }
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="grid simple">
+        <div class="grid-body no-border">
+          <br>
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">Category</span> Details
+              </h3>
+              <hr />
+            </div>
+
+            <div class="col-md-12">
+              <div class="form-group">
+                <label asp-for="Name" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="Name" class="form-control" />
+                  <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+              </div>
+
+              @if (Model.Categories.Any())
+              {
+                <div class="form-group">
+                  <label asp-for="ParentCategoryId" class="form-label"></label>
+                  <div class="controls">
+                    <select asp-for="ParentCategoryId"
+                            asp-items="@(new SelectList(Model.Categories, "Value", "Text"))"
+                            class="form-control">
+                      <option value="">Select a Parent Category</option>
+                    </select>
+                    <span asp-validation-for="ParentCategoryId" class="text-danger"></span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <input type="submit" value="@Model.ButtonText" class="btn btn-primary pull-right" />
+
+      <a asp-controller="Category"
+         asp-action="Page"
+         asp-route-showDeleted="false"
+         class="btn btn-default pull-right">
+        Back to Categories
+      </a>
+    </div>
+  </div>
+</form>

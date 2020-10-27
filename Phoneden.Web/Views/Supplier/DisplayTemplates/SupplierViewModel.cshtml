@@ -1,0 +1,384 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.SupplierViewModel
+
+<div class="row">
+  <div class="col-md-7">
+    <div class="grid simple">
+      <div class="grid-body no-border">
+        <br>
+        <div class="row">
+          <div class="col-md-12 col-sm-8 col-xs-8">
+            <h1 class="all-caps">
+              <span class="semi-bold">@Model.Name</span>
+            </h1>
+
+            <h4>
+              <i class="far fa-compass"></i>&nbsp;&nbsp; <a href='$"http://{@Model.Website}"' target="_blank">@Model.Website</a>
+            </h4>
+            <h4>
+              <i class="far fa-envelope"></i>&nbsp;&nbsp; <a href="mailto:@Model.Email">@Model.Email</a>
+            </h4>
+            <h4>
+              <i class="far fa-comment-dots"></i>&nbsp;&nbsp; @Model.Phone
+            </h4>
+            <h5>
+              @if (Model.IsDeleted)
+              {
+                <span class="label label-inverse">DELETED</span>
+              }
+              else
+              {
+                <span class="label label-success">ACTIVE</span>
+              }
+            </h5>
+            <hr />
+            <p>@Html.DisplayFor(model => model.Description)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="active">
+        <a href="#purchase-orders" role="tab" data-toggle="tab" aria-expanded="false">Purchase Orders</a>
+      </li>
+      <li>
+        <a href="#addresses" role="tab" data-toggle="tab" aria-expanded="true">Addresses</a>
+      </li>
+      <li>
+        <a href="#contacts" role="tab" data-toggle="tab" aria-expanded="true">Contacts</a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="purchase-orders">
+        <div class="row column-seperation">
+          <div class="col-md-12">
+            @if (!Model.PurchaseOrders.Any())
+            {
+              <div class="alert alert-block alert-warning fade in">
+                <h4 class="alert-heading">Note!</h4>
+                <p>It looks like you haven't made any <strong>orders</strong> from your supplier @Model.Name yet!</p>
+
+                @if (!Model.IsDeleted)
+                {
+                  <div class="button-set">
+                    <a asp-controller="PurchaseOrder"
+                       asp-action="Create"
+                       class="btn btn-success">
+                      Make New Purchase Order
+                    </a>
+                  </div>
+                }
+              </div>
+            }
+            else
+            {
+              <table class="table table-striped table-flip-scroll cf">
+                <thead class="cf">
+                  <tr>
+                    <th>
+                      Order Id
+                    </th>
+                    <th>
+                      Order Date
+                    </th>
+                    <th>
+                      Is Invoiced
+                    </th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach (var purchaseOrder in Model.PurchaseOrders)
+                  {
+                    <tr>
+                      <td>
+                        @($"PO{purchaseOrder.Id}")
+                      </td>
+                      <td>
+                        @purchaseOrder.CreatedOn)
+                      </td>
+                      <td>
+                        @if (purchaseOrder.Invoice == null)
+                        {
+                          <span class="label label-inverse">NOT INVOICED</span>
+                        }
+                        else
+                        {
+                          <a asp-controller="PurchaseOrderInvoice"
+                             asp-action="Details"
+                             asp-route-purchaseOrderInvoiceId="@purchaseOrder.Invoice.Id">
+                            <span class="label label-success">INVOICED</span>
+                          </a>
+                        }
+                      </td>
+                      <td>
+                        <a asp-controller="PurchaseOrder"
+                           asp-action="Details"
+                           asp-route-id="@purchaseOrder.Id"
+                           class="btn btn-mini btn-warning">
+                          View
+                        </a>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="addresses">
+        <div class="row column-seperation">
+          <div class="col-md-12">
+            @if (!Model.Addresses.Any())
+            {
+              <div class="alert alert-block alert-warning fade in">
+                <h4 class="alert-heading">Note!</h4>
+                <p>It looks like you haven't added any <strong>addresses</strong> for your supplier @Model.Name yet!</p>
+                <div class="button-set">
+                  <button class="btn btn-success" type="button">Add New Address</button>
+                </div>
+              </div>
+            }
+            else
+            {
+              <table class="table table-striped table-flip-scroll cf">
+                <thead class="cf">
+                  <tr>
+                    <th>
+                      Address Line 1
+                    </th>
+                    <th>
+                      Address Line 2
+                    </th>
+                    <th>
+                      City
+                    </th>
+                    <th>
+                      County
+                    </th>
+                    <th>
+                      Country
+                    </th>
+                    <th>
+                      Post Code
+                    </th>
+                    <th>
+                      Status
+                    </th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach (var address in Model.Addresses)
+                  {
+                    <tr>
+                      <td>
+                        @address.AddressLine1
+                      </td>
+                      <td>
+                        @address.AddressLine2
+                      </td>
+                      <td>
+                        @address.City
+                      </td>
+                      <td>
+                        @address.County
+                      </td>
+                      <td>
+                        @address.Country
+                      </td>
+                      <td>
+                        @address.PostCode
+                      </td>
+                      <td>
+                        @if (address.IsDeleted)
+                        {
+                          <span class="label label-inverse">DELETED</span>
+                        }
+                        else
+                        {
+                          <span class="label label-success">ACTIVE</span>
+                        }
+                      </td>
+                      <td>
+                        @if (!address.IsDeleted)
+                        {
+                          <a asp-controller="Address"
+                             asp-action="Edit"
+                             asp-route-id="@address.Id"
+                             asp-route-isSupplierAddress="true"
+                             class="btn btn-mini btn-warning pull-right">
+                            Edit
+                          </a>
+
+                          if (Model.ShowAddressesDeleteButton)
+                          {
+                            <a asp-controller="Address"
+                               asp-action="Delete"
+                               asp-route-id="@address.Id"
+                               asp-route-businessId="@Model.Id"
+                               asp-route-isSupplierAddress="true"
+                               class="btn btn-mini btn-danger pull-right">
+                              Delete
+                            </a>
+                          }
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+
+          @if (!Model.IsDeleted)
+          {
+            <div class="col-md-12">
+              <a asp-controller="Address"
+                 asp-action="Create"
+                 asp-route-businessId="@Model.Id"
+                 asp-route-isSupplierAddress="true"
+                 class="btn btn-primary pull-right">
+                Add New Address
+              </a>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="tab-pane" id="contacts">
+        <div class="row">
+          <div class="col-md-12">
+            @if (!Model.Contacts.Any())
+            {
+              <div class="alert alert-block alert-warning fade in">
+                <h4 class="alert-heading">Note!</h4>
+                <p>It looks like you haven't added any <strong>contacts</strong> for your supplier @Model.Name yet!</p>
+                <div class="button-set">
+                  <button class="btn btn-success" type="button">Add New Contact</button>
+                </div>
+              </div>
+            }
+            else
+            {
+              <table class="table table-striped table-flip-scroll cf">
+                <thead class="cf">
+                  <tr>
+                    <th>
+                      Title
+                    </th>
+                    <th>
+                      First Name
+                    </th>
+                    <th>
+                      Last Name
+                    </th>
+                    <th>
+                      Department
+                    </th>
+                    <th>
+                      Email
+                    </th>
+                    <th>
+                      Phone
+                    </th>
+                    <th>
+                      Status
+                    </th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach (var contact in Model.Contacts)
+                  {
+                    <tr>
+                      <td>
+                        @contact.Title
+                      </td>
+                      <td>
+                        @contact.FirstName
+                      </td>
+                      <td>
+                        @contact.LastName
+                      </td>
+                      <td>
+                        @contact.Department
+                      </td>
+                      <td>
+                        @contact.Email
+                      </td>
+                      <td>
+                        @contact.Phone
+                      </td>
+                      <td>
+                        @if (contact.IsDeleted)
+                        {
+                          <span class="label label-inverse">DELETED</span>
+                        }
+                        else
+                        {
+                          <span class="label label-success">ACTIVE</span>
+                        }
+                      </td>
+                      <td>
+                        @if (!contact.IsDeleted)
+                        {
+                          <a asp-controller="Contact"
+                             asp-action="Edit"
+                             asp-route-id="@contact.Id"
+                             asp-route-isSupplierContact="true"
+                             class="btn btn-mini btn-warning pull-right">
+                            Edit
+                          </a>
+
+                          if (Model.ShowContactsDeleteButton)
+                          {
+                            <a asp-controller="Contact"
+                               asp-action="Delete"
+                               asp-route-id="@contact.Id"
+                               asp-route-businessId="@Model.Id"
+                               asp-route-isSupplierContact="true"
+                               class="btn btn-mini btn-danger pull-right">
+                              Delete
+                            </a>
+                          }
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+
+          @if (!Model.IsDeleted)
+          {
+            <div class="col-md-12">
+              <a asp-controller="Contact"
+                 asp-action="Create"
+                 asp-route-businessId="@Model.Id"
+                 asp-route-isSupplierContact="true"
+                 class="btn btn-primary pull-right">
+                Add New Contact
+              </a>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <a asp-controller="Supplier"
+       asp-action="page"
+       asp-route-showDeleted="false"
+       class="btn btn-default pull-right">
+      Back to Suppliers
+    </a>
+  </div>
+</div>

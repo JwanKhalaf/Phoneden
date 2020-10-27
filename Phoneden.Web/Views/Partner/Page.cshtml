@@ -1,0 +1,84 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.PartnerPageViewModel
+
+@{
+  ViewBag.Title = "Business Partners";
+}
+
+<div class="page-title">
+  <h3>Partners</h3>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="grid simple">
+      <div class="grid-title no-border">
+        <div>
+          @{
+            var deletedFlag = !ViewBag.ShowDeleted;
+          }
+
+          @Html.ActionLink(ViewBag.ShowDeleted ? "Hide Deleted" : "Show Deleted", "Page", new { showDeleted = deletedFlag }, new { @class = "btn btn-mini btn-info" })
+        </div>
+      </div>
+      <div class="grid-body no-border">
+        <table class="table table-striped table-flip-scroll cf">
+          <thead class="cf">
+            <tr>
+              <th>
+                @Html.DisplayNameFor(model => model.Partners.First().FullName)
+              </th>
+              <th>
+                @Html.DisplayNameFor(model => model.Partners.First().IsDeleted)
+              </th>
+              <th>
+                @Html.DisplayNameFor(model => model.Partners.First().Email)
+              </th>
+              <th>
+                @Html.DisplayNameFor(model => model.Partners.First().Phone)
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (var partner in Model.Partners)
+            {
+              <tr>
+                <td>
+                  @Html.DisplayFor(s => partner.FullName)
+                </td>
+                <td>
+                  @if (partner.IsDeleted)
+                  {
+                    <span class="label label-inverse">DELETED</span>
+                  }
+                </td>
+                <td>
+                  @Html.DisplayFor(s => partner.Email)
+                </td>
+                <td>
+                  @Html.DisplayFor(s => partner.Phone)
+                </td>
+                <td>
+                  @Html.ActionLink("View", "Details", "Partner", new { id = partner.Id }, new { @class = "btn btn-mini btn-success" })&nbsp;
+                  @if (!partner.IsDeleted)
+                  {
+                    @Html.ActionLink("Edit", "Edit", "Partner", new { id = partner.Id }, new { @class = "btn btn-mini btn-warning" })<text>&nbsp;</text>
+                    @Html.ActionLink("Delete", "Delete", "Partner", new { id = partner.Id }, new { @class = "btn btn-mini btn-danger" })
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <cs-pager cs-paging-pagesize="10"
+                  cs-paging-pagenumber="@Model.Pagination.CurrentPage"
+                  cs-paging-totalitems="@Model.Pagination.TotalRecords"
+                  cs-pagenumber-param="page"
+                  asp-controller="Partner"
+                  asp-action="Page">
+        </cs-pager>
+      </div>
+    </div>
+    @Html.ActionLink("Add New Partner", "Create", "Partner", null, new { @class = "btn btn-primary btn-cons pull-right" })
+  </div>
+</div>

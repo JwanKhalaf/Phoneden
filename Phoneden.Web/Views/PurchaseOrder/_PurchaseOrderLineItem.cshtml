@@ -1,0 +1,53 @@
+@using Phoneden.Entities.Shared
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.PurchaseOrderLineItemViewModel
+
+<tr class="line-order">
+  <td class="control">
+    <i class="far fa-trash-alt delete-line-order-btn"></i>
+    <input asp-for="Id" type="hidden" class="poli-id"/>
+    <input asp-for="OrderId" type="hidden" class="poli-order-id"/>
+  </td>
+  <td>
+    <div class="form-group">
+      <input asp-for="Name" class="form-control poli-product-name" />
+      <span asp-validation-for="Name" class="text-danger"></span>
+      <input asp-for="ProductId" type="hidden" class="poli-product-id" />
+    </div>
+  </td>
+  <td>
+    <div class="form-group">
+      <input asp-for="Price" class="form-control poli-product-price" />
+      <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+  </td>
+  <td>
+    <div class="form-group">
+      <select asp-for="Currency"
+              asp-items="Html.GetEnumSelectList<Currency>()"
+              class="form-control poli-product-payment-currency">
+        <option>Select a Currency</option>
+      </select>
+      <span asp-validation-for="Currency" class="text-danger"></span>
+    </div>
+  </td>
+  <td>
+    <div class="form-group">
+      <input asp-for="PricePaidInGbp" class="form-control poli-product-price-paid-in-gbp" disabled value="0.00" />
+      <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+  </td>
+  <td>
+    <div class="form-group">
+      <div class="poli-product-conversion-rate-read">
+        <p>Not Applicable</p>
+      </div>
+    </div>
+  </td>
+  <td>
+    <div class="form-group">
+      <input asp-for="Quantity" class="form-control poli-product-quantity" />
+      <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+  </td>
+</tr>

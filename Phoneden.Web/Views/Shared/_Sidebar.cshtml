@@ -1,0 +1,188 @@
+
+<div class="page-sidebar " id="main-menu">
+  <div class="page-sidebar-wrapper scrollbar-dynamic" id="main-menu-wrapper">
+    <div class="user-info-wrapper sm">
+      <div class="profile-wrapper sm">
+        <img src="~/images/avatar.jpg" alt="" data-src="@Url.Content("~/images/avatar.jpg")" data-src-retina="@Url.Content("~/images/avatar2x.jpg")" asp-append-version="true" width="69" height="69" />
+        <div class="availability-bubble online"></div>
+      </div>
+      <div class="user-info sm">
+        <div class="username">@ViewBag.DisplayUsername</div>
+        <div class="status">Life goes on...</div>
+      </div>
+    </div>
+    <p class="menu-title sm">BROWSE <span class="pull-right"><a href="javascript:;"><i class="material-icons">refresh</i></a></span></p>
+    <ul>
+      <li is-active-route asp-controller="Home" asp-action="Index">
+        <a asp-controller="Home"
+           asp-action="Index">
+          <i class="material-icons">home</i>
+          <span class="title">Home</span>
+        </a>
+      </li>
+
+      @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+      {
+        <li is-active-route asp-controller="Supplier" asp-action="Page">
+          <a asp-controller="Supplier"
+             asp-action="Page">
+            <i class="material-icons">work</i>
+            <span class="title">Suppliers</span>
+          </a>
+        </li>
+
+        <li is-active-route asp-controller="Customer" asp-action="Page">
+          <a asp-controller="Customer"
+             asp-action="Page">
+            <i class="material-icons">account_box</i>
+            <span class="title">Customers</span>
+          </a>
+        </li>
+      }
+
+      <li is-active-route asp-controller="Product" asp-action="Page">
+        <a href="javascript:;">
+          <i class="material-icons">local_offer</i>
+          <span class="title">Inventory</span>
+          <span class=" arrow"></span>
+        </a>
+        <ul class="sub-menu">
+          <li>
+            <a asp-controller="Brand"
+               asp-action="Page">
+              Brands
+            </a>
+          </li>
+          <li>
+            <a asp-controller="Quality"
+               asp-action="Page">
+              Qualities
+            </a>
+          </li>
+          <li>
+            <a asp-controller="Category"
+               asp-action="Page">
+              Categories
+            </a>
+          </li>
+          <li>
+            <a asp-controller="Product"
+               asp-action="Page">
+              Products
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+      {
+        <li is-active-route asp-controller="PurchaseOrder" asp-action="Page">
+          <a href="javascript:;">
+            <i class="material-icons">assignment</i>
+            <span class="title">Purchase Orders</span>
+            <span class=" arrow"></span>
+          </a>
+          <ul class="sub-menu">
+            <li>
+              <a asp-controller="PurchaseOrder"
+                 asp-action="Page">
+                Purchase Orders
+              </a>
+            </li>
+            <li>
+              <a asp-controller="PurchaseOrderInvoice"
+                 asp-action="Page">
+                Purchase Order Invoices
+              </a>
+            </li>
+          </ul>
+        </li>
+      }
+
+      <li is-active-route asp-controller="SaleOrder" asp-action="Page">
+        <a href="javascript:;">
+          <i class="material-icons">assignment</i>
+          <span class="title">Sale Orders</span>
+          <span class=" arrow"></span>
+        </a>
+        <ul class="sub-menu">
+          <li>
+            <a asp-controller="SaleOrder"
+               asp-action="Page">
+              Sale Orders
+            </a>
+          </li>
+          <li>
+            <a asp-controller="SaleOrderInvoice"
+               asp-action="Page">
+              Sale Order Invoices
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li is-active-route asp-controller="Expense" asp-action="Page">
+        <a asp-controller="Expense"
+           asp-action="Page">
+          <i class="material-icons">attach_money</i>
+          <span class="title">Expenses</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="javascript:;">
+          <i class="material-icons">receipt</i>
+          <span class="title">Reports</span>
+          <span class=" arrow"></span>
+        </a>
+        <ul class="sub-menu">
+          <li>
+            <a asp-controller="Report"
+               asp-action="TopSuppliers">
+              Top Suppliers
+            </a>
+          </li>
+          <li>
+            <a asp-controller="Report"
+               asp-action="TopCustomers">
+              Top Customers
+            </a>
+          </li>
+          <li>
+            <a asp-controller="Report"
+               asp-action="Inventory">
+              Inventory
+            </a>
+          </li>
+          <li>
+            <a asp-controller="Report"
+               asp-action="Sales">
+              Sales
+            </a>
+          </li>
+          <li>
+            <a asp-controller="Report"
+               asp-action="OutstandingInvoices">
+              Outstanding Purchase Order Invoices
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <div class="clearfix"></div>
+  </div>
+</div>
+<a href="#" class="scrollup">Scroll</a>
+<div class="footer-widget">
+  <div class="progress transparent progress-small no-radius no-margin">
+    <div class="progress-bar progress-bar-success" data-percentage="79%" style="width: 79%;"></div>
+  </div>
+  <div class="pull-right">
+    <div class="details-status"> <span data-value="86" data-animation-duration="560">86</span>% </div>
+    <form asp-controller="Account" asp-action="Logout" method="post" id="logout-form">
+      <a href="#" onclick="document.getElementById('logout-form').submit();" title="Log Out">
+        <i class="material-icons">power_settings_new</i>
+      </a>
+    </form>
+  </div>
+</div>

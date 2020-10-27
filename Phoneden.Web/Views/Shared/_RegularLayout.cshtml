@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>@ViewData["Title"] | Phoneden</title>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link href="~/lib/pace/pace-theme-flash.css" rel="stylesheet" type="text/css" media="screen" />
+  <link href="~/lib/bootstrapv3/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <link href="~/lib/bootstrapv3/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/regular.css" integrity="sha384-ZlNfXjxAqKFWCwMwQFGhmMh3i89dWDnaFU2/VZg9CvsMGA7hXHQsPIqS+JIAmgEq" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/fontawesome.css" integrity="sha384-1rquJLNOM3ijoueaaeS5m+McXPJCGdr5HcA03/VHXxcp2kX2sUrQDmFc3jR5i/C7" crossorigin="anonymous">
+  <link href="~/lib/animate.min.css" rel="stylesheet" type="text/css" />
+  <link href="~/lib/jquery-scrollbar/jquery.scrollbar.css" rel="stylesheet" type="text/css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="~/css/webarch.css" rel="stylesheet" type="text/css" />
+  <link href="~/css/custom.css" rel="stylesheet" type="text/css" />
+  @RenderSection("styles", false)
+  <meta name="google-site-verification" content="HhpxFzskRHB4JTRuUXeTuk_M8cS6RzWABP15tuIMo9Y" />
+</head>
+
+<body class="">
+  <div class="header navbar navbar-inverse ">
+    <div class="navbar-inner">
+      <div class="header-seperation">
+        <ul class="nav pull-left notifcation-center visible-xs visible-sm">
+          <li class="dropdown">
+            <a href="#main-menu" data-webarch="toggle-left-side">
+              <i class="material-icons">menu</i>
+            </a>
+          </li>
+        </ul>
+        <a href="index.html">
+          <img src="~/images/logo.svg" class="logo" alt="Phoneden logo" width="106" height="21" />
+        </a>
+        <ul class="nav pull-right notifcation-center">
+          <li class="dropdown hidden-xs hidden-sm">
+            <a asp-controller="Home" asp-action="Index" class="dropdown-toggle active">
+              <i class="material-icons">home</i>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="header-quick-nav">
+        <div class="pull-left">
+          <ul class="nav quick-section">
+            <li class="quicklinks">
+              <a href="#" class="" id="layout-condensed-toggle">
+                <i class="material-icons">menu</i>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="notification-list" style="display:none">
+          <div style="width:300px">
+            <div class="notification-messages info">
+              <div class="user-profile">
+                <img src="~/images/d.jpg" alt="" data-src="@Url.Content("~/images/d.jpg")" data-src-retina="@Url.Content("~/images/d2x.jpg")" width="35" height="35">
+              </div>
+              <div class="message-wrapper">
+                <div class="heading">
+                  David Nester - Commented on your wall
+                </div>
+                <div class="description">
+                  Meeting postponed to tomorrow
+                </div>
+                <div class="date pull-left">
+                  A min ago
+                </div>
+              </div>
+              <div class="clearfix"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="pull-right">
+          <div class="chat-toggler sm">
+            <div class="profile-pic">
+              <img src="~/images/avatar_small.jpg" alt="" data-src="@Url.Content("~/images/avatar_small.jpg")" data-src-retina="@Url.Content("~/images/avatar_small2x.jpg")" width="35" height="35" />
+              <div class="availability-bubble online"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-container row-fluid">
+    @await Html.PartialAsync("_Sidebar")
+    <div class="page-content">
+      <div class="content">
+        @RenderBody()
+      </div>
+    </div>
+  </div>
+  <script src="@Url.Content("~/lib/pace/pace.min.js")" type="text/javascript"></script>
+  <script src="~/lib/jquery/jquery-1.11.3.min.js" type="text/javascript"></script>
+  <script src="~/lib/bootstrapv3/js/bootstrap.min.js" type="text/javascript"></script>
+  <script src="~/lib/jquery-block-ui/jqueryblockui.min.js" type="text/javascript"></script>
+  <script src="~/lib/jquery-unveil/jquery.unveil.min.js" type="text/javascript"></script>
+  <script src="~/lib/jquery-scrollbar/jquery.scrollbar.min.js" type="text/javascript"></script>
+  <script src="~/lib/jquery-numberAnimate/jquery.animateNumbers.js" type="text/javascript"></script>
+  <script src="~/lib/jquery-validation/js/jquery.validate.min.js" type="text/javascript"></script>
+  <script src="~/lib/bootstrap-select2/select2.min.js" type="text/javascript"></script>
+  <script src="~/js/webarch.js" type="text/javascript"></script>
+  @RenderSection("scripts", false)
+</body>
+</html>

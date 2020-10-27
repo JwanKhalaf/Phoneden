@@ -1,0 +1,141 @@
+@model Phoneden.ViewModels.PurchaseOrders.PurchaseOrderPageViewModel
+
+@{
+  ViewBag.Title = "Purchase Orders";
+}
+
+<div class="page-title">
+  <h3>Purchase Orders</h3>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="grid simple">
+      <div class="grid-title no-border">
+        <div>
+          @{
+            var deletedFlag = !ViewBag.ShowDeleted;
+          }
+
+          <a asp-controller="PurchaseOrder" asp-action="Page" asp-route-showDeleted="@deletedFlag" class="btn btn-mini btn-info pull-right">
+            @(ViewBag.ShowDeleted ? "Hide Deleted" : "Show Deleted")
+          </a>
+        </div>
+      </div>
+      <div class="grid-body no-border">
+        <table class="table table-striped table-flip-scroll cf">
+          <thead class="cf">
+          <tr>
+            <th>
+              Order Number
+            </th>
+            <th>
+              Status
+            </th>
+            <th>
+              Name
+            </th>
+            <th>
+              Is Invoiced?
+            </th>
+            <th>
+              Order Total
+            </th>
+            <th>
+              Date
+            </th>
+          </tr>
+          </thead>
+          <tbody>
+          @foreach (var purchaseOrder in Model.PurchaseOrders)
+          {
+            <tr>
+              <td>
+                @purchaseOrder.SupplierOrderNumber
+                @if (purchaseOrder.IsDeleted)
+                {
+                  <span class="label label-inverse">DELETED</span>
+                }
+              </td>
+              <td>
+                @purchaseOrder.Status
+              </td>
+              <td>
+                @purchaseOrder.SupplierName
+              </td>
+              <td>
+                @if (purchaseOrder.IsInvoiced)
+                {
+                  <a asp-controller="PurchaseOrderInvoice"
+                     asp-action="Details"
+                     asp-route-purchaseOrderInvoiceId="@purchaseOrder.Invoice.Id">
+                    <span class="label label-success">INVOICED</span>
+                  </a>
+                }
+                else
+                {
+                  <span class="label label-inverse">NOT INVOICED</span>
+                }
+              </td>
+              <td>
+                @purchaseOrder.CalculatePurchaseOrderTotalInGbp().ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+              </td>
+              <td>
+                @string.Format("{0:dd MMM yyyy}", purchaseOrder.Date)
+              </td>
+
+              <td>
+                <a asp-controller="PurchaseOrder"
+                   asp-action="Details"
+                   asp-route-id="@purchaseOrder.Id"
+                   class="btn btn-mini btn-success pull-right">
+                  View
+                </a>
+                
+                @if (!purchaseOrder.IsDeleted)
+                {
+                  <a asp-controller="PurchaseOrder"
+                     asp-action="Edit"
+                     asp-route-id="@purchaseOrder.Id"
+                     class="btn btn-mini btn-warning pull-right">
+                    Edit
+                  </a>
+                  
+                  <a asp-controller="PurchaseOrder"
+                     asp-action="Delete"
+                     asp-route-id="@purchaseOrder.Id"
+                     class="btn btn-mini btn-danger pull-right">
+                    Delete
+                  </a>
+                }
+                
+                @if (!purchaseOrder.IsInvoiced && !purchaseOrder.IsDeleted)
+                {
+                  <a asp-controller="PurchaseOrderInvoice"
+                     asp-action="Create"
+                     asp-route-purchaseOrderInvoiceId="@purchaseOrder.Id"
+                     class="btn btn-mini btn-primary">
+                    Generate Invoice
+                  </a>
+                }
+              </td>
+            </tr>
+          }
+          </tbody>
+        </table>
+        <cs-pager cs-paging-pagesize="10"
+                  cs-paging-pagenumber="@Model.Pagination.CurrentPage"
+                  cs-paging-totalitems="@Model.Pagination.TotalRecords"
+                  cs-pagenumber-param="page"
+                  asp-controller="PurchaseOrder"
+                  asp-action="Page">
+        </cs-pager>
+      </div>
+    </div>
+    <a asp-controller="PurchaseOrder"
+       asp-action="Create"
+       class="btn btn-primary pull-right">
+      New Purchase Order
+    </a>
+  </div>
+</div>

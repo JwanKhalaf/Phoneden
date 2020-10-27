@@ -1,0 +1,305 @@
+@using Phoneden.Entities
+@using Phoneden.Entities.Shared
+@using Phoneden.ViewModels.PurchaseOrders
+@using SelectList = Microsoft.AspNetCore.Mvc.Rendering.SelectList
+@model Phoneden.ViewModels.PurchaseOrders.PurchaseOrderViewModel
+
+@if (!ViewData.ModelState.IsValid)
+{
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert"></button>
+    <h4 class="alert-heading">Error!</h4>
+    <div asp-validation-summary="All" class="text-danger"></div>
+  </div>
+}
+
+<form asp-controller="PurchaseOrder" asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post" role="form">
+
+  @if (Model.Id != 0)
+  {
+    <input asp-for="Id" type="hidden" />
+  }
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="grid simple">
+        <div class="grid-body no-border">
+          <br>
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">General</span> Information
+              </h3>
+              <hr />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="SupplierId" class="form-label"></label>
+                    <div class="controls">
+                      <select asp-for="SupplierId"
+                              asp-items="@(new SelectList(Model.Suppliers, "Value", "Text"))"
+                              class="form-control">
+                        <option>Select a Supplier</option>
+                      </select>
+                      <span asp-validation-for="SupplierId" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="Date" class="form-label"></label>
+                    <div class="controls">
+                      <div class="input-group">
+                        <input asp-for="Date" class="form-control" />
+                        <span class="input-group-addon">
+                          <i class="far fa-calendar-alt"></i>
+                        </span>
+                      </div>
+                      <span asp-validation-for="Date" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="SupplierOrderNumber" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="SupplierOrderNumber" class="form-control" />
+                      <span asp-validation-for="SupplierOrderNumber" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="Status" class="form-label"></label>
+                    <div class="controls">
+                      <select asp-for="Status"
+                              asp-items="Html.GetEnumSelectList<PurchaseOrderStatus>()"
+                              class="form-control">
+                        <option>Select a Status</option>
+                      </select>
+                      <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="Vat" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="Vat" class="form-control" />
+                      <span asp-validation-for="Vat" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="ImportDuty" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="ImportDuty" class="form-control" />
+                      <span asp-validation-for="ImportDuty" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label asp-for="ShippingCost" class="form-label"></label>
+                    <div class="controls">
+                      @{ string shippingCost = Model.ShippingCost == 0 ? Model.ShippingCost.ToString("F") : Model.ShippingCost.ToString(); }
+                      <input asp-for="ShippingCost" class="form-control shipping-cost" value="@shippingCost" />
+                      <span asp-validation-for="ShippingCost" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label asp-for="ShippingCurrency" class="form-label"></label>
+                    <div class="controls">
+                      <select asp-for="ShippingCurrency"
+                              asp-items="Html.GetEnumSelectList<Currency>()"
+                              class="form-control shipping-currency">
+                        <option>Select a Currency</option>
+                      </select>
+                      <span asp-validation-for="ShippingCurrency" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label asp-for="ShippingCostPaidInGbp" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="ShippingCostPaidInGbp" class="form-control shipping-cost-in-gbp" />
+                      <span asp-validation-for="ShippingCostPaidInGbp" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label class="form-label">Conversion Rate</label>
+                    <div class="controls">
+                      <div class="shipping-conversion-rate-read">
+                        <p>Not Applicable</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="grid simple">
+        <div class="grid-body no-border">
+          <br />
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">Order</span> Products
+              </h3>
+              <hr />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <table class="table table-striped table-flip-scroll cf line-order-items">
+                <thead class="cf">
+                  <tr>
+                    <th>
+
+                    </th>
+                    <th>
+                      Barcode
+                    </th>
+                    <th>
+                      Product Id
+                    </th>
+                    <th>
+                      Unit Price
+                    </th>
+                    <th>
+                      Currency
+                    </th>
+                    <th>
+                      Price in GBP
+                    </th>
+                    <th>
+                      Conversion Rate
+                    </th>
+                    <th>
+                      Quantity
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (var counter = 0; counter < Model.LineItems.Count; counter++)
+                  {
+                    <tr class="line-order">
+                      <td class="control">
+                        <i class="far fa-trash-alt delete-line-order-btn"></i>
+                        <input asp-for="LineItems[counter].Id" type="hidden" class="poli-id" />
+                        <input asp-for="LineItems[counter].OrderId" type="hidden" class="poli-order-id" />
+                      </td>
+                      <td>
+                        <div class="form-group">
+                          <input asp-for="@Model.LineItems[counter].Barcode" class="form-control" />
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-group">
+                          @{ string name = string.IsNullOrEmpty(Model.LineItems[counter].Name) ? "" : $"{Model.LineItems[counter].Name} - {Model.LineItems[counter].Colour} - {Model.LineItems[counter].Quality}"; }
+                          <input asp-for="LineItems[counter].Name" class="form-control poli-product-name" value="@name" />
+                          <span asp-validation-for="LineItems[counter].Name" class="text-danger"></span>
+                          <input asp-for="LineItems[counter].ProductId" type="hidden" class="poli-product-id" />
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-group">
+                          @{ string lineItemPrice = Model.LineItems[counter].Price == 0 ? Model.LineItems[counter].Price.ToString("F") : Model.LineItems[counter].Price.ToString(); }
+                          <input asp-for="LineItems[counter].Price" class="form-control poli-product-price" value="@lineItemPrice" />
+                          <span asp-validation-for="LineItems[counter].Price" class="text-danger"></span>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-group">
+                          <select asp-for="LineItems[counter].Currency"
+                                  asp-items="Html.GetEnumSelectList<Currency>()"
+                                  class="form-control poli-product-payment-currency">
+                            <option>Select a Currency</option>
+                          </select>
+                          <span asp-validation-for="LineItems[counter].Currency" class="text-danger"></span>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-group">
+                          @if (Model.LineItems[counter].Currency == Currency.Gbp)
+                          {
+                            <input asp-for="LineItems[counter].PricePaidInGbp" class="form-control poli-product-price-paid-in-gbp" disabled value="0.00" />
+                            <span asp-validation-for="LineItems[counter].PricePaidInGbp" class="text-danger"></span>
+                          }
+                          else
+                          {
+                            <input asp-for="LineItems[counter].PricePaidInGbp" class="form-control poli-product-price-paid-in-gbp" />
+                            <span asp-validation-for="LineItems[counter].PricePaidInGbp" class="text-danger"></span>
+                          }
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-group">
+                          <div class="poli-product-conversion-rate-read">
+                            <p>Not Applicable</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-group">
+                          <input asp-for="LineItems[counter].Quantity" class="form-control poli-product-quantity" />
+                          <span asp-validation-for="LineItems[counter].Quantity" class="text-danger"></span>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              <a class="btn btn-default btn-cons pull-right add-line-item" href="#">Add Another Product</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <input type="submit" value="@Model.ButtonText" class="btn btn-primary pull-right" />
+
+      <a asp-controller="PurchaseOrder"
+         asp-action="Page"
+         asp-route-showDeleted="false"
+         class="btn btn-default pull-right">
+        Back to Purchase Orders
+      </a>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,12 @@
+@using Phoneden.ViewModels.SaleOrders
+@model Phoneden.ViewModels.SaleOrders.SaleOrderViewModel
+
+@{
+  ViewBag.Title = "Sale Order " + Model.Id;
+}
+
+<div class="page-title">
+  <h3>Sale Order Details</h3>
+</div>
+
+@Html.DisplayFor(m => m)

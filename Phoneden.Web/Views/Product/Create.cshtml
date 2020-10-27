@@ -1,0 +1,18 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.ProductViewModel
+
+@{
+  ViewBag.Title = "Add New Product";
+}
+
+<div class="page-title">
+  <h3>Add New Product</h3>
+</div>
+
+@Html.EditorFor(m => m)
+
+@section Scripts {
+  @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+  
+  <script src="~/js/product-create.js"></script>
+}

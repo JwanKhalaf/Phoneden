@@ -1,0 +1,28 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.SaleOrderLineItemViewModel
+
+<tr class="line-order">
+  <td class="control">
+    <i class="far fa-trash-alt delete-line-order-btn"></i>
+  </td>
+  <td>
+    <div class="form-group">
+      <div class="controls">
+        <input asp-for="ProductId" type="hidden" class="soli-product-id" />
+        <input asp-for="Id" type="hidden" class="soli-id" />
+        <input asp-for="SaleOrderId" type="hidden" class="soli-order-id" />
+        
+        <input asp-for="Name" class="form-control soli-product-name" />
+        <span asp-validation-for="ProductId" class="text-danger"></span>
+      </div>
+    </div>
+  </td>
+  <td>
+    <div class="form-group">
+      <div class="controls">
+        <input asp-for="Quantity" class="form-control soli-product-quantity" />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+      </div>
+    </div>
+  </td>
+</tr>

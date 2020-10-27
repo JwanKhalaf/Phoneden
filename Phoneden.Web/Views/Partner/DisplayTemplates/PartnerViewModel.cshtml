@@ -1,0 +1,41 @@
+@using Phoneden.ViewModels
+@model Phoneden.ViewModels.PartnerViewModel
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="grid simple">
+      <div class="grid-body no-border">
+        <br>
+        <div class="row">
+          <div class="col-md-12 col-sm-8 col-xs-8">
+            <h1 class="all-caps">
+              <span class="semi-bold">@Model.FullName</span>
+              @if (Model.IsDeleted)
+              {
+                <span class="label label-inverse">DELETED</span>
+              }
+              else
+              {
+                <span class="label label-success">ACTIVE</span>
+              }
+            </h1>
+
+            <h4>
+              <i class="fa fa-envelope" aria-hidden="true"></i>&nbsp;&nbsp; <a href="mailto:@Model.Email">@Model.Email</a>
+            </h4>
+            <h4>
+              <i class="fa fa-phone" aria-hidden="true"></i>&nbsp;&nbsp; @Model.Phone
+            </h4>
+            <h4>
+              <i class="fa fa-home" aria-hidden="true"></i>&nbsp;&nbsp; @Model.AddressLine1, @Model.City, @Model.PostCode
+            </h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    @Html.ActionLink("Back to Partners", "Page", "Partner", new { showDeleted = false }, new { @class = "btn btn-default pull-right" })
+  </div>
+</div>

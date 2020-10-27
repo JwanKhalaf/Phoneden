@@ -1,0 +1,69 @@
+@using Phoneden.ViewModels.Emails
+@model Phoneden.ViewModels.Emails.InvoiceEmailViewModel
+
+@{
+  Layout = "_Layout.cshtml";
+}
+
+<p>Dear @Model.CustomerFullName</p>
+
+<p>Below you will find details of your invoice for <strong>Order Number @Model.OrderId</strong> with Phoneden.</p>
+
+<p>
+  <strong>Order Date: @string.Format("{0:dd MMM yyyy}", Model.OrderDate)</strong>
+</p>
+
+<table border="0 " cellpadding="0 " cellspacing="0 " class="line-items ">
+  <thead>
+    <tr>
+      <th>Qty</th>
+      <th>Name</th>
+      <th>Unit Cost</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (InvoiceLineItemViewModel lineItem in Model.LineItems)
+    {
+      <tr>
+        <td>
+          @lineItem.Quantity
+        </td>
+        <td>
+          @lineItem.Name
+        </td>
+        <td>
+          @string.Format("{0:F2} GBP", lineItem.Price)
+        </td>
+        <td>
+          @string.Format("{0:F2} GBP", lineItem.LineTotal)
+        </td>
+      </tr>
+    }
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="4 ">
+        <hr />
+      </td>
+    </tr>
+    <tr>
+      <td colspan="3">
+        Shipping
+      </td>
+      <td>
+        @string.Format("{0:F2} GBP", Model.ShippingCost)
+      </td>
+    </tr>
+    <tr>
+      <td colspan="3" class="order-total ">
+        <strong>Total</strong>
+      </td>
+      <td class="order-total ">
+        <strong>@string.Format("{0:F2} GBP", Model.InvoiceTotal)</strong>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
+<p>Thank you for your business. If you have any questions, please do not hesitate to contact us.</p>

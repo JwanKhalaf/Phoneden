@@ -1,0 +1,160 @@
+@using Phoneden.ViewModels.SaleOrders
+@model Phoneden.ViewModels.SaleOrders.SaleOrderViewModel
+
+@if (!ViewData.ModelState.IsValid)
+{
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert"></button>
+    <h4 class="alert-heading">Error!</h4>
+    <div asp-validation-summary="All" class="text-danger"></div>
+  </div>
+}
+
+<form asp-controller="SaleOrder" asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post" role="form">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="grid simple">
+        <div class="grid-body no-border">
+          <br>
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">General</span> Information
+              </h3>
+              <hr />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label asp-for="CustomerId" class="form-label"></label>
+                <div class="controls">
+                  <select asp-for="CustomerId"
+                          asp-items="@(new SelectList(Model.Customers, "Value", "Text"))"
+                          class="form-control customer-select">
+                    <option>Select a Customer</option>
+                  </select>
+                  <span asp-validation-for="CustomerId" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group">
+                <label asp-for="Date" class="form-label"></label>
+                <div class="controls">
+                  <div class="input-group">
+                    <input asp-for="Date" class="form-control" />
+                    <span class="input-group-addon"><i class="far fa-calendar-alt"></i></span>
+                  </div>
+                  <span asp-validation-for="Date" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group">
+                <label asp-for="PostageCost" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="PostageCost" class="form-control" />
+                  <span asp-validation-for="PostageCost" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="grid simple">
+        <div class="grid-body no-border">
+          <br />
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">Order</span> Products
+              </h3>
+              <hr />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <table class="table table-striped table-flip-scroll cf line-order-items">
+                <thead class="cf">
+                  <tr>
+                    <th>
+
+                    </th>
+                    <th>
+                      Barcode
+                    </th>
+                    <th>
+                      Product Id
+                    </th>
+                    <th>
+                      Quantity
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (var counter = 0; counter < Model.LineItems.Count(); counter++)
+                  {
+                    <tr class="line-order">
+                      <td class="control">
+                        <i class="far fa-trash-alt delete-line-order-btn"></i>
+                      </td>
+                      <td>
+                        <div class="form-group">
+                          <div class="controls">
+                            <input asp-for="LineItems[counter].Barcode" class="form-control" />
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-group">
+                          <div class="controls">
+                            <input asp-for="LineItems[counter].ProductId" type="hidden" class="soli-product-id" />
+                            <input asp-for="LineItems[counter].Id" type="hidden" class="soli-id" />
+                            <input asp-for="LineItems[counter].SaleOrderId" type="hidden" class="soli-order-id" />
+
+                            <input asp-for="LineItems[counter].Name" class="form-control soli-product-name" />
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-group">
+                          <div class="controls">
+                            <input asp-for="LineItems[counter].Quantity" class="form-control soli-product-quantity" />
+                            <span asp-validation-for="LineItems[counter].Quantity" class="text-danger"></span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              <a class="btn btn-default btn-cons pull-right add-line-item" href="#">Add Another Product</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <input type="submit" value="@Model.ButtonText" class="btn btn-primary pull-right" />
+
+      <a asp-controller="SaleOrder"
+         asp-action="Page"
+         asp-route-showDeleted="false"
+         class="btn btn-default pull-right">
+        Back to Sale Orders
+      </a>
+    </div>
+  </div>
+</form>

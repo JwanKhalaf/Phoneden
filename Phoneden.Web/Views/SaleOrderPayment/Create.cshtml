@@ -1,0 +1,15 @@
+@model Phoneden.ViewModels.SaleOrderInviocePaymentViewModel
+
+@{
+  ViewBag.Title = "Record Sale Order Payment";
+}
+
+<div class="page-title">
+  <h3>Record Sale Order Payment</h3>
+</div>
+
+@Html.EditorFor(m => m)
+
+@section Scripts {
+  @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
