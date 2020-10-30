@@ -6,14 +6,22 @@ namespace Phoneden.Services
 
   public interface IReportService
   {
-    InventoryReportViewModel GetProducts(int page, InventoryReportSearchViewModel search);
+    InventoryReportViewModel GetProducts(
+      int page,
+      InventoryReportSearchViewModel search);
 
     IEnumerable<CustomerViewModel> GetTopTenCustomers();
 
     IEnumerable<SupplierViewModel> GetTopTenSuppliers();
 
-    SalesReportViewModel GetSaleOrders(int page, DateTime startDate, DateTime endDate);
+    CustomerSalesReportViewModel GetCustomerSaleOrders(
+      int page,
+      DateTime startDate,
+      DateTime endDate, int customerId);
 
-    OutstandingInvoicesReportViewModel GetOutstandingInvoices(int page, DateTime startDate, DateTime endDate);
+    OutstandingInvoicesReportViewModel GetOutstandingInvoices(
+      int page,
+      DateTime startDate,
+      DateTime endDate);
   }
 }

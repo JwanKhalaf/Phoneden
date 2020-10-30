@@ -3,10 +3,10 @@ namespace Phoneden.ViewModels
   using System;
   using System.Collections.Generic;
   using System.ComponentModel.DataAnnotations;
+  using Microsoft.AspNetCore.Mvc.Rendering;
   using Reports;
-  using SaleOrders;
 
-  public class SalesReportViewModel
+  public class CustomerSalesReportViewModel
   {
     [Display(Name = "From Date")]
     [DataType(DataType.Date)]
@@ -19,14 +19,19 @@ namespace Phoneden.ViewModels
     [DateGreaterThan("StartDate", "The End Date must come after Start Date")]
     public DateTime EndDate { get; set; }
 
-    public IEnumerable<SaleOrderViewModel> SaleOrders { get; set; }
+    [Display(Name = "Customer")]
+    public int CustomerId { get; set; }
+
+    public List<SelectListItem> Customers { get; set; }
+
+    public IEnumerable<CustomerSalesItemReportViewModel> SettledSaleOrders { get; set; }
 
     public PaginationViewModel Pagination { get; set; }
 
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:n} GBP")]
-    public decimal Total { get; set; }
+    public decimal TotalSales { get; set; }
 
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:n} GBP")]
-    public decimal Profit { get; set; }
+    public decimal TotalProfit { get; set; }
   }
 }

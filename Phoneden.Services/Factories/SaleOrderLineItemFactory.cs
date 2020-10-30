@@ -35,7 +35,9 @@ namespace Phoneden.Services
         Colour = lineItemViewModel.Colour,
         Quantity = lineItemViewModel.Quantity,
         Barcode = lineItemViewModel.Barcode,
+        Cost = lineItemViewModel.Cost,
       };
+
       return lineItem;
     }
 

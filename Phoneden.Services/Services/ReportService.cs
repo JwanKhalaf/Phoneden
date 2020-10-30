@@ -9,20 +9,25 @@ namespace Phoneden.Services
   using Interfaces;
   using Microsoft.EntityFrameworkCore;
   using ViewModels;
-  using ViewModels.SaleOrders;
 
   public class ReportService : IReportService
   {
     private readonly PdContext _context;
+
     private readonly int _recordsPerPage;
 
-    public ReportService(IPaginationConfiguration paginationSettings, PdContext context)
+    public ReportService(
+      IPaginationConfiguration paginationSettings,
+      PdContext context)
     {
       _context = context ?? throw new ArgumentNullException(nameof(context));
+
       _recordsPerPage = paginationSettings.RecordsPerPage;
     }
 
-    public InventoryReportViewModel GetProducts(int page, InventoryReportSearchViewModel search)
+    public InventoryReportViewModel GetProducts(
+      int page,
+      InventoryReportSearchViewModel search)
     {
       int totalNumberOfProducts = 0;
 
@@ -92,6 +97,7 @@ namespace Phoneden.Services
       inventoryReportVm.Search = search;
 
       TrackCurrentSearchTerm(inventoryReportVm);
+
       return inventoryReportVm;
     }
 
@@ -117,7 +123,11 @@ namespace Phoneden.Services
       return supplierVms;
     }
 
-    public SalesReportViewModel GetSaleOrders(int page, DateTime startDate, DateTime endDate)
+    public CustomerSalesReportViewModel GetCustomerSaleOrders(
+      int page,
+      DateTime startDate,
+      DateTime endDate,
+      int customerId)
     {
       if (startDate == null)
       {
@@ -129,27 +139,29 @@ namespace Phoneden.Services
         throw new ArgumentException(@"The start date cannot be set in the future!", nameof(startDate));
       }
 
-      IQueryable<SaleOrder> saleOrders = _context
-        .SaleOrders
-        .Include(so => so.Customer)
-        .Include(so => so.LineItems)
-        .Include(so => so.Invoice)
-        .ThenInclude(i => i.Payments)
-        .Include(so => so.Invoice)
-        .ThenInclude(i => i.Returns)
-        .ThenInclude(r => r.Product)
+      IQueryable<SaleOrderInvoice> saleOrderInvoices = _context
+        .SaleOrderInvoices
+        .Include(i => i.SaleOrder)
+        .ThenInclude(i => i.LineItems)
+        .Include(i => i.SaleOrder)
+        .ThenInclude(i => i.Customer)
+        .Include(soi => soi.InvoicedLineItems)
         .AsNoTracking()
-        .Where(so => so.Date >= startDate && so.Date <= endDate && !so.IsDeleted)
-        .OrderByDescending(so => so.Date)
+        .Where(soi => soi.SaleOrder.Date >= startDate && soi.SaleOrder.Date <= endDate && !soi.IsDeleted);
+
+      if (customerId != 0)
+      {
+        saleOrderInvoices =
+          saleOrderInvoices.Where(i => i.SaleOrder.CustomerId == customerId);
+      }
+
+      saleOrderInvoices = saleOrderInvoices
+        .OrderByDescending(soi => soi.SaleOrder.Date)
         .Skip(_recordsPerPage * (page - 1))
         .Take(_recordsPerPage);
 
-      List<SaleOrderViewModel> saleOrderVms = SaleOrderViewModelFactory.BuildList(saleOrders.ToList());
-
-      foreach (SaleOrderViewModel saleOrder in saleOrderVms)
-      {
-        CalculateSaleOrderProfit(saleOrder);
-      }
+      List<CustomerSalesItemReportViewModel> reportItems = CustomerSalesItemReportViewModelFactory
+        .BuildList(saleOrderInvoices.ToList());
 
       PaginationViewModel pagination = new PaginationViewModel();
       pagination.CurrentPage = 1;
@@ -158,28 +170,31 @@ namespace Phoneden.Services
         .SaleOrders
         .Count(so => so.Date >= startDate && so.Date <= endDate && !so.IsDeleted);
 
-      SalesReportViewModel saleReport = new SalesReportViewModel();
+      CustomerSalesReportViewModel saleReport = new CustomerSalesReportViewModel();
       saleReport.StartDate = startDate;
       saleReport.EndDate = endDate;
-      saleReport.SaleOrders = saleOrderVms;
+      saleReport.SettledSaleOrders = reportItems;
       saleReport.Pagination = pagination;
 
-      if (!saleReport.SaleOrders.Any())
+      if (!saleReport.SettledSaleOrders.Any())
       {
-        saleReport.Total = 0;
+        saleReport.TotalSales = 0;
       }
       else
       {
-        saleReport.Total = saleOrderVms
-          .Sum(so => so.Invoice.Amount - so.Invoice.Returns.Sum(r => r.Value));
+        saleReport.TotalSales = reportItems
+          .Sum(i => i.InvoiceTotal);
       }
 
-      saleReport.Profit = saleOrderVms.Sum(so => so.Profit);
+      saleReport.TotalProfit = reportItems.Sum(so => so.Profit);
 
       return saleReport;
     }
 
-    public OutstandingInvoicesReportViewModel GetOutstandingInvoices(int page, DateTime startDate, DateTime endDate)
+    public OutstandingInvoicesReportViewModel GetOutstandingInvoices(
+      int page,
+      DateTime startDate,
+      DateTime endDate)
     {
       if (startDate == null)
       {
@@ -234,33 +249,16 @@ namespace Phoneden.Services
       return reportVm;
     }
 
-    private static void TrackCurrentSearchTerm(InventoryReportViewModel viewModel)
+    private static void TrackCurrentSearchTerm(
+      InventoryReportViewModel viewModel)
     {
       viewModel.Search.PreviousSearchTerm = viewModel.Search.SearchTerm;
     }
 
-    private static bool HaveSearchTermsChanged(InventoryReportSearchViewModel searchVm)
+    private static bool HaveSearchTermsChanged(
+      InventoryReportSearchViewModel searchVm)
     {
       return !string.Equals(searchVm.SearchTerm, searchVm.PreviousSearchTerm);
-    }
-
-    private void CalculateSaleOrderProfit(SaleOrderViewModel saleOrder)
-    {
-      decimal totalProfitAcrossAllLineItems = 0;
-
-      foreach (SaleOrderLineItemViewModel lineItem in saleOrder.LineItems)
-      {
-        Product product = _context
-          .Products
-          .FirstOrDefault(p => p.Id == lineItem.ProductId);
-
-        if (product != null)
-        {
-          totalProfitAcrossAllLineItems += (lineItem.Price - product.UnitCostPrice) * lineItem.Quantity;
-        }
-      }
-
-      saleOrder.Profit = totalProfitAcrossAllLineItems;
     }
   }
 }

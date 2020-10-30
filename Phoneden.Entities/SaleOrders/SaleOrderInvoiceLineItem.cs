@@ -19,6 +19,8 @@ namespace Phoneden.Entities
 
     public decimal Price { get; set; }
 
+    public decimal Cost { get; set; }
+
     public int SaleOrderInvoiceId { get; set; }
 
     public SaleOrderInvoice SaleOrderInvoice { get; set; }

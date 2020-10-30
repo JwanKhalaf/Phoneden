@@ -15,6 +15,7 @@ namespace Phoneden.Web.Controllers
   public class SaleOrderController : BaseController
   {
     private readonly ISaleOrderService _saleOrderService;
+
     private readonly ICustomerService _customerService;
 
     public SaleOrderController(
