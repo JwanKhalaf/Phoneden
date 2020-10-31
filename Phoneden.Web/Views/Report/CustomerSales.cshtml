@@ -74,15 +74,19 @@
               <th>
                 Order Date
               </th>
+
               <th>
                 Invoice Id
               </th>
+
               <th>
                 Customer
               </th>
+
               <th>
                 Invoiced Total
               </th>
+
               <th>
                 Order Profit
               </th>
@@ -97,15 +101,19 @@
                   <td>
                     @string.Format("{0:dd MMM yyyy}", item.SaleOrderDate)
                   </td>
+
                   <td>
                     @item.InvoiceId
                   </td>
+
                   <td>
                     <a asp-controller="Customer" asp-action="Details" asp-route-id="@item.CustomerId">@item.CustomerName</a>
                   </td>
+
                   <td>
                     @item.InvoiceTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
                   </td>
+
                   <td>
                     @item.Profit.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
                   </td>
@@ -145,11 +153,21 @@
               </h3>
             </td>
           </tr>
+
           <tr>
             <td><h3 class="all-caps"><strong>Total Profit</strong></h3></td>
             <td>
               <h3>
                 @Model.TotalProfit.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+              </h3>
+            </td>
+          </tr>
+
+          <tr>
+            <td><h3 class="all-caps"><strong>Total Profit After Expenses</strong></h3></td>
+            <td>
+              <h3>
+                @Model.TotalProfitAfterExpenses.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
               </h3>
             </td>
           </tr>

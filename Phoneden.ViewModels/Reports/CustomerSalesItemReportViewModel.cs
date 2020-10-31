@@ -14,6 +14,8 @@ namespace Phoneden.ViewModels
 
     public decimal Profit { get; set; }
 
+    public decimal ProfitAfterExpenses { get; set; }
+
     public DateTime SaleOrderDate { get; set; }
   }
 }

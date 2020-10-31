@@ -33,5 +33,7 @@ namespace Phoneden.ViewModels
 
     [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:n} GBP")]
     public decimal TotalProfit { get; set; }
+
+    public decimal TotalProfitAfterExpenses { get; set; }
   }
 }

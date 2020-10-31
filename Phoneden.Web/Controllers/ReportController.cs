@@ -3,6 +3,7 @@ namespace Phoneden.Web.Controllers
   using System;
   using System.Collections.Generic;
   using System.Linq;
+  using System.Threading.Tasks;
   using Base;
   using Microsoft.AspNetCore.Mvc;
   using Microsoft.AspNetCore.Mvc.Rendering;
@@ -24,28 +25,34 @@ namespace Phoneden.Web.Controllers
       _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
     }
 
-    public ActionResult TopSuppliers()
+    public async Task<ActionResult> TopSuppliers()
     {
-      IEnumerable<SupplierViewModel> viewModel = _reportService.GetTopTenSuppliers();
+      IEnumerable<SupplierViewModel> viewModel = await _reportService
+        .GetTopTenSuppliersAsync();
+
       return View(viewModel);
     }
 
-    public ActionResult TopCustomers()
+    public async Task<ActionResult> TopCustomers()
     {
-      IEnumerable<CustomerViewModel> viewModel = _reportService.GetTopTenCustomers();
+      IEnumerable<CustomerViewModel> viewModel = await _reportService
+        .GetTopTenCustomersAsync();
+
       return View(viewModel);
     }
 
-    public ActionResult Inventory(
+    public async Task<ActionResult> Inventory(
       InventoryReportSearchViewModel search,
       int page = 1)
     {
-      InventoryReportViewModel viewModel = _reportService.GetProducts(page, search);
+      InventoryReportViewModel viewModel = await _reportService
+        .GetProductsAsync(page, search);
+
       return View(viewModel);
     }
 
     [HttpGet]
-    public ActionResult CustomerSales(
+    public async Task<ActionResult> CustomerSales(
       DateTime? startDate,
       DateTime? endDate,
       int customerId,
@@ -55,8 +62,8 @@ namespace Phoneden.Web.Controllers
 
       if (!endDate.HasValue) endDate = DateTime.UtcNow;
 
-      CustomerSalesReportViewModel viewModel = _reportService
-        .GetCustomerSaleOrders(page, startDate.Value, endDate.Value, customerId);
+      CustomerSalesReportViewModel viewModel = await _reportService
+        .GetCustomerSaleOrdersAsync(page, startDate.Value, endDate.Value, customerId);
 
       viewModel.Customers = GetCustomersSelectList();
 
@@ -64,7 +71,7 @@ namespace Phoneden.Web.Controllers
     }
 
     [HttpPost]
-    public ActionResult CustomerSales(
+    public async Task<ActionResult> CustomerSales(
       CustomerSalesReportViewModel salesReportVm)
     {
       if (!ModelState.IsValid)
@@ -74,8 +81,8 @@ namespace Phoneden.Web.Controllers
         return View(salesReportVm);
       }
 
-      CustomerSalesReportViewModel viewModel = _reportService
-        .GetCustomerSaleOrders(1, salesReportVm.StartDate, salesReportVm.EndDate, salesReportVm.CustomerId);
+      CustomerSalesReportViewModel viewModel = await _reportService
+        .GetCustomerSaleOrdersAsync(1, salesReportVm.StartDate, salesReportVm.EndDate, salesReportVm.CustomerId);
 
       viewModel.Customers = GetCustomersSelectList();
 
@@ -83,14 +90,18 @@ namespace Phoneden.Web.Controllers
     }
 
     [HttpGet]
-    public ActionResult OutstandingInvoices(
+    public async Task<ActionResult> OutstandingInvoices(
       DateTime? startDate,
       DateTime? endDate,
       int page = 1)
     {
       if (startDate == null) startDate = DateTime.UtcNow.AddMonths(-1);
+
       if (!endDate.HasValue) endDate = DateTime.UtcNow;
-      OutstandingInvoicesReportViewModel viewModel = _reportService.GetOutstandingInvoices(page, startDate.Value, endDate.Value);
+
+      OutstandingInvoicesReportViewModel viewModel = await _reportService
+        .GetOutstandingInvoicesAsync(page, startDate.Value, endDate.Value);
+
       return View(viewModel);
     }
 

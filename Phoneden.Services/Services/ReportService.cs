@@ -3,6 +3,7 @@ namespace Phoneden.Services
   using System;
   using System.Collections.Generic;
   using System.Linq;
+  using System.Threading.Tasks;
   using DataAccess.Context;
   using Entities;
   using Entities.Shared;
@@ -25,7 +26,7 @@ namespace Phoneden.Services
       _recordsPerPage = paginationSettings.RecordsPerPage;
     }
 
-    public InventoryReportViewModel GetProducts(
+    public async Task<InventoryReportViewModel> GetProductsAsync(
       int page,
       InventoryReportSearchViewModel search)
     {
@@ -57,7 +58,7 @@ namespace Phoneden.Services
               .Where(p => EF.Functions.Like(p.Category.Name.ToLowerInvariant(), $"%{searchTerm}%"))
               .OrderBy(p => p.Category.Name);
 
-            totalNumberOfProducts = products.Count();
+            totalNumberOfProducts = await products.CountAsync();
 
             products = products
               .Skip(_recordsPerPage * (page - 1))
@@ -68,7 +69,7 @@ namespace Phoneden.Services
               .Where(p => EF.Functions.Like(p.Brand.Name.ToLowerInvariant(), $"%{searchTerm}%"))
               .OrderBy(p => p.Brand.Name);
 
-            totalNumberOfProducts = products.Count();
+            totalNumberOfProducts = await products.CountAsync();
 
             products = products
               .Skip(_recordsPerPage * (page - 1))
@@ -79,7 +80,8 @@ namespace Phoneden.Services
       else
       {
         products = products.OrderBy(p => p.Quantity);
-        totalNumberOfProducts = products.Count();
+
+        totalNumberOfProducts = await products.CountAsync();
 
         products = products
           .Skip(_recordsPerPage * (page - 1))
@@ -101,29 +103,36 @@ namespace Phoneden.Services
       return inventoryReportVm;
     }
 
-    public IEnumerable<CustomerViewModel> GetTopTenCustomers()
+    public async Task<IEnumerable<CustomerViewModel>> GetTopTenCustomersAsync()
     {
       IQueryable<Customer> customers = (from c in _context.Customers
                                         where c.SaleOrders.Count > 0
                                         let orderSum = c.SaleOrders.Where(so => so.Status != SaleOrderStatus.Cancelled).Sum(so => so.LineItems.Sum(li => li.Quantity * li.Price))
                                         orderby orderSum descending
                                         select c).Take(10);
-      IEnumerable<CustomerViewModel> customerVms = CustomerViewModelFactory.BuildList(customers.ToList());
+
+      IEnumerable<CustomerViewModel> customerVms = CustomerViewModelFactory
+        .BuildList(await customers.ToListAsync());
+
       return customerVms;
     }
 
-    public IEnumerable<SupplierViewModel> GetTopTenSuppliers()
+    public async Task<IEnumerable<SupplierViewModel>> GetTopTenSuppliersAsync()
     {
       IQueryable<Supplier> suppliers = (from s in _context.Suppliers
                                         where s.PurchaseOrders.Count > 0
                                         let orderSum = s.PurchaseOrders.Where(po => po.Status != PurchaseOrderStatus.Cancelled).Sum(po => po.LineItems.Sum(li => li.Quantity * li.Price))
                                         orderby orderSum descending
-                                        select s).AsNoTracking().Take(10);
-      List<SupplierViewModel> supplierVms = SupplierViewModelFactory.CreateList(suppliers.ToList());
+                                        select s)
+                                        .AsNoTracking().Take(10);
+
+      List<SupplierViewModel> supplierVms = SupplierViewModelFactory
+        .CreateList(await suppliers.ToListAsync());
+
       return supplierVms;
     }
 
-    public CustomerSalesReportViewModel GetCustomerSaleOrders(
+    public async Task<CustomerSalesReportViewModel> GetCustomerSaleOrdersAsync(
       int page,
       DateTime startDate,
       DateTime endDate,
@@ -151,8 +160,8 @@ namespace Phoneden.Services
 
       if (customerId != 0)
       {
-        saleOrderInvoices =
-          saleOrderInvoices.Where(i => i.SaleOrder.CustomerId == customerId);
+        saleOrderInvoices = saleOrderInvoices
+            .Where(i => i.SaleOrder.CustomerId == customerId);
       }
 
       saleOrderInvoices = saleOrderInvoices
@@ -160,15 +169,28 @@ namespace Phoneden.Services
         .Skip(_recordsPerPage * (page - 1))
         .Take(_recordsPerPage);
 
+      // all expenses between selected dates
+      decimal totalExpensesForSelectedPeriod = await _context
+        .Expenses
+        .Where(e => e.Date >= startDate && e.Date <= endDate)
+        .SumAsync(e => e.Amount);
+
+      int totalNumberOfProductsSold = await _context
+        .SaleOrders
+        .Where(s => s.Date >= startDate && s.Date <= endDate)
+        .SumAsync(s => s.LineItems.Sum(l => l.Quantity));
+
+      decimal expensePerItem = totalExpensesForSelectedPeriod / totalNumberOfProductsSold;
+
       List<CustomerSalesItemReportViewModel> reportItems = CustomerSalesItemReportViewModelFactory
-        .BuildList(saleOrderInvoices.ToList());
+        .BuildList(await saleOrderInvoices.ToListAsync(), expensePerItem);
 
       PaginationViewModel pagination = new PaginationViewModel();
       pagination.CurrentPage = 1;
       pagination.RecordsPerPage = _recordsPerPage;
-      pagination.TotalRecords = _context
+      pagination.TotalRecords = await _context
         .SaleOrders
-        .Count(so => so.Date >= startDate && so.Date <= endDate && !so.IsDeleted);
+        .CountAsync(so => so.Date >= startDate && so.Date <= endDate && !so.IsDeleted);
 
       CustomerSalesReportViewModel saleReport = new CustomerSalesReportViewModel();
       saleReport.StartDate = startDate;
@@ -186,12 +208,16 @@ namespace Phoneden.Services
           .Sum(i => i.InvoiceTotal);
       }
 
-      saleReport.TotalProfit = reportItems.Sum(so => so.Profit);
+      saleReport.TotalProfit = reportItems
+        .Sum(so => so.Profit);
+
+      saleReport.TotalProfitAfterExpenses = reportItems
+        .Sum(s => s.ProfitAfterExpenses);
 
       return saleReport;
     }
 
-    public OutstandingInvoicesReportViewModel GetOutstandingInvoices(
+    public async Task<OutstandingInvoicesReportViewModel> GetOutstandingInvoicesAsync(
       int page,
       DateTime startDate,
       DateTime endDate)
@@ -206,24 +232,25 @@ namespace Phoneden.Services
         throw new ArgumentException(@"The start date cannot be set in the future!", nameof(startDate));
       }
 
-      List<PurchaseOrderInvoice> outstandingInvoices = (from invoice in _context.PurchaseOrderInvoices.Include(i => i.Payments)
-                                                        let totalPaidSoFar = invoice.Payments.Any() ? invoice.Payments.Sum(p => p.Currency == Currency.Gbp ? p.Amount : p.Amount / p.ConversionRate) : 0
-                                                        where !invoice.IsDeleted && invoice.DueDate >= startDate && invoice.DueDate <= endDate && totalPaidSoFar < invoice.Amount
-                                                        orderby invoice.DueDate descending
-                                                        select invoice)
+      List<PurchaseOrderInvoice> outstandingInvoices = await (from invoice in _context.PurchaseOrderInvoices.Include(i => i.Payments)
+                                                              let totalPaidSoFar = invoice.Payments.Any() ? invoice.Payments.Sum(p => p.Currency == Currency.Gbp ? p.Amount : p.Amount / p.ConversionRate) : 0
+                                                              where !invoice.IsDeleted && invoice.DueDate >= startDate && invoice.DueDate <= endDate && totalPaidSoFar < invoice.Amount
+                                                              orderby invoice.DueDate descending
+                                                              select invoice)
         .AsNoTracking()
         .Skip(_recordsPerPage * (page - 1))
-        .Take(_recordsPerPage).ToList();
+        .Take(_recordsPerPage).ToListAsync();
 
-      List<PurchaseOrderInvoiceViewModel> outstandingInvoiceVms = PurchaseOrderInvoiceViewModelFactory.BuildList(outstandingInvoices);
+      List<PurchaseOrderInvoiceViewModel> outstandingInvoiceVms = PurchaseOrderInvoiceViewModelFactory
+        .BuildList(outstandingInvoices);
 
       foreach (PurchaseOrderInvoiceViewModel invoice in outstandingInvoiceVms)
       {
-        string businessName = _context
+        string businessName = await _context
           .PurchaseOrders
           .Where(so => so.Id == invoice.PurchaseOrderId)
           .Select(so => so.Supplier.Name)
-          .First();
+          .FirstAsync();
 
         invoice.Business.Name = businessName;
       }
@@ -239,9 +266,9 @@ namespace Phoneden.Services
         {
           CurrentPage = page,
           RecordsPerPage = _recordsPerPage,
-          TotalRecords = _context
+          TotalRecords = await _context
           .PurchaseOrderInvoices
-          .Count(i => i.DueDate >= startDate && i.DueDate <= endDate && !i.IsDeleted)
+          .CountAsync(i => i.DueDate >= startDate && i.DueDate <= endDate && !i.IsDeleted)
         },
         Total = moneyUnpaid
       };
