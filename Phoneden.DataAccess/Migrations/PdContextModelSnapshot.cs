@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Phoneden.DataAccess.Context;
 
@@ -805,6 +804,9 @@ namespace Phoneden.DataAccess.Migrations
                       .HasColumnName("conversion_rate")
                       .HasColumnType("decimal(19, 8)");
 
+            b.Property<decimal>("Cost")
+                      .HasColumnName("cost");
+
             b.Property<DateTime>("CreatedOn")
                       .HasColumnName("created_on");
 
@@ -991,6 +993,9 @@ namespace Phoneden.DataAccess.Migrations
                       .ValueGeneratedOnAdd()
                       .HasColumnName("id");
 
+            b.Property<decimal>("Cost")
+                      .HasColumnName("cost");
+
             b.Property<DateTime>("CreatedOn")
                       .HasColumnName("created_on");
 
@@ -1085,6 +1090,9 @@ namespace Phoneden.DataAccess.Migrations
             b.Property<decimal>("ConversionRate")
                       .HasColumnName("conversion_rate")
                       .HasColumnType("decimal(19, 8)");
+
+            b.Property<decimal>("Cost")
+                      .HasColumnName("cost");
 
             b.Property<DateTime>("CreatedOn")
                       .HasColumnName("created_on");

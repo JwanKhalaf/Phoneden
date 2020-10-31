@@ -43,6 +43,8 @@ namespace Phoneden.Services.SaleOrders
         invoiceLineItem.ProductQuality = soLineItem.Quality;
         invoiceLineItem.ProductId = soLineItem.ProductId;
         invoiceLineItem.CreatedOn = DateTime.UtcNow;
+        invoiceLineItem.Cost = soLineItem.Product.UnitCostPrice;
+
         saleOrderInvoice.InvoicedLineItems.Add(invoiceLineItem);
       }
 

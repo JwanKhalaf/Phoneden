@@ -3,26 +3,32 @@ namespace Phoneden.Services
   using System;
   using System.Collections.Generic;
   using System.Linq;
+  using System.Threading.Tasks;
   using DataAccess.Context;
   using Entities;
   using Entities.Shared;
   using Interfaces;
   using Microsoft.EntityFrameworkCore;
   using ViewModels;
-  using ViewModels.SaleOrders;
 
   public class ReportService : IReportService
   {
     private readonly PdContext _context;
+
     private readonly int _recordsPerPage;
 
-    public ReportService(IPaginationConfiguration paginationSettings, PdContext context)
+    public ReportService(
+      IPaginationConfiguration paginationSettings,
+      PdContext context)
     {
       _context = context ?? throw new ArgumentNullException(nameof(context));
+
       _recordsPerPage = paginationSettings.RecordsPerPage;
     }
 
-    public InventoryReportViewModel GetProducts(int page, InventoryReportSearchViewModel search)
+    public async Task<InventoryReportViewModel> GetProductsAsync(
+      int page,
+      InventoryReportSearchViewModel search)
     {
       int totalNumberOfProducts = 0;
 
@@ -52,7 +58,7 @@ namespace Phoneden.Services
               .Where(p => EF.Functions.Like(p.Category.Name.ToLowerInvariant(), $"%{searchTerm}%"))
               .OrderBy(p => p.Category.Name);
 
-            totalNumberOfProducts = products.Count();
+            totalNumberOfProducts = await products.CountAsync();
 
             products = products
               .Skip(_recordsPerPage * (page - 1))
@@ -63,7 +69,7 @@ namespace Phoneden.Services
               .Where(p => EF.Functions.Like(p.Brand.Name.ToLowerInvariant(), $"%{searchTerm}%"))
               .OrderBy(p => p.Brand.Name);
 
-            totalNumberOfProducts = products.Count();
+            totalNumberOfProducts = await products.CountAsync();
 
             products = products
               .Skip(_recordsPerPage * (page - 1))
@@ -74,7 +80,8 @@ namespace Phoneden.Services
       else
       {
         products = products.OrderBy(p => p.Quantity);
-        totalNumberOfProducts = products.Count();
+
+        totalNumberOfProducts = await products.CountAsync();
 
         products = products
           .Skip(_recordsPerPage * (page - 1))
@@ -92,32 +99,44 @@ namespace Phoneden.Services
       inventoryReportVm.Search = search;
 
       TrackCurrentSearchTerm(inventoryReportVm);
+
       return inventoryReportVm;
     }
 
-    public IEnumerable<CustomerViewModel> GetTopTenCustomers()
+    public async Task<IEnumerable<CustomerViewModel>> GetTopTenCustomersAsync()
     {
       IQueryable<Customer> customers = (from c in _context.Customers
                                         where c.SaleOrders.Count > 0
                                         let orderSum = c.SaleOrders.Where(so => so.Status != SaleOrderStatus.Cancelled).Sum(so => so.LineItems.Sum(li => li.Quantity * li.Price))
                                         orderby orderSum descending
                                         select c).Take(10);
-      IEnumerable<CustomerViewModel> customerVms = CustomerViewModelFactory.BuildList(customers.ToList());
+
+      IEnumerable<CustomerViewModel> customerVms = CustomerViewModelFactory
+        .BuildList(await customers.ToListAsync());
+
       return customerVms;
     }
 
-    public IEnumerable<SupplierViewModel> GetTopTenSuppliers()
+    public async Task<IEnumerable<SupplierViewModel>> GetTopTenSuppliersAsync()
     {
       IQueryable<Supplier> suppliers = (from s in _context.Suppliers
                                         where s.PurchaseOrders.Count > 0
                                         let orderSum = s.PurchaseOrders.Where(po => po.Status != PurchaseOrderStatus.Cancelled).Sum(po => po.LineItems.Sum(li => li.Quantity * li.Price))
                                         orderby orderSum descending
-                                        select s).AsNoTracking().Take(10);
-      List<SupplierViewModel> supplierVms = SupplierViewModelFactory.CreateList(suppliers.ToList());
+                                        select s)
+                                        .AsNoTracking().Take(10);
+
+      List<SupplierViewModel> supplierVms = SupplierViewModelFactory
+        .CreateList(await suppliers.ToListAsync());
+
       return supplierVms;
     }
 
-    public SalesReportViewModel GetSaleOrders(int page, DateTime startDate, DateTime endDate)
+    public async Task<CustomerSalesReportViewModel> GetCustomerSaleOrdersAsync(
+      int page,
+      DateTime startDate,
+      DateTime endDate,
+      int customerId)
     {
       if (startDate == null)
       {
@@ -129,57 +148,79 @@ namespace Phoneden.Services
         throw new ArgumentException(@"The start date cannot be set in the future!", nameof(startDate));
       }
 
-      IQueryable<SaleOrder> saleOrders = _context
-        .SaleOrders
-        .Include(so => so.Customer)
-        .Include(so => so.LineItems)
-        .Include(so => so.Invoice)
-        .ThenInclude(i => i.Payments)
-        .Include(so => so.Invoice)
-        .ThenInclude(i => i.Returns)
-        .ThenInclude(r => r.Product)
+      IQueryable<SaleOrderInvoice> saleOrderInvoices = _context
+        .SaleOrderInvoices
+        .Include(i => i.SaleOrder)
+        .ThenInclude(i => i.LineItems)
+        .Include(i => i.SaleOrder)
+        .ThenInclude(i => i.Customer)
+        .Include(soi => soi.InvoicedLineItems)
         .AsNoTracking()
-        .Where(so => so.Date >= startDate && so.Date <= endDate && !so.IsDeleted)
-        .OrderByDescending(so => so.Date)
+        .Where(soi => soi.SaleOrder.Date >= startDate && soi.SaleOrder.Date <= endDate && !soi.IsDeleted);
+
+      if (customerId != 0)
+      {
+        saleOrderInvoices = saleOrderInvoices
+            .Where(i => i.SaleOrder.CustomerId == customerId);
+      }
+
+      saleOrderInvoices = saleOrderInvoices
+        .OrderByDescending(soi => soi.SaleOrder.Date)
         .Skip(_recordsPerPage * (page - 1))
         .Take(_recordsPerPage);
 
-      List<SaleOrderViewModel> saleOrderVms = SaleOrderViewModelFactory.BuildList(saleOrders.ToList());
+      // all expenses between selected dates
+      decimal totalExpensesForSelectedPeriod = await _context
+        .Expenses
+        .Where(e => e.Date >= startDate && e.Date <= endDate)
+        .SumAsync(e => e.Amount);
 
-      foreach (SaleOrderViewModel saleOrder in saleOrderVms)
-      {
-        CalculateSaleOrderProfit(saleOrder);
-      }
+      int totalNumberOfProductsSold = await _context
+        .SaleOrders
+        .Where(s => s.Date >= startDate && s.Date <= endDate)
+        .SumAsync(s => s.LineItems.Sum(l => l.Quantity));
+
+      decimal expensePerItem = totalExpensesForSelectedPeriod / totalNumberOfProductsSold;
+
+      List<CustomerSalesItemReportViewModel> reportItems = CustomerSalesItemReportViewModelFactory
+        .BuildList(await saleOrderInvoices.ToListAsync(), expensePerItem);
 
       PaginationViewModel pagination = new PaginationViewModel();
       pagination.CurrentPage = 1;
       pagination.RecordsPerPage = _recordsPerPage;
-      pagination.TotalRecords = _context
+      pagination.TotalRecords = await _context
         .SaleOrders
-        .Count(so => so.Date >= startDate && so.Date <= endDate && !so.IsDeleted);
+        .CountAsync(so => so.Date >= startDate && so.Date <= endDate && !so.IsDeleted);
 
-      SalesReportViewModel saleReport = new SalesReportViewModel();
+      CustomerSalesReportViewModel saleReport = new CustomerSalesReportViewModel();
       saleReport.StartDate = startDate;
       saleReport.EndDate = endDate;
-      saleReport.SaleOrders = saleOrderVms;
+      saleReport.SettledSaleOrders = reportItems;
       saleReport.Pagination = pagination;
 
-      if (!saleReport.SaleOrders.Any())
+      if (!saleReport.SettledSaleOrders.Any())
       {
-        saleReport.Total = 0;
+        saleReport.TotalSales = 0;
       }
       else
       {
-        saleReport.Total = saleOrderVms
-          .Sum(so => so.Invoice.Amount - so.Invoice.Returns.Sum(r => r.Value));
+        saleReport.TotalSales = reportItems
+          .Sum(i => i.InvoiceTotal);
       }
 
-      saleReport.Profit = saleOrderVms.Sum(so => so.Profit);
+      saleReport.TotalProfit = reportItems
+        .Sum(so => so.Profit);
+
+      saleReport.TotalProfitAfterExpenses = reportItems
+        .Sum(s => s.ProfitAfterExpenses);
 
       return saleReport;
     }
 
-    public OutstandingInvoicesReportViewModel GetOutstandingInvoices(int page, DateTime startDate, DateTime endDate)
+    public async Task<OutstandingInvoicesReportViewModel> GetOutstandingInvoicesAsync(
+      int page,
+      DateTime startDate,
+      DateTime endDate)
     {
       if (startDate == null)
       {
@@ -191,24 +232,25 @@ namespace Phoneden.Services
         throw new ArgumentException(@"The start date cannot be set in the future!", nameof(startDate));
       }
 
-      List<PurchaseOrderInvoice> outstandingInvoices = (from invoice in _context.PurchaseOrderInvoices.Include(i => i.Payments)
-                                                        let totalPaidSoFar = invoice.Payments.Any() ? invoice.Payments.Sum(p => p.Currency == Currency.Gbp ? p.Amount : p.Amount / p.ConversionRate) : 0
-                                                        where !invoice.IsDeleted && invoice.DueDate >= startDate && invoice.DueDate <= endDate && totalPaidSoFar < invoice.Amount
-                                                        orderby invoice.DueDate descending
-                                                        select invoice)
+      List<PurchaseOrderInvoice> outstandingInvoices = await (from invoice in _context.PurchaseOrderInvoices.Include(i => i.Payments)
+                                                              let totalPaidSoFar = invoice.Payments.Any() ? invoice.Payments.Sum(p => p.Currency == Currency.Gbp ? p.Amount : p.Amount / p.ConversionRate) : 0
+                                                              where !invoice.IsDeleted && invoice.DueDate >= startDate && invoice.DueDate <= endDate && totalPaidSoFar < invoice.Amount
+                                                              orderby invoice.DueDate descending
+                                                              select invoice)
         .AsNoTracking()
         .Skip(_recordsPerPage * (page - 1))
-        .Take(_recordsPerPage).ToList();
+        .Take(_recordsPerPage).ToListAsync();
 
-      List<PurchaseOrderInvoiceViewModel> outstandingInvoiceVms = PurchaseOrderInvoiceViewModelFactory.BuildList(outstandingInvoices);
+      List<PurchaseOrderInvoiceViewModel> outstandingInvoiceVms = PurchaseOrderInvoiceViewModelFactory
+        .BuildList(outstandingInvoices);
 
       foreach (PurchaseOrderInvoiceViewModel invoice in outstandingInvoiceVms)
       {
-        string businessName = _context
+        string businessName = await _context
           .PurchaseOrders
           .Where(so => so.Id == invoice.PurchaseOrderId)
           .Select(so => so.Supplier.Name)
-          .First();
+          .FirstAsync();
 
         invoice.Business.Name = businessName;
       }
@@ -224,9 +266,9 @@ namespace Phoneden.Services
         {
           CurrentPage = page,
           RecordsPerPage = _recordsPerPage,
-          TotalRecords = _context
+          TotalRecords = await _context
           .PurchaseOrderInvoices
-          .Count(i => i.DueDate >= startDate && i.DueDate <= endDate && !i.IsDeleted)
+          .CountAsync(i => i.DueDate >= startDate && i.DueDate <= endDate && !i.IsDeleted)
         },
         Total = moneyUnpaid
       };
@@ -234,33 +276,16 @@ namespace Phoneden.Services
       return reportVm;
     }
 
-    private static void TrackCurrentSearchTerm(InventoryReportViewModel viewModel)
+    private static void TrackCurrentSearchTerm(
+      InventoryReportViewModel viewModel)
     {
       viewModel.Search.PreviousSearchTerm = viewModel.Search.SearchTerm;
     }
 
-    private static bool HaveSearchTermsChanged(InventoryReportSearchViewModel searchVm)
+    private static bool HaveSearchTermsChanged(
+      InventoryReportSearchViewModel searchVm)
     {
       return !string.Equals(searchVm.SearchTerm, searchVm.PreviousSearchTerm);
-    }
-
-    private void CalculateSaleOrderProfit(SaleOrderViewModel saleOrder)
-    {
-      decimal totalProfitAcrossAllLineItems = 0;
-
-      foreach (SaleOrderLineItemViewModel lineItem in saleOrder.LineItems)
-      {
-        Product product = _context
-          .Products
-          .FirstOrDefault(p => p.Id == lineItem.ProductId);
-
-        if (product != null)
-        {
-          totalProfitAcrossAllLineItems += (lineItem.Price - product.UnitCostPrice) * lineItem.Quantity;
-        }
-      }
-
-      saleOrder.Profit = totalProfitAcrossAllLineItems;
     }
   }
 }

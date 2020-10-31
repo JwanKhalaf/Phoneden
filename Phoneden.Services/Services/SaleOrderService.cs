@@ -22,7 +22,9 @@ namespace Phoneden.Services
       _recordsPerPage = paginationSettings.RecordsPerPage;
     }
 
-    public async Task<SaleOrderPageViewModel> GetPagedSaleOrdersAsync(bool showDeleted, int page = 1)
+    public async Task<SaleOrderPageViewModel> GetPagedSaleOrdersAsync(
+      bool showDeleted,
+      int page = 1)
     {
       IQueryable<SaleOrder> saleOrders = _context
         .SaleOrders
@@ -66,7 +68,8 @@ namespace Phoneden.Services
       return saleOrdersPageVm;
     }
 
-    public async Task<SaleOrderViewModel> GetSaleOrderAsync(int id)
+    public async Task<SaleOrderViewModel> GetSaleOrderAsync(
+      int id)
     {
       SaleOrder order = await _context
         .SaleOrders
@@ -86,7 +89,8 @@ namespace Phoneden.Services
       return orderVm;
     }
 
-    public async Task AddSaleOrderAsync(SaleOrderViewModel saleOrderVm)
+    public async Task AddSaleOrderAsync(
+      SaleOrderViewModel saleOrderVm)
     {
       await RunPreOrderCreationTasksAsync(saleOrderVm);
 
@@ -100,7 +104,8 @@ namespace Phoneden.Services
       await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateSaleOrderAsync(SaleOrderViewModel saleOrderVm)
+    public async Task UpdateSaleOrderAsync(
+      SaleOrderViewModel saleOrderVm)
     {
       SaleOrder saleOrder = await _context
         .SaleOrders
@@ -119,7 +124,8 @@ namespace Phoneden.Services
       _context.SaveChanges();
     }
 
-    public async Task DeleteSaleOrderAsync(int id)
+    public async Task DeleteSaleOrderAsync(
+      int id)
     {
       SaleOrder saleOrder = await _context
         .SaleOrders
@@ -144,7 +150,8 @@ namespace Phoneden.Services
       await _context.SaveChangesAsync();
     }
 
-    public decimal CalculateSaleOrderTotal(SaleOrderViewModel saleOrder)
+    public decimal CalculateSaleOrderTotal(
+      SaleOrderViewModel saleOrder)
     {
       decimal totalLogisticsCost = saleOrder.PostageCost;
 
@@ -153,12 +160,16 @@ namespace Phoneden.Services
       return totalLogisticsCost + lineItemsTotal;
     }
 
-    private static bool DoesStockHaveEnoughOfProduct(SaleOrderLineItemViewModel saleOrderLineItem, Product product)
+    private static bool DoesStockHaveEnoughOfProduct(
+      SaleOrderLineItemViewModel saleOrderLineItem,
+      Product product)
     {
       return product.Quantity >= saleOrderLineItem.Quantity;
     }
 
-    private static void PopulateLineItemMissingData(SaleOrderLineItemViewModel saleOrderLineItem, Product product)
+    private static void PopulateLineItemMissingData(
+      SaleOrderLineItemViewModel saleOrderLineItem,
+      Product product)
     {
       if (saleOrderLineItem.ProductId == 0)
       {
@@ -173,9 +184,11 @@ namespace Phoneden.Services
       saleOrderLineItem.Name = product.Name;
       saleOrderLineItem.Quality = product.Quality.Name;
       saleOrderLineItem.Colour = product.Colour.ToString();
+      saleOrderLineItem.Cost = product.UnitCostPrice;
     }
 
-    private void ReverseStockLevelsForProductsInSaleOrder(SaleOrder saleOrder)
+    private void ReverseStockLevelsForProductsInSaleOrder(
+      SaleOrder saleOrder)
     {
       foreach (SaleOrderLineItem lineItem in saleOrder.LineItems)
       {
@@ -189,7 +202,8 @@ namespace Phoneden.Services
       _context.SaveChanges();
     }
 
-    private async Task RunPreOrderCreationTasksAsync(SaleOrderViewModel newOrder)
+    private async Task RunPreOrderCreationTasksAsync(
+      SaleOrderViewModel newOrder)
     {
       await EnsureStockCanCoverOrderAsync(newOrder);
 
@@ -208,7 +222,8 @@ namespace Phoneden.Services
       }
     }
 
-    private async Task EnsureStockCanCoverOrderAsync(SaleOrderViewModel newOrder)
+    private async Task EnsureStockCanCoverOrderAsync(
+      SaleOrderViewModel newOrder)
     {
       List<string> namesOfProductsNotInStock = new List<string>();
 
@@ -231,12 +246,15 @@ namespace Phoneden.Services
       }
     }
 
-    private void DecreaseProductQuantity(SaleOrderLineItemViewModel saleOrderLineItem, Product product)
+    private void DecreaseProductQuantity(
+      SaleOrderLineItemViewModel saleOrderLineItem,
+      Product product)
     {
       product.Quantity -= saleOrderLineItem.Quantity;
     }
 
-    private async Task SaveProductAsync(Product product)
+    private async Task SaveProductAsync(
+      Product product)
     {
       _context.Entry(product).State = EntityState.Modified;
       await _context.SaveChangesAsync();

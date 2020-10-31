@@ -2,18 +2,27 @@ namespace Phoneden.Services
 {
   using System;
   using System.Collections.Generic;
+  using System.Threading.Tasks;
   using ViewModels;
 
   public interface IReportService
   {
-    InventoryReportViewModel GetProducts(int page, InventoryReportSearchViewModel search);
+    Task<InventoryReportViewModel> GetProductsAsync(
+      int page,
+      InventoryReportSearchViewModel search);
 
-    IEnumerable<CustomerViewModel> GetTopTenCustomers();
+    Task<IEnumerable<CustomerViewModel>> GetTopTenCustomersAsync();
 
-    IEnumerable<SupplierViewModel> GetTopTenSuppliers();
+    Task<IEnumerable<SupplierViewModel>> GetTopTenSuppliersAsync();
 
-    SalesReportViewModel GetSaleOrders(int page, DateTime startDate, DateTime endDate);
+    Task<CustomerSalesReportViewModel> GetCustomerSaleOrdersAsync(
+      int page,
+      DateTime startDate,
+      DateTime endDate, int customerId);
 
-    OutstandingInvoicesReportViewModel GetOutstandingInvoices(int page, DateTime startDate, DateTime endDate);
+    Task<OutstandingInvoicesReportViewModel> GetOutstandingInvoicesAsync(
+      int page,
+      DateTime startDate,
+      DateTime endDate);
   }
 }

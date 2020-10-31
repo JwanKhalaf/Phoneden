@@ -51,8 +51,6 @@ namespace Phoneden.ViewModels.SaleOrders
 
     public List<SelectListItem> Customers { get; set; }
 
-    public decimal Profit { get; set; }
-
     [Display(Name = "Invoiced")]
     public bool IsInvoiced => Invoice != null;
 

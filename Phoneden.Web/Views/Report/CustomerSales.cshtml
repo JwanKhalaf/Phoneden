@@ -1,5 +1,5 @@
 @using Phoneden.ViewModels
-@model Phoneden.ViewModels.SalesReportViewModel
+@model Phoneden.ViewModels.CustomerSalesReportViewModel
 
 @{
   ViewBag.Title = "Customer Orders";
@@ -22,10 +22,24 @@
             <hr />
           </div>
         </div>
-        <form asp-controller="Report" asp-action="Sales" method="post" role="form">
+        <form asp-controller="Report" asp-action="CustomerSales" method="post" role="form">
           <div asp-validation-summary="All" class="text-danger"></div>
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label asp-for="CustomerId" class="form-label"></label>
+                <div class="controls">
+                  <select asp-for="CustomerId"
+                          asp-items="@(new SelectList(Model.Customers, "Value", "Text"))"
+                          class="form-control customer-select">
+                    <option>Select a Customer</option>
+                  </select>
+                  <span asp-validation-for="CustomerId" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
               <div class="form-group">
                 <label asp-for="StartDate" class="form-label"></label>
                 <div class="controls">
@@ -34,7 +48,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="form-group">
                 <label asp-for="EndDate" class="form-label"></label>
                 <div class="controls">
@@ -45,7 +59,7 @@
             </div>
             <div class="col-md-12">
               <button type="submit" class="btn btn-primary pull-right filter">Update Results</button>
-              <a asp-controller="Report" asp-action="Sales" class="btn btn-default pull-right">Reset</a>
+              <a asp-controller="Report" asp-action="CustomerSales" class="btn btn-default pull-right">Reset</a>
             </div>
           </div>
         </form>
@@ -58,61 +72,50 @@
           <thead class="cf">
             <tr>
               <th>
-                Id
+                Order Date
               </th>
+
+              <th>
+                Invoice Id
+              </th>
+
               <th>
                 Customer
               </th>
+
               <th>
-                Status
+                Invoiced Total
               </th>
+
               <th>
-                Profit
-              </th>
-              <th>
-                Is Invoiced
-              </th>
-              <th>
-                Date
-              </th>
-              <th>
-                Order Total
+                Order Profit
               </th>
             </tr>
           </thead>
           <tbody>
-            @if (Model.SaleOrders != null && Model.SaleOrders.Any())
+            @if (Model.SettledSaleOrders != null && Model.SettledSaleOrders.Any())
             {
-              foreach (var saleOrder in Model.SaleOrders)
+              foreach (CustomerSalesItemReportViewModel item in Model.SettledSaleOrders)
               {
                 <tr>
                   <td>
-                    @saleOrder.Id
+                    @string.Format("{0:dd MMM yyyy}", item.SaleOrderDate)
                   </td>
+
                   <td>
-                    @saleOrder.CustomerName
+                    @item.InvoiceId
                   </td>
+
                   <td>
-                    @saleOrder.Status
+                    <a asp-controller="Customer" asp-action="Details" asp-route-id="@item.CustomerId">@item.CustomerName</a>
                   </td>
+
                   <td>
-                    @saleOrder.Profit.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+                    @item.InvoiceTotal.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
                   </td>
+
                   <td>
-                    @if (saleOrder.IsInvoiced)
-                    {
-                      <span class="label label-success">INVOICED</span>
-                    }
-                    else
-                    {
-                      <span class="label label-inverse">NOT INVOICED</span>
-                    }
-                  </td>
-                  <td>
-                    @string.Format("{0:dd MMM yyyy}", saleOrder.Date)
-                  </td>
-                  <td>
-                    @saleOrder.CalculateSaleOrderTotal().ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+                    @item.Profit.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
                   </td>
                 </tr>
               }
@@ -136,9 +139,9 @@
                     cs-paging-totalitems="@Model.Pagination.TotalRecords"
                     cs-pagenumber-param="page"
                     asp-controller="Report"
-                    asp-action="Sales">
+                    asp-action="CustomerSales">
           </cs-pager>
-          <input asp-for="Pagination.CurrentPage" type="hidden"/>
+          <input asp-for="Pagination.CurrentPage" type="hidden" />
         }
 
         <table class="table">
@@ -146,15 +149,25 @@
             <td><h3 class="all-caps"><strong>Total Sales</strong></h3></td>
             <td>
               <h3>
-                @Model.Total.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+                @Model.TotalSales.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
               </h3>
             </td>
           </tr>
+
           <tr>
             <td><h3 class="all-caps"><strong>Total Profit</strong></h3></td>
             <td>
               <h3>
-                @Model.Profit.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+                @Model.TotalProfit.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
+              </h3>
+            </td>
+          </tr>
+
+          <tr>
+            <td><h3 class="all-caps"><strong>Total Profit After Expenses</strong></h3></td>
+            <td>
+              <h3>
+                @Model.TotalProfitAfterExpenses.ToString("C", CultureInfo.CreateSpecificCulture("en-GB"))
               </h3>
             </td>
           </tr>

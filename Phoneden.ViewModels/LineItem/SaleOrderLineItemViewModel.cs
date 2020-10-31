@@ -15,6 +15,8 @@ namespace Phoneden.ViewModels
     [Range(0, int.MaxValue)]
     public decimal Price { get; set; }
 
+    public decimal Cost { get; set; }
+
     [Display(Name = "Quality")]
     public string Quality { get; set; }
 
