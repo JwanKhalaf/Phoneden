@@ -6,29 +6,30 @@ namespace Phoneden.Services
 
   public class ExpenseFactory
   {
-    public static Expense BuildNewExpenseFromViewModel(ExpenseViewModel expenseVm)
+    public static Expense BuildNewExpenseFromViewModel(ExpenseViewModel viewModel)
     {
-      if (expenseVm == null)
+      if (viewModel == null)
       {
-        throw new ArgumentNullException(nameof(expenseVm));
+        throw new ArgumentNullException(nameof(viewModel));
       }
 
       Expense expense = new Expense
       {
-        Date = expenseVm.Date,
-        Method = expenseVm.Method,
-        Amount = expenseVm.Amount,
-        Reason = expenseVm.Reason,
-        ApplicationUserId = expenseVm.UserId
+        Date = viewModel.Date,
+        Method = viewModel.Method,
+        Amount = viewModel.Amount,
+        Reason = viewModel.Reason,
+        ApplicationUserId = viewModel.UserId
       };
+
       return expense;
     }
 
-    public static void MapViewModelToExpense(ExpenseViewModel expenseVm, Expense expense)
+    public static void MapViewModelToExpense(ExpenseViewModel viewModel, Expense expense)
     {
-      if (expenseVm == null)
+      if (viewModel == null)
       {
-        throw new ArgumentNullException(nameof(expenseVm));
+        throw new ArgumentNullException(nameof(viewModel));
       }
 
       if (expense == null)
@@ -36,10 +37,10 @@ namespace Phoneden.Services
         throw new ArgumentNullException(nameof(expense));
       }
 
-      expense.Date = expenseVm.Date;
-      expense.Method = expenseVm.Method;
-      expense.Amount = expenseVm.Amount;
-      expense.Reason = expenseVm.Reason;
+      expense.Date = viewModel.Date;
+      expense.Method = viewModel.Method;
+      expense.Amount = viewModel.Amount;
+      expense.Reason = viewModel.Reason;
       expense.ModifiedOn = DateTime.UtcNow;
     }
   }

@@ -27,7 +27,9 @@ namespace Phoneden.Web.Controllers
       _customerService = customerService ?? throw new ArgumentNullException(nameof(customerService));
     }
 
-    public async Task<ActionResult> Page(bool showDeleted, int page = 1)
+    public async Task<ActionResult> Page(
+      bool showDeleted,
+      int page = 1)
     {
       SaleOrderPageViewModel viewModel = await _saleOrderService
         .GetPagedSaleOrdersAsync(showDeleted, page);
@@ -37,7 +39,8 @@ namespace Phoneden.Web.Controllers
       return View(viewModel);
     }
 
-    public async Task<ActionResult> Details(int id)
+    public async Task<ActionResult> Details(
+      int id)
     {
       SaleOrderViewModel viewModel = await _saleOrderService.GetSaleOrderAsync(id);
 
@@ -56,7 +59,8 @@ namespace Phoneden.Web.Controllers
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create(SaleOrderViewModel newSaleOrder)
+    public async Task<ActionResult> Create(
+      SaleOrderViewModel newSaleOrder)
     {
       if (!ModelState.IsValid)
       {
@@ -84,7 +88,8 @@ namespace Phoneden.Web.Controllers
       }
     }
 
-    public async Task<ActionResult> Edit(int? id)
+    public async Task<ActionResult> Edit(
+      int? id)
     {
       if (id == null) return BadRequest();
 
@@ -97,7 +102,8 @@ namespace Phoneden.Web.Controllers
     }
 
     [HttpPost]
-    public async Task<ActionResult> Edit(SaleOrderViewModel saleOrder)
+    public async Task<ActionResult> Edit(
+      SaleOrderViewModel saleOrder)
     {
       if (!ModelState.IsValid)
       {
@@ -131,7 +137,9 @@ namespace Phoneden.Web.Controllers
       }
     }
 
-    public async Task<ActionResult> Delete(int? id, bool? saveChangesError = false)
+    public async Task<ActionResult> Delete(
+      int? id,
+      bool? saveChangesError = false)
     {
       if (id == null) return BadRequest();
 
@@ -151,7 +159,8 @@ namespace Phoneden.Web.Controllers
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Delete(int id)
+    public async Task<ActionResult> Delete(
+      int id)
     {
       if (id == 0) return BadRequest();
 

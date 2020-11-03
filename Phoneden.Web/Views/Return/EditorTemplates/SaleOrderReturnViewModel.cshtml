@@ -1,0 +1,113 @@
+@using Phoneden.Entities
+@model Phoneden.ViewModels.SaleOrderReturnViewModel
+
+<form asp-controller="Return" asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post" role="form">
+  <input asp-for="InvoiceId" type="hidden" />
+
+  @if (Model.Id != 0)
+  {
+    <input asp-for="Id" type="hidden" />
+  }
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="grid simple">
+        <div class="grid-body no-border">
+          <br>
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">Return</span> Details
+              </h3>
+              <hr />
+            </div>
+
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="Date" class="form-label"></label>
+                    <div class="controls">
+                      <div class="input-group">
+                        <input asp-for="Date" class="form-control" />
+                        <span class="input-group-addon"><i class="far fa-calendar-alt"></i></span>
+                        <span asp-validation-for="Date" class="text-danger"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="Resolution" class="form-label"></label>
+                    <div class="controls">
+                      <select asp-for="Resolution" asp-items="Html.GetEnumSelectList<Resolution>()" class="form-control">
+                        <option>Select a resolution</option>
+                      </select>
+                      <span asp-validation-for="Resolution" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group returns-product-selection">
+                    <label asp-for="ProductName" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="ProductName" class="form-control return-product-name" />
+                      <span asp-validation-for="ProductName" class="text-danger"></span>
+                      <input asp-for="ProductId" type="hidden" class="return-product-id" />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="Quantity" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="Quantity" class="form-control" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label asp-for="Description" class="form-label"></label>
+                    <div class="controls">
+                      <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                      <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label asp-for="IsVerified">
+                      <input asp-for="IsVerified" />
+                      @Html.DisplayNameFor(m => m.IsVerified)
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <input type="submit" value="@Model.ButtonText" class="btn btn-primary pull-right" />
+
+      <a asp-controller="SaleOrderInvoice"
+         asp-action="Details"
+         asp-route-id="@Model.InvoiceId"
+         class="btn btn-default pull-right">
+        No, Go Back
+      </a>
+    </div>
+  </div>
+</form>

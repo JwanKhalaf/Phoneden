@@ -3,6 +3,7 @@ namespace Phoneden.Services
   using System;
   using System.Collections.Generic;
   using System.Linq;
+  using System.Threading.Tasks;
   using DataAccess.Context;
   using Entities;
   using Interfaces;
@@ -12,24 +13,31 @@ namespace Phoneden.Services
   public class ExpenseService : IExpenseService
   {
     private readonly PdContext _context;
+
     private readonly int _recordsPerPage;
 
-    public ExpenseService(IPaginationConfiguration paginationSettings, PdContext context)
+    public ExpenseService(
+      IPaginationConfiguration paginationSettings,
+      PdContext context)
     {
       _context = context ?? throw new ArgumentNullException(nameof(context));
+
       _recordsPerPage = paginationSettings.RecordsPerPage;
     }
 
-    public ExpensePageViewModel GetPagedExpenses(int page)
+    public async Task<ExpensePageViewModel> GetPagedExpensesAsync(int page)
     {
-      List<Expense> expenses = _context.Expenses
+      List<Expense> expenses = await _context.Expenses
         .AsNoTracking()
         .Where(b => !b.IsDeleted)
         .OrderByDescending(s => s.CreatedOn)
         .Skip(_recordsPerPage * (page - 1))
-        .Take(_recordsPerPage).ToList();
+        .Take(_recordsPerPage)
+        .ToListAsync();
+
       List<ExpenseViewModel> expenseVms = ExpenseViewModelFactory.BuildListOfExpenseViewModels(expenses);
-      ExpensePageViewModel expensePagedVm = new ExpensePageViewModel()
+
+      ExpensePageViewModel viewModel = new ExpensePageViewModel()
       {
         Expenses = expenseVms,
         Pagination = new PaginationViewModel
@@ -39,51 +47,86 @@ namespace Phoneden.Services
           TotalRecords = _context.Expenses.Count(b => !b.IsDeleted)
         }
       };
-      return expensePagedVm;
+
+      return viewModel;
     }
 
-    public IEnumerable<ExpenseViewModel> GetAllExpenses()
+    public async Task<IEnumerable<ExpenseViewModel>> GetAllExpensesAsync()
     {
-      IQueryable<Expense> expenses = _context.Expenses
+      List<Expense> expenses = await _context
+        .Expenses
         .AsNoTracking()
-        .Where(e => !e.IsDeleted);
-      List<ExpenseViewModel> expenseVms = ExpenseViewModelFactory.BuildListOfExpenseViewModels(expenses);
+        .Where(e => !e.IsDeleted)
+        .ToListAsync();
+
+      List<ExpenseViewModel> expenseVms = ExpenseViewModelFactory
+        .BuildListOfExpenseViewModels(expenses);
+
       return expenseVms;
     }
 
-    public ExpenseViewModel GetExpense(int id)
+    public async Task<ExpenseViewModel> GetExpenseAsync(int id)
     {
-      Expense expense = _context.Expenses.First(e => e.Id == id);
-      ExpenseViewModel expenseVm = ExpenseViewModelFactory.BuildExpenseViewModel(expense);
-      return expenseVm;
+      Expense expense = await _context
+        .Expenses
+        .FirstAsync(e => e.Id == id);
+
+      ExpenseViewModel viewModel = ExpenseViewModelFactory
+        .BuildExpenseViewModel(expense);
+
+      return viewModel;
     }
 
-    public void AddExpense(ExpenseViewModel expenseVm)
+    public async Task AddExpenseAsync(ExpenseViewModel viewModel)
     {
-      Expense expense = ExpenseFactory.BuildNewExpenseFromViewModel(expenseVm);
-      _context.Expenses.Add(expense);
-      _context.SaveChanges();
+      Expense expense = ExpenseFactory
+        .BuildNewExpenseFromViewModel(viewModel);
+
+      _context
+        .Expenses
+        .Add(expense);
+
+      await _context.SaveChangesAsync();
     }
 
-    public void UpdateExpense(ExpenseViewModel expenseVm)
+    public async Task UpdateExpenseAsync(ExpenseViewModel viewModel)
     {
-      Expense expense = _context.Expenses.First(e => e.Id == expenseVm.Id && !e.IsDeleted);
-      ExpenseFactory.MapViewModelToExpense(expenseVm, expense);
+      Expense expense = await _context
+        .Expenses
+        .FirstAsync(e => e.Id == viewModel.Id && !e.IsDeleted);
+
+      ExpenseFactory.MapViewModelToExpense(viewModel, expense);
+
       _context.Entry(expense).State = EntityState.Modified;
-      _context.SaveChanges();
+
+      await _context.SaveChangesAsync();
     }
 
-    public void DeleteExpense(int id)
+    public async Task DeleteExpenseAsync(int id)
     {
-      Expense expense = _context.Expenses.First(e => e.Id == id && !e.IsDeleted);
-      _context.Expenses.Remove(expense);
-      _context.SaveChanges();
+      Expense expense = await _context
+        .Expenses
+        .FirstAsync(e => e.Id == id && !e.IsDeleted);
+
+      _context
+        .Expenses
+        .Remove(expense);
+
+      await _context.SaveChangesAsync();
     }
 
-    public bool CurrentUserOwnsExpense(string userId, int expenseId)
+    public async Task<bool> CurrentUserOwnsExpenseAsync(
+      string userId,
+      int expenseId)
     {
-      Expense expense = _context.Expenses.Include(e => e.User).FirstOrDefault(e => e.Id == expenseId);
-      return expense.User.Id == userId;
+      Expense expense = await _context
+        .Expenses
+        .Include(e => e.User)
+        .FirstOrDefaultAsync(e => e.Id == expenseId);
+
+      bool value = expense.User.Id == userId;
+
+      return value;
     }
   }
 }

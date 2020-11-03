@@ -3,7 +3,7 @@ namespace Phoneden.Web.Controllers
   using Microsoft.AspNetCore.Mvc;
   using Microsoft.EntityFrameworkCore.Storage;
   using Phoneden.Services;
-  using Phoneden.ViewModels;
+  using ViewModels;
   using System.Threading.Tasks;
 
   public class SaleOrderPaymentController : Controller
@@ -18,11 +18,6 @@ namespace Phoneden.Web.Controllers
     {
       _saleOrderInvoiceService = saleOrderInvoiceService;
       _saleOrderPaymentService = saleOrderPaymentService;
-    }
-
-    public IActionResult Index()
-    {
-      return View();
     }
 
     [HttpGet]
@@ -49,7 +44,7 @@ namespace Phoneden.Web.Controllers
 
       await _saleOrderPaymentService.AddPaymentAsync(saleOrderInviocePayment);
 
-      return RedirectToAction("Details", "SaleOrderInvoice", new { saleOrderInvoiceId = saleOrderInviocePayment.InvoiceId });
+      return RedirectToAction("Details", "SaleOrderInvoice", new { id = saleOrderInviocePayment.InvoiceId });
     }
 
     [HttpGet]
@@ -105,14 +100,15 @@ namespace Phoneden.Web.Controllers
 
       try
       {
-        await _saleOrderPaymentService.DeletePaymentAsync(id);
+        await _saleOrderPaymentService
+          .DeletePaymentAsync(id);
       }
       catch (RetryLimitExceededException)
       {
         return RedirectToAction("Delete", new { id, saveChangesError = true });
       }
 
-      return RedirectToAction("Details", "SaleOrderInvoice", new { saleOrderInvoiceId = invoiceId });
+      return RedirectToAction("Details", "SaleOrderInvoice", new { id = invoiceId });
     }
   }
 }

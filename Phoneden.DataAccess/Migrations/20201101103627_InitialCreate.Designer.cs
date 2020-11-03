@@ -10,7 +10,7 @@ using Phoneden.DataAccess.Context;
 namespace Phoneden.DataAccess.Migrations
 {
     [DbContext(typeof(PdContext))]
-    [Migration("20201030195239_InitialCreate")]
+    [Migration("20201101103627_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -806,9 +806,6 @@ namespace Phoneden.DataAccess.Migrations
                     b.Property<decimal>("ConversionRate")
                         .HasColumnName("conversion_rate")
                         .HasColumnType("decimal(19, 8)");
-
-                    b.Property<decimal>("Cost")
-                        .HasColumnName("cost");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnName("created_on");

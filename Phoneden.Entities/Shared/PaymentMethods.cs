@@ -5,6 +5,7 @@ namespace Phoneden.Entities
     Cash,
     Cheque,
     Card,
-    Transfer
+    Transfer,
+    System
   }
 }

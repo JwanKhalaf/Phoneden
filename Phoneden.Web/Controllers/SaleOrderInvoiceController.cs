@@ -6,13 +6,14 @@ namespace Phoneden.Web.Controllers
   using Microsoft.EntityFrameworkCore.Storage;
   using Phoneden.Services;
   using ViewModels;
-  using ViewModels.PurchaseOrders;
   using ViewModels.SaleOrders;
 
   public class SaleOrderInvoiceController : BaseController
   {
     private readonly ISaleOrderInvoiceService _saleOrderInvoiceService;
+
     private readonly ISaleOrderService _saleOrderService;
+
     private readonly INotificationService _notificationService;
 
     public SaleOrderInvoiceController(
@@ -25,19 +26,23 @@ namespace Phoneden.Web.Controllers
       _notificationService = notificationService;
     }
 
-    public ActionResult Page(InvoiceSearchViewModel search, int page = 1)
+    public async Task<ActionResult> Page(
+      InvoiceSearchViewModel search,
+      int page = 1)
     {
-      SaleOrderInvoicePageViewModel viewModel = _saleOrderInvoiceService.GetPagedInvoices(search, page);
+      SaleOrderInvoicePageViewModel viewModel = await _saleOrderInvoiceService
+        .GetPagedInvoicesAsync(search, page);
 
       return View(viewModel);
     }
 
-    public async Task<ActionResult> Details(int saleOrderInvoiceId)
+    public async Task<ActionResult> Details(
+      int id)
     {
-      if (saleOrderInvoiceId == 0) return BadRequest();
+      if (id == 0) return BadRequest();
 
       SaleOrderInvoiceViewModel invoice = await _saleOrderInvoiceService
-        .GetInvoiceAsync(saleOrderInvoiceId);
+        .GetInvoiceAsync(id);
 
       SaleOrderViewModel saleOrder = await _saleOrderService
         .GetSaleOrderAsync(invoice.SaleOrderId);
@@ -51,7 +56,8 @@ namespace Phoneden.Web.Controllers
       return View(viewModel);
     }
 
-    public async Task<ActionResult> Create(int saleOrderId)
+    public async Task<ActionResult> Create(
+      int saleOrderId)
     {
       if (saleOrderId == 0) return BadRequest();
 
@@ -68,13 +74,14 @@ namespace Phoneden.Web.Controllers
     }
 
     [HttpPost]
-    public ActionResult Create(SaleOrderInvoiceViewModel invoice)
+    public async Task<ActionResult> Create(
+      SaleOrderInvoiceViewModel invoice)
     {
       if (!ModelState.IsValid) return View(invoice);
 
       try
       {
-        _saleOrderInvoiceService.AddInvoice(invoice);
+        await _saleOrderInvoiceService.AddInvoiceAsync(invoice);
 
         return RedirectToAction("Page", new { showDeleted = false });
       }
@@ -92,7 +99,9 @@ namespace Phoneden.Web.Controllers
       }
     }
 
-    public async Task<ActionResult> Delete(int? id, bool? saveChangesError = false)
+    public async Task<ActionResult> Delete(
+      int? id,
+      bool? saveChangesError = false)
     {
       if (id == null) return BadRequest();
 
@@ -110,13 +119,14 @@ namespace Phoneden.Web.Controllers
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Delete(int id)
+    public async Task<ActionResult> Delete(
+      int id)
     {
       if (id == 0) return BadRequest();
 
       try
       {
-        _saleOrderInvoiceService.DeleteInvoice(id);
+        await _saleOrderInvoiceService.DeleteInvoiceAsync(id);
       }
       catch (RetryLimitExceededException)
       {
@@ -126,7 +136,10 @@ namespace Phoneden.Web.Controllers
       return RedirectToAction("Page", new { showDeleted = false });
     }
 
-    public ActionResult Email(int invoiceId, int orderId, bool isSaleOrder)
+    public ActionResult Email(
+      int invoiceId,
+      int orderId,
+      bool isSaleOrder)
     {
       _notificationService.SendInvoiceEmail(invoiceId, orderId, isSaleOrder);
 

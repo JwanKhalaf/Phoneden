@@ -108,6 +108,9 @@ namespace Phoneden.Web
         .AddScoped<ISupplierService, SupplierService>();
 
       services
+        .AddScoped<IReturnService, ReturnService>();
+
+      services
         .AddTransient<INotificationService, NotificationService>();
 
       services
