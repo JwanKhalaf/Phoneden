@@ -804,9 +804,6 @@ namespace Phoneden.DataAccess.Migrations
                       .HasColumnName("conversion_rate")
                       .HasColumnType("decimal(19, 8)");
 
-            b.Property<decimal>("Cost")
-                      .HasColumnName("cost");
-
             b.Property<DateTime>("CreatedOn")
                       .HasColumnName("created_on");
 

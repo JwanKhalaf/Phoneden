@@ -6,19 +6,21 @@ namespace Phoneden.Services
 
   public interface ISaleOrderInvoiceService
   {
-    SaleOrderInvoicePageViewModel GetPagedInvoices(InvoiceSearchViewModel search, int page);
+    Task<SaleOrderInvoicePageViewModel> GetPagedInvoicesAsync(
+      InvoiceSearchViewModel search,
+      int page);
 
-    IEnumerable<SaleOrderInvoiceViewModel> GetAllInvoices();
+    Task<IEnumerable<SaleOrderInvoiceViewModel>> GetAllInvoicesAsync();
 
     Task<SaleOrderInvoiceViewModel> GetInvoiceAsync(int id);
 
-    void AddInvoice(SaleOrderInvoiceViewModel invoice);
+    Task AddInvoiceAsync(SaleOrderInvoiceViewModel viewModel);
 
-    void UpdateInvoice(SaleOrderInvoiceViewModel invoiceVm);
+    Task UpdateInvoiceAsync(SaleOrderInvoiceViewModel viewModel);
 
-    void DeleteInvoice(int id);
+    Task DeleteInvoiceAsync(int id);
 
-    InvoiceCustomerContactDetailsViewModel GetCustomerContactDetails(int invoiceId);
+    Task<InvoiceCustomerContactDetailsViewModel> GetCustomerContactDetailsAsync(int invoiceId);
 
     Task<decimal> GetRemainingCustomerCreditAsync(int orderId);
   }

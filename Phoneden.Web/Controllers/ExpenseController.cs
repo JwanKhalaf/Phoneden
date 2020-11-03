@@ -1,5 +1,6 @@
 namespace Phoneden.Web.Controllers
 {
+  using System.Threading.Tasks;
   using Base;
   using Microsoft.AspNetCore.Mvc;
   using Microsoft.EntityFrameworkCore.Storage;
@@ -15,44 +16,55 @@ namespace Phoneden.Web.Controllers
       _expenseService = expenseService;
     }
 
-    public ActionResult Page(int page = 1)
+    public async Task<ActionResult> Page(int page = 1)
     {
-      ExpensePageViewModel viewModel = _expenseService.GetPagedExpenses(page);
+      ExpensePageViewModel viewModel = await _expenseService
+        .GetPagedExpensesAsync(page);
+
       return View(viewModel);
     }
 
     public ActionResult Create()
     {
       ExpenseViewModel viewModel = new ExpenseViewModel();
+
       return View(viewModel);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Create(ExpenseViewModel vm)
+    public async Task<ActionResult> Create(ExpenseViewModel viewModel)
     {
-      if (!ModelState.IsValid) return View(vm);
-      _expenseService.AddExpense(vm);
+      if (!ModelState.IsValid) return View(viewModel);
+
+      await _expenseService
+        .AddExpenseAsync(viewModel);
+
       return RedirectToAction("Page");
     }
 
-    public ActionResult Edit(int id)
+    public async Task<ActionResult> Edit(int id)
     {
-      ExpenseViewModel expenseVm = _expenseService.GetExpense(id);
+      ExpenseViewModel expenseVm = await _expenseService
+        .GetExpenseAsync(id);
+
       return View(expenseVm);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Edit(ExpenseViewModel vm)
+    public ActionResult Edit(ExpenseViewModel viewModel)
     {
-      if (!ModelState.IsValid) return View(vm);
+      if (!ModelState.IsValid) return View(viewModel);
 
-      _expenseService.UpdateExpense(vm);
+      _expenseService.UpdateExpenseAsync(viewModel);
+
       return RedirectToAction("Page");
     }
 
-    public ActionResult Delete(int? id, bool? saveChangesError = false)
+    public async Task<ActionResult> Delete(
+      int? id,
+      bool? saveChangesError = false)
     {
       if (id == null) return BadRequest();
 
@@ -64,21 +76,25 @@ namespace Phoneden.Web.Controllers
       }
       else
       {
-        viewModel = _expenseService.GetExpense(id.Value);
+        viewModel = await _expenseService
+          .GetExpenseAsync(id.Value);
+
         if (viewModel == null) return NotFound();
       }
+
       return View(viewModel);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Delete(int id)
+    public async Task<ActionResult> Delete(int id)
     {
       if (id == 0) return BadRequest();
 
       try
       {
-        _expenseService.DeleteExpense(id);
+        await _expenseService
+          .DeleteExpenseAsync(id);
       }
       catch (RetryLimitExceededException)
       {

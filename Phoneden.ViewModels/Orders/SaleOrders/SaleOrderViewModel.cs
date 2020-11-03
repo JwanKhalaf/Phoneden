@@ -52,7 +52,7 @@ namespace Phoneden.ViewModels.SaleOrders
     public List<SelectListItem> Customers { get; set; }
 
     [Display(Name = "Invoiced")]
-    public bool IsInvoiced => Invoice != null;
+    public bool IsInvoiced => Invoice != null && !Invoice.IsDeleted;
 
     public string ButtonText => Id != 0 ? "Update Sale Order" : "Add Sale Order";
 

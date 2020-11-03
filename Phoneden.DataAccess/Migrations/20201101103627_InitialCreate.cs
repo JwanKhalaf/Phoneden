@@ -559,7 +559,6 @@ namespace Phoneden.DataAccess.Migrations
                   .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
             name = table.Column<string>(nullable: true),
             price = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
-            cost = table.Column<decimal>(nullable: false),
             currency = table.Column<int>(nullable: false),
             conversion_rate = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
             quality = table.Column<string>(nullable: true),
@@ -597,7 +596,6 @@ namespace Phoneden.DataAccess.Migrations
                   .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
             name = table.Column<string>(nullable: true),
             price = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
-            cost = table.Column<decimal>(nullable: false),
             currency = table.Column<int>(nullable: false),
             conversion_rate = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
             quality = table.Column<string>(nullable: true),
@@ -608,6 +606,7 @@ namespace Phoneden.DataAccess.Migrations
             modified_on = table.Column<DateTime>(nullable: true),
             sale_order_id = table.Column<int>(nullable: false),
             product_id = table.Column<int>(nullable: false),
+            cost = table.Column<decimal>(nullable: false),
             barcode = table.Column<string>(nullable: true)
           },
           constraints: table =>

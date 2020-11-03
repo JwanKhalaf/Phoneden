@@ -1,22 +1,23 @@
 namespace Phoneden.Services
 {
   using System.Collections.Generic;
+  using System.Threading.Tasks;
   using ViewModels;
 
   public interface IExpenseService
   {
-    ExpensePageViewModel GetPagedExpenses(int page);
+    Task<ExpensePageViewModel> GetPagedExpensesAsync(int page);
 
-    IEnumerable<ExpenseViewModel> GetAllExpenses();
+    Task<IEnumerable<ExpenseViewModel>> GetAllExpensesAsync();
 
-    ExpenseViewModel GetExpense(int id);
+    Task<ExpenseViewModel> GetExpenseAsync(int id);
 
-    void AddExpense(ExpenseViewModel expenseVm);
+    Task AddExpenseAsync(ExpenseViewModel viewModel);
 
-    void UpdateExpense(ExpenseViewModel expenseVm);
+    Task UpdateExpenseAsync(ExpenseViewModel viewModel);
 
-    void DeleteExpense(int id);
+    Task DeleteExpenseAsync(int id);
 
-    bool CurrentUserOwnsExpense(string userId, int expenseId);
+    Task<bool> CurrentUserOwnsExpenseAsync(string userId, int expenseId);
   }
 }

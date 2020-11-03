@@ -48,7 +48,7 @@ namespace Phoneden.Services
 
       List<PurchaseOrderViewModel> purchaseOrderVms = PurchaseOrderViewModelFactory.BuildList(purchaseOrderList);
 
-      PurchaseOrderPageViewModel purchaseOrderPageVm = new PurchaseOrderPageViewModel
+      PurchaseOrderPageViewModel viewModel = new PurchaseOrderPageViewModel
       {
         PurchaseOrders = purchaseOrderVms,
         Pagination = new PaginationViewModel
@@ -59,7 +59,7 @@ namespace Phoneden.Services
         }
       };
 
-      return purchaseOrderPageVm;
+      return viewModel;
     }
 
     public async Task<IEnumerable<PurchaseOrderViewModel>> GetAllPurchaseOrdersAsync()

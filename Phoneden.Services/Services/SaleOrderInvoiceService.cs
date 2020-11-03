@@ -26,7 +26,9 @@ namespace Phoneden.Services
       _recordsPerPage = paginationSettings.RecordsPerPage;
     }
 
-    public SaleOrderInvoicePageViewModel GetPagedInvoices(InvoiceSearchViewModel search, int page)
+    public async Task<SaleOrderInvoicePageViewModel> GetPagedInvoicesAsync(
+      InvoiceSearchViewModel search,
+      int page)
     {
       if (search.SearchTermHasChanged())
       {
@@ -50,6 +52,7 @@ namespace Phoneden.Services
       if (!string.IsNullOrEmpty(search.SearchTerm) && search.IsNumeric())
       {
         int searchInvoiceId = int.Parse(search.SearchTerm);
+
         invoices = invoices
           .Where(i => i.Id == searchInvoiceId);
       }
@@ -59,35 +62,35 @@ namespace Phoneden.Services
           .Where(i => i.Id == 0);
       }
 
-      List<SaleOrderInvoice> invoiceList = invoices
+      List<SaleOrderInvoice> invoiceList = await invoices
         .OrderByDescending(s => s.CreatedOn)
         .Skip(_recordsPerPage * (page - 1))
         .Take(_recordsPerPage)
-        .ToList();
+        .ToListAsync();
 
       List<SaleOrderInvoiceViewModel> invoiceVms = SaleOrderInvoiceViewModelFactory
         .BuildList(invoiceList);
 
       foreach (SaleOrderInvoiceViewModel invoice in invoiceVms)
       {
-        string businessName = _context
+        string businessName = await _context
           .SaleOrders
           .Where(so => so.Id == invoice.SaleOrderId)
           .Select(so => so.Customer.Name)
-          .First();
+          .FirstAsync();
 
-        decimal discount = _context
+        decimal discount = await _context
           .SaleOrders
           .Where(po => po.Id == invoice.SaleOrderId)
           .Select(po => po.Discount)
-          .First();
+          .FirstAsync();
 
         invoice.Discount = discount;
 
         invoice.Business.Name = businessName;
       }
 
-      SaleOrderInvoicePageViewModel invoicePageVm = new SaleOrderInvoicePageViewModel
+      SaleOrderInvoicePageViewModel viewModel = new SaleOrderInvoicePageViewModel
       {
         Invoices = invoiceVms,
         Pagination = new PaginationViewModel
@@ -98,10 +101,10 @@ namespace Phoneden.Services
         }
       };
 
-      return invoicePageVm;
+      return viewModel;
     }
 
-    public IEnumerable<SaleOrderInvoiceViewModel> GetAllInvoices()
+    public async Task<IEnumerable<SaleOrderInvoiceViewModel>> GetAllInvoicesAsync()
     {
       IQueryable<SaleOrderInvoice> invoices = _context
         .SaleOrderInvoices
@@ -110,10 +113,10 @@ namespace Phoneden.Services
         .AsNoTracking()
         .Where(i => !i.IsDeleted);
 
-      List<SaleOrderInvoiceViewModel> invoiceVms = SaleOrderInvoiceViewModelFactory
-        .BuildList(invoices.ToList());
+      List<SaleOrderInvoiceViewModel> viewModel = SaleOrderInvoiceViewModelFactory
+        .BuildList(await invoices.ToListAsync());
 
-      return invoiceVms;
+      return viewModel;
     }
 
     public async Task<SaleOrderInvoiceViewModel> GetInvoiceAsync(int id)
@@ -162,89 +165,100 @@ namespace Phoneden.Services
       return viewModel;
     }
 
-    public void AddInvoice(SaleOrderInvoiceViewModel invoice)
+    public async Task AddInvoiceAsync(SaleOrderInvoiceViewModel viewModel)
     {
-      SaleOrder saleOrder = _context
+      SaleOrder saleOrder = await _context
         .SaleOrders
         .Include(po => po.LineItems)
         .ThenInclude(li => li.Product)
-        .FirstOrDefault(po => po.Id == invoice.SaleOrderId);
+        .FirstOrDefaultAsync(po => po.Id == viewModel.SaleOrderId);
 
-      if (invoice.Discount > invoice.Amount)
+      if (viewModel.Discount > viewModel.Amount)
       {
         throw new DiscountTooHighException();
       }
 
       if (saleOrder != null)
       {
-        saleOrder.Discount = invoice.Discount;
+        saleOrder.Discount = viewModel.Discount;
 
         SaleOrderInvoice saleOrderInvoice = SaleOrderInvoiceFactory
-          .Build(saleOrder, invoice);
+          .Build(saleOrder, viewModel);
 
-        _context.SaleOrderInvoices.Add(saleOrderInvoice);
+        _context
+          .SaleOrderInvoices
+          .Add(saleOrderInvoice);
       }
 
-      _context.SaveChanges();
+      await _context.SaveChangesAsync();
     }
 
-    public void UpdateInvoice(SaleOrderInvoiceViewModel invoiceVm)
+    public async Task UpdateInvoiceAsync(SaleOrderInvoiceViewModel viewModel)
     {
-      SaleOrderInvoice saleOrderInvoice = _context
+      SaleOrderInvoice saleOrderInvoice = await _context
         .SaleOrderInvoices
         .Include(i => i.Payments)
         .Include(i => i.Returns)
-        .First(i => i.Id == invoiceVm.Id && !i.IsDeleted);
+        .FirstAsync(i => i.Id == viewModel.Id && !i.IsDeleted);
 
       SaleOrderInvoiceFactory
-        .MapViewModelToInvoice(invoiceVm, saleOrderInvoice);
+        .MapViewModelToInvoice(viewModel, saleOrderInvoice);
 
       _context.Entry(saleOrderInvoice).State = EntityState.Modified;
-      _context.SaveChanges();
+
+      await _context
+        .SaveChangesAsync();
     }
 
-    public void DeleteInvoice(int id)
+    public async Task DeleteInvoiceAsync(int id)
     {
-      PurchaseOrderInvoice purchaseOrderInvoice = _context
-        .PurchaseOrderInvoices
-        .Include(i => i.Payments)
-        .First(i => i.Id == id && !i.IsDeleted);
-
-      purchaseOrderInvoice.IsDeleted = true;
-
-      _context.Entry(purchaseOrderInvoice).State = EntityState.Modified;
-      _context.SaveChanges();
-    }
-
-    public InvoiceCustomerContactDetailsViewModel GetCustomerContactDetails(int invoiceId)
-    {
-      InvoiceCustomerContactDetailsViewModel customerContactDetails = new InvoiceCustomerContactDetailsViewModel();
-
-      SaleOrderInvoice saleOrderInvoice = _context
+      SaleOrderInvoice invoice = await _context
         .SaleOrderInvoices
-        .First(i => i.Id == invoiceId);
+        .Include(i => i.Payments)
+        .FirstAsync(i => i.Id == id && !i.IsDeleted);
 
-      SaleOrder saleOrder = _context
+      invoice.IsDeleted = true;
+
+      _context.Entry(invoice).State = EntityState.Modified;
+
+      await _context
+        .SaveChangesAsync();
+    }
+
+    public async Task<InvoiceCustomerContactDetailsViewModel> GetCustomerContactDetailsAsync(int invoiceId)
+    {
+      InvoiceCustomerContactDetailsViewModel viewModel = new InvoiceCustomerContactDetailsViewModel();
+
+      SaleOrderInvoice saleOrderInvoice = await _context
+        .SaleOrderInvoices
+        .FirstAsync(i => i.Id == invoiceId);
+
+      SaleOrder saleOrder = await _context
         .SaleOrders
         .Include(so => so.Customer)
         .ThenInclude(c => c.Contacts)
-        .First(so => so.Id == saleOrderInvoice.SaleOrderId);
+        .FirstAsync(so => so.Id == saleOrderInvoice.SaleOrderId);
 
-      customerContactDetails.Email = saleOrder.Customer.Email;
+      viewModel.Email = saleOrder.Customer.Email;
 
-      customerContactDetails.Name = saleOrder.Customer.Contacts.FirstOrDefault()?.FirstName + " " +
-                                    saleOrder.Customer.Contacts.FirstOrDefault()?.LastName;
+      viewModel.Name = saleOrder.Customer.Contacts.FirstOrDefault()?.FirstName + " " +
+                       saleOrder.Customer.Contacts.FirstOrDefault()?.LastName;
 
-      return customerContactDetails;
+      return viewModel;
     }
 
     public async Task<decimal> GetRemainingCustomerCreditAsync(int orderId)
     {
-      SaleOrder saleOrder = await _context.SaleOrders.Where(so => so.Id == orderId).FirstAsync();
+      SaleOrder saleOrder = await _context
+        .SaleOrders
+        .Where(so => so.Id == orderId)
+        .FirstAsync();
 
       int customerId = saleOrder.CustomerId;
 
-      Customer customer = await _context.Customers.FindAsync(customerId);
+      Customer customer = await _context
+        .Customers
+        .FindAsync(customerId);
 
       decimal remainingCredit = customer.AllowedCredit - customer.CreditUsed;
 
