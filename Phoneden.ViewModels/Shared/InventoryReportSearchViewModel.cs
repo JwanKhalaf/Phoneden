@@ -1,10 +1,6 @@
 namespace Phoneden.ViewModels
 {
-  public enum SearchCategory
-  {
-    Category,
-    Brand
-  }
+  using System.ComponentModel.DataAnnotations;
 
   public class InventoryReportSearchViewModel
   {
@@ -13,10 +9,18 @@ namespace Phoneden.ViewModels
       PreviousSearchTerm = SearchTerm;
     }
 
+    [Display(Name = "Product name")]
     public string SearchTerm { get; set; }
+
+    [Display(Name = "Product Barcode")]
+    public string Barcode { get; set; }
 
     public string PreviousSearchTerm { get; set; }
 
-    public SearchCategory Category { get; set; }
+    [Display(Name = "Category")]
+    public int CategoryId { get; set; }
+
+    [Display(Name = "Brand")]
+    public int BrandId { get; set; }
   }
 }

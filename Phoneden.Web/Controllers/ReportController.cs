@@ -41,12 +41,23 @@ namespace Phoneden.Web.Controllers
       return View(viewModel);
     }
 
+    [HttpGet]
     public async Task<ActionResult> Inventory(
       InventoryReportSearchViewModel search,
       int page = 1)
     {
       InventoryReportViewModel viewModel = await _reportService
         .GetProductsAsync(page, search);
+
+      return View(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> Inventory(
+      InventoryReportSearchViewModel search)
+    {
+      InventoryReportViewModel viewModel = await _reportService
+        .GetProductsAsync(1, search);
 
       return View(viewModel);
     }

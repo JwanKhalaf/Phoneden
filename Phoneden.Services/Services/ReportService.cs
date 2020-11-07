@@ -8,6 +8,7 @@ namespace Phoneden.Services
   using Entities;
   using Entities.Shared;
   using Interfaces;
+  using Microsoft.AspNetCore.Mvc.Rendering;
   using Microsoft.EntityFrameworkCore;
   using ViewModels;
 
@@ -37,7 +38,8 @@ namespace Phoneden.Services
         page = 1;
       }
 
-      IQueryable<Product> products = _context.Products
+      IQueryable<Product> products = _context
+        .Products
         .Include(p => p.Category)
         .Include(p => p.Brand)
         .Include(p => p.Quality)
@@ -51,56 +53,66 @@ namespace Phoneden.Services
           .Trim()
           .ToLowerInvariant();
 
-        switch (search.Category)
-        {
-          case SearchCategory.Category:
-            products = products
-              .Where(p => EF.Functions.Like(p.Category.Name.ToLowerInvariant(), $"%{searchTerm}%"))
-              .OrderBy(p => p.Category.Name);
-
-            totalNumberOfProducts = await products.CountAsync();
-
-            products = products
-              .Skip(_recordsPerPage * (page - 1))
-              .Take(_recordsPerPage);
-            break;
-          case SearchCategory.Brand:
-            products = products
-              .Where(p => EF.Functions.Like(p.Brand.Name.ToLowerInvariant(), $"%{searchTerm}%"))
-              .OrderBy(p => p.Brand.Name);
-
-            totalNumberOfProducts = await products.CountAsync();
-
-            products = products
-              .Skip(_recordsPerPage * (page - 1))
-              .Take(_recordsPerPage);
-            break;
-        }
-      }
-      else
-      {
-        products = products.OrderBy(p => p.Quantity);
-
-        totalNumberOfProducts = await products.CountAsync();
-
         products = products
-          .Skip(_recordsPerPage * (page - 1))
-          .Take(_recordsPerPage);
+          .Where(p => EF.Functions.Like(p.Name.ToLowerInvariant(), $"%{searchTerm}%"));
       }
+      else if (!string.IsNullOrEmpty(search.Barcode))
+      {
+        products = products
+          .Where(p => p.Barcode == search.Barcode);
+      }
+
+      if (search.CategoryId != 0)
+      {
+        products = products.Where(p => p.CategoryId == search.CategoryId);
+      }
+
+      if (search.BrandId != 0)
+      {
+        products = products.Where(p => p.BrandId == search.BrandId);
+      }
+
+      products = products.OrderBy(p => p.Quantity);
+
+      totalNumberOfProducts = await products.CountAsync();
+
+      products = products
+        .Skip(_recordsPerPage * (page - 1))
+        .Take(_recordsPerPage);
 
       PaginationViewModel paginationVm = new PaginationViewModel();
       paginationVm.CurrentPage = page;
       paginationVm.RecordsPerPage = _recordsPerPage;
       paginationVm.TotalRecords = totalNumberOfProducts;
 
-      InventoryReportViewModel inventoryReportVm = new InventoryReportViewModel();
-      inventoryReportVm.Products = ProductViewModelFactory.BuildList(products.ToList());
-      inventoryReportVm.Pagination = paginationVm;
-      inventoryReportVm.Search = search;
+      InventoryReportViewModel viewModel = new InventoryReportViewModel();
+      viewModel.Products = ProductViewModelFactory.BuildList(await products.ToListAsync());
+      viewModel.Pagination = paginationVm;
+      viewModel.Search = search;
+      viewModel.Categories = await _context
+        .Categories
+        .Where(c => !c.IsDeleted)
+        .Select(s =>
+          new SelectListItem
+          {
+            Text = s.Name,
+            Value = s.Id.ToString()
+          })
+        .ToListAsync();
+      viewModel.Brands = await _context
+        .Brands
+        .Where(b => !b.IsDeleted)
+        .Select(s =>
+          new SelectListItem
+          {
+            Text = s.Name,
+            Value = s.Id.ToString()
+          })
+        .ToListAsync();
 
-      TrackCurrentSearchTerm(inventoryReportVm);
+      TrackCurrentSearchTerm(viewModel);
 
-      return inventoryReportVm;
+      return viewModel;
     }
 
     public async Task<IEnumerable<CustomerViewModel>> GetTopTenCustomersAsync()
