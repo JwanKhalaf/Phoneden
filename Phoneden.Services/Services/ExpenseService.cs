@@ -128,5 +128,30 @@ namespace Phoneden.Services
 
       return value;
     }
+
+    public async Task<decimal> GetAverageExpensePerItemForPeriodAsync(
+      DateTime startDate,
+      DateTime endDate)
+    {
+      // all expenses between selected dates
+      decimal totalExpensesForSelectedPeriod = await _context
+        .Expenses
+        .Where(e => e.Date >= startDate && e.Date <= endDate)
+        .SumAsync(e => e.Amount);
+
+      int totalNumberOfProductsSold = await _context
+        .SaleOrders
+        .Where(s => s.Date >= startDate && s.Date <= endDate)
+        .SumAsync(s => s.LineItems.Sum(l => l.Quantity));
+
+      decimal expensePerItem = 0;
+
+      if (totalNumberOfProductsSold > 0)
+      {
+        expensePerItem = totalExpensesForSelectedPeriod / totalNumberOfProductsSold;
+      }
+
+      return expensePerItem;
+    }
   }
 }

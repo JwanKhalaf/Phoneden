@@ -24,5 +24,10 @@ namespace Phoneden.Services
       int page,
       DateTime startDate,
       DateTime endDate);
+
+    Task<ProductSalesViewModel> GetProductSalesAsync(
+      DateTime startDate,
+      DateTime endDate,
+      string barcode);
   }
 }

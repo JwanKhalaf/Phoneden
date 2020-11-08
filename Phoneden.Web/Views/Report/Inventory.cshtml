@@ -1,4 +1,3 @@
-@using Phoneden.ViewModels
 @model Phoneden.ViewModels.InventoryReportViewModel
 
 @{
@@ -26,7 +25,16 @@
         @using (Html.BeginForm("Inventory", "Report", FormMethod.Get))
         {
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-3">
+              <div class="form-group">
+                @Html.LabelFor(model => model.Search.Barcode, new { @class = "form-label" })
+                <div class="controls">
+                  @Html.EditorFor(m => m.Search.Barcode, new { htmlAttributes = new { @class = "form-control" } })
+                  @Html.ValidationMessageFor(model => model.Search.Barcode, "", new { @class = "text-danger" })
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
               <div class="form-group">
                 @Html.LabelFor(model => model.Search.SearchTerm, new { @class = "form-label" })
                 <div class="controls">
@@ -35,14 +43,29 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
               <div class="form-group">
-                @Html.LabelFor(model => model.Search.Category, new { @class = "form-label" })
+                <label asp-for="Search.CategoryId" class="form-label"></label>
                 <div class="controls">
-                  <select asp-for="Search.Category" asp-items="Html.GetEnumSelectList<SearchCategory>()" class="form-control">
-                    <option>Select a search category</option>
+                  <select asp-for="Search.CategoryId"
+                          asp-items="@(new SelectList(Model.Categories, "Value", "Text"))"
+                          class="form-control">
+                    <option value="0">Select a Category</option>
                   </select>
-                  @Html.ValidationMessageFor(m => m.Search.Category, "", new {@class = "text-danger"})
+                  <span asp-validation-for="Search.CategoryId" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label asp-for="Search.BrandId" class="form-label"></label>
+                <div class="controls">
+                  <select asp-for="Search.BrandId"
+                          asp-items="@(new SelectList(Model.Brands, "Value", "Text"))"
+                          class="form-control">
+                    <option value="0">Select a Brand</option>
+                  </select>
+                  <span asp-validation-for="Search.BrandId" class="text-danger"></span>
                 </div>
               </div>
             </div>
@@ -63,60 +86,60 @@
       <div class="grid-body no-border">
         <table class="table table-striped table-flip-scroll cf">
           <thead class="cf">
-          <tr>
-            <th>
-              Product Name
-            </th>
-            <th>Stock</th>
-            <th>
-              Category
-            </th>
-            <th>
-              Brand
-            </th>
-            <th>
-              Quality
-            </th>
-            <th>
-              Quantity
-            </th>
-          </tr>
+            <tr>
+              <th>
+                Product Name
+              </th>
+              <th>Stock</th>
+              <th>
+                Category
+              </th>
+              <th>
+                Brand
+              </th>
+              <th>
+                Quality
+              </th>
+              <th>
+                Quantity
+              </th>
+            </tr>
           </thead>
           <tbody>
-          @foreach (var product in Model.Products)
-          {
-            <tr>
-              <td>
-                @Html.DisplayFor(p => product.Name)
-              </td>
-              <td>
-                @if (product.Quantity > product.AlertThreshold)
-                {
-                  <span class="label label-success">OK STOCK</span>
-                }
-                else if (product.Quantity == 0)
-                {
-                  <span class="label label-danger">OUT OF STOCK</span>
-                }
-                else
-                {
-                  <span class="label label-inverse">LOW STOCK</span>
-                }
-              </td>
-              <td>
-                @Html.DisplayFor(m => product.Category)
-              </td>
-              <td>
-                @Html.DisplayFor(m => product.Brand)
-              </td>
-              <td>
-                @Html.DisplayFor(p => product.AssociatedQuality)
-              </td>
-              <td>
-                @Html.DisplayFor(s => product.Quantity)
-              </td>
-            </tr>
-          }
+            @foreach (var product in Model.Products)
+            {
+              <tr>
+                <td>
+                  @Html.DisplayFor(p => product.Name)
+                </td>
+                <td>
+                  @if (product.Quantity > product.AlertThreshold)
+                  {
+                    <span class="label label-success">OK STOCK</span>
+                  }
+                  else if (product.Quantity == 0)
+                  {
+                    <span class="label label-danger">OUT OF STOCK</span>
+                  }
+                  else
+                  {
+                    <span class="label label-inverse">LOW STOCK</span>
+                  }
+                </td>
+                <td>
+                  @Html.DisplayFor(m => product.Category)
+                </td>
+                <td>
+                  @Html.DisplayFor(m => product.Brand)
+                </td>
+                <td>
+                  @Html.DisplayFor(p => product.AssociatedQuality)
+                </td>
+                <td>
+                  @Html.DisplayFor(s => product.Quantity)
+                </td>
+              </tr>
+            }
           </tbody>
         </table>
         <cs-pager cs-paging-pagesize="10"

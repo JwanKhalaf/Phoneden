@@ -8,6 +8,7 @@ namespace Phoneden.Services
   using Entities;
   using Entities.Shared;
   using Interfaces;
+  using Microsoft.AspNetCore.Mvc.Rendering;
   using Microsoft.EntityFrameworkCore;
   using ViewModels;
 
@@ -15,13 +16,18 @@ namespace Phoneden.Services
   {
     private readonly PdContext _context;
 
+    private readonly IExpenseService _expenseService;
+
     private readonly int _recordsPerPage;
 
     public ReportService(
-      IPaginationConfiguration paginationSettings,
-      PdContext context)
+      PdContext context,
+      IExpenseService expenseService,
+      IPaginationConfiguration paginationSettings)
     {
       _context = context ?? throw new ArgumentNullException(nameof(context));
+
+      _expenseService = expenseService ?? throw new ArgumentNullException(nameof(expenseService));
 
       _recordsPerPage = paginationSettings.RecordsPerPage;
     }
@@ -30,14 +36,13 @@ namespace Phoneden.Services
       int page,
       InventoryReportSearchViewModel search)
     {
-      int totalNumberOfProducts = 0;
-
       if (HaveSearchTermsChanged(search))
       {
         page = 1;
       }
 
-      IQueryable<Product> products = _context.Products
+      IQueryable<Product> products = _context
+        .Products
         .Include(p => p.Category)
         .Include(p => p.Brand)
         .Include(p => p.Quality)
@@ -51,56 +56,66 @@ namespace Phoneden.Services
           .Trim()
           .ToLowerInvariant();
 
-        switch (search.Category)
-        {
-          case SearchCategory.Category:
-            products = products
-              .Where(p => EF.Functions.Like(p.Category.Name.ToLowerInvariant(), $"%{searchTerm}%"))
-              .OrderBy(p => p.Category.Name);
-
-            totalNumberOfProducts = await products.CountAsync();
-
-            products = products
-              .Skip(_recordsPerPage * (page - 1))
-              .Take(_recordsPerPage);
-            break;
-          case SearchCategory.Brand:
-            products = products
-              .Where(p => EF.Functions.Like(p.Brand.Name.ToLowerInvariant(), $"%{searchTerm}%"))
-              .OrderBy(p => p.Brand.Name);
-
-            totalNumberOfProducts = await products.CountAsync();
-
-            products = products
-              .Skip(_recordsPerPage * (page - 1))
-              .Take(_recordsPerPage);
-            break;
-        }
-      }
-      else
-      {
-        products = products.OrderBy(p => p.Quantity);
-
-        totalNumberOfProducts = await products.CountAsync();
-
         products = products
-          .Skip(_recordsPerPage * (page - 1))
-          .Take(_recordsPerPage);
+          .Where(p => EF.Functions.Like(p.Name.ToLowerInvariant(), $"%{searchTerm}%"));
       }
+      else if (!string.IsNullOrEmpty(search.Barcode))
+      {
+        products = products
+          .Where(p => p.Barcode == search.Barcode);
+      }
+
+      if (search.CategoryId != 0)
+      {
+        products = products.Where(p => p.CategoryId == search.CategoryId);
+      }
+
+      if (search.BrandId != 0)
+      {
+        products = products.Where(p => p.BrandId == search.BrandId);
+      }
+
+      products = products.OrderBy(p => p.Quantity);
+
+      int totalNumberOfProducts = await products.CountAsync();
+
+      products = products
+        .Skip(_recordsPerPage * (page - 1))
+        .Take(_recordsPerPage);
 
       PaginationViewModel paginationVm = new PaginationViewModel();
       paginationVm.CurrentPage = page;
       paginationVm.RecordsPerPage = _recordsPerPage;
       paginationVm.TotalRecords = totalNumberOfProducts;
 
-      InventoryReportViewModel inventoryReportVm = new InventoryReportViewModel();
-      inventoryReportVm.Products = ProductViewModelFactory.BuildList(products.ToList());
-      inventoryReportVm.Pagination = paginationVm;
-      inventoryReportVm.Search = search;
+      InventoryReportViewModel viewModel = new InventoryReportViewModel();
+      viewModel.Products = ProductViewModelFactory.BuildList(await products.ToListAsync());
+      viewModel.Pagination = paginationVm;
+      viewModel.Search = search;
+      viewModel.Categories = await _context
+        .Categories
+        .Where(c => !c.IsDeleted)
+        .Select(s =>
+          new SelectListItem
+          {
+            Text = s.Name,
+            Value = s.Id.ToString()
+          })
+        .ToListAsync();
+      viewModel.Brands = await _context
+        .Brands
+        .Where(b => !b.IsDeleted)
+        .Select(s =>
+          new SelectListItem
+          {
+            Text = s.Name,
+            Value = s.Id.ToString()
+          })
+        .ToListAsync();
 
-      TrackCurrentSearchTerm(inventoryReportVm);
+      TrackCurrentSearchTerm(viewModel);
 
-      return inventoryReportVm;
+      return viewModel;
     }
 
     public async Task<IEnumerable<CustomerViewModel>> GetTopTenCustomersAsync()
@@ -169,18 +184,8 @@ namespace Phoneden.Services
         .Skip(_recordsPerPage * (page - 1))
         .Take(_recordsPerPage);
 
-      // all expenses between selected dates
-      decimal totalExpensesForSelectedPeriod = await _context
-        .Expenses
-        .Where(e => e.Date >= startDate && e.Date <= endDate)
-        .SumAsync(e => e.Amount);
-
-      int totalNumberOfProductsSold = await _context
-        .SaleOrders
-        .Where(s => s.Date >= startDate && s.Date <= endDate)
-        .SumAsync(s => s.LineItems.Sum(l => l.Quantity));
-
-      decimal expensePerItem = totalExpensesForSelectedPeriod / totalNumberOfProductsSold;
+      decimal expensePerItem = await _expenseService
+        .GetAverageExpensePerItemForPeriodAsync(startDate, endDate);
 
       List<CustomerSalesItemReportViewModel> reportItems = CustomerSalesItemReportViewModelFactory
         .BuildList(await saleOrderInvoices.ToListAsync(), expensePerItem);
@@ -274,6 +279,60 @@ namespace Phoneden.Services
       };
 
       return reportVm;
+    }
+
+    public async Task<ProductSalesViewModel> GetProductSalesAsync(
+      DateTime startDate,
+      DateTime endDate,
+      string barcode)
+    {
+      List<ProductSalesItemViewModel> viewModelItems = new List<ProductSalesItemViewModel>();
+
+      IQueryable<Product> products = _context
+        .Products
+        .Include(i => i.Brand)
+        .Where(i => !i.IsDeleted);
+
+      if (!string.IsNullOrEmpty(barcode))
+      {
+        products = products
+          .Where(i => i.Barcode == barcode);
+      }
+
+      ProductSalesViewModel viewModel = new ProductSalesViewModel();
+
+      decimal averageExpensePerItem = await _expenseService
+        .GetAverageExpensePerItemForPeriodAsync(startDate, endDate);
+
+      foreach (Product product in await products.ToListAsync())
+      {
+        int totalNumberSold = await _context
+          .SaleOrderInvoiceLineItems
+          .Where(i => i.ProductId == product.Id)
+          .SumAsync(i => i.Quantity);
+
+        decimal profit = await _context
+          .SaleOrderInvoiceLineItems
+          .Where(i =>
+            i.ProductId == product.Id
+            && i.CreatedOn >= startDate
+            && i.CreatedOn <= endDate)
+          .SumAsync(i => (i.Price - i.Cost - averageExpensePerItem) * i.Quantity);
+
+        ProductSalesItemViewModel viewModelItem = new ProductSalesItemViewModel();
+        viewModelItem.ProductName = $"{product.Brand.Name}/{product.Name}";
+        viewModelItem.NumberSold = totalNumberSold;
+        viewModelItem.Profit = profit;
+
+        viewModelItems.Add(viewModelItem);
+      }
+
+      viewModel.NumberSold = 1;
+      viewModel.Products = viewModelItems;
+      viewModel.StartDate = startDate;
+      viewModel.EndDate = endDate;
+
+      return viewModel;
     }
 
     private static void TrackCurrentSearchTerm(
