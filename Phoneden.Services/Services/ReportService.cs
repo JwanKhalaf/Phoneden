@@ -16,13 +16,18 @@ namespace Phoneden.Services
   {
     private readonly PdContext _context;
 
+    private readonly IExpenseService _expenseService;
+
     private readonly int _recordsPerPage;
 
     public ReportService(
-      IPaginationConfiguration paginationSettings,
-      PdContext context)
+      PdContext context,
+      IExpenseService expenseService,
+      IPaginationConfiguration paginationSettings)
     {
       _context = context ?? throw new ArgumentNullException(nameof(context));
+
+      _expenseService = expenseService ?? throw new ArgumentNullException(nameof(expenseService));
 
       _recordsPerPage = paginationSettings.RecordsPerPage;
     }
@@ -31,8 +36,6 @@ namespace Phoneden.Services
       int page,
       InventoryReportSearchViewModel search)
     {
-      int totalNumberOfProducts = 0;
-
       if (HaveSearchTermsChanged(search))
       {
         page = 1;
@@ -74,7 +77,7 @@ namespace Phoneden.Services
 
       products = products.OrderBy(p => p.Quantity);
 
-      totalNumberOfProducts = await products.CountAsync();
+      int totalNumberOfProducts = await products.CountAsync();
 
       products = products
         .Skip(_recordsPerPage * (page - 1))
@@ -181,18 +184,8 @@ namespace Phoneden.Services
         .Skip(_recordsPerPage * (page - 1))
         .Take(_recordsPerPage);
 
-      // all expenses between selected dates
-      decimal totalExpensesForSelectedPeriod = await _context
-        .Expenses
-        .Where(e => e.Date >= startDate && e.Date <= endDate)
-        .SumAsync(e => e.Amount);
-
-      int totalNumberOfProductsSold = await _context
-        .SaleOrders
-        .Where(s => s.Date >= startDate && s.Date <= endDate)
-        .SumAsync(s => s.LineItems.Sum(l => l.Quantity));
-
-      decimal expensePerItem = totalExpensesForSelectedPeriod / totalNumberOfProductsSold;
+      decimal expensePerItem = await _expenseService
+        .GetAverageExpensePerItemForPeriodAsync(startDate, endDate);
 
       List<CustomerSalesItemReportViewModel> reportItems = CustomerSalesItemReportViewModelFactory
         .BuildList(await saleOrderInvoices.ToListAsync(), expensePerItem);
@@ -286,6 +279,60 @@ namespace Phoneden.Services
       };
 
       return reportVm;
+    }
+
+    public async Task<ProductSalesViewModel> GetProductSalesAsync(
+      DateTime startDate,
+      DateTime endDate,
+      string barcode)
+    {
+      List<ProductSalesItemViewModel> viewModelItems = new List<ProductSalesItemViewModel>();
+
+      IQueryable<Product> products = _context
+        .Products
+        .Include(i => i.Brand)
+        .Where(i => !i.IsDeleted);
+
+      if (!string.IsNullOrEmpty(barcode))
+      {
+        products = products
+          .Where(i => i.Barcode == barcode);
+      }
+
+      ProductSalesViewModel viewModel = new ProductSalesViewModel();
+
+      decimal averageExpensePerItem = await _expenseService
+        .GetAverageExpensePerItemForPeriodAsync(startDate, endDate);
+
+      foreach (Product product in await products.ToListAsync())
+      {
+        int totalNumberSold = await _context
+          .SaleOrderInvoiceLineItems
+          .Where(i => i.ProductId == product.Id)
+          .SumAsync(i => i.Quantity);
+
+        decimal profit = await _context
+          .SaleOrderInvoiceLineItems
+          .Where(i =>
+            i.ProductId == product.Id
+            && i.CreatedOn >= startDate
+            && i.CreatedOn <= endDate)
+          .SumAsync(i => (i.Price - i.Cost - averageExpensePerItem) * i.Quantity);
+
+        ProductSalesItemViewModel viewModelItem = new ProductSalesItemViewModel();
+        viewModelItem.ProductName = $"{product.Brand.Name}/{product.Name}";
+        viewModelItem.NumberSold = totalNumberSold;
+        viewModelItem.Profit = profit;
+
+        viewModelItems.Add(viewModelItem);
+      }
+
+      viewModel.NumberSold = 1;
+      viewModel.Products = viewModelItems;
+      viewModel.StartDate = startDate;
+      viewModel.EndDate = endDate;
+
+      return viewModel;
     }
 
     private static void TrackCurrentSearchTerm(

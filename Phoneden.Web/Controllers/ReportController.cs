@@ -9,6 +9,7 @@ namespace Phoneden.Web.Controllers
   using Microsoft.AspNetCore.Mvc.Rendering;
   using Phoneden.Services;
   using ViewModels;
+  using ViewModels.Reports;
 
   public class ReportController : BaseController
   {
@@ -115,6 +116,23 @@ namespace Phoneden.Web.Controllers
 
       return View(viewModel);
     }
+
+    [HttpGet]
+    public async Task<ActionResult> ProductSales(
+      DateTime? startDate,
+      DateTime? endDate,
+      string barcode = "")
+    {
+      if (!startDate.HasValue) startDate = DateTime.UtcNow.AddMonths(-1);
+
+      if (!endDate.HasValue) endDate = DateTime.UtcNow;
+
+      ProductSalesViewModel viewModel = await _reportService
+        .GetProductSalesAsync(startDate.Value, endDate.Value, barcode);
+
+      return View(viewModel);
+    }
+
 
     private List<SelectListItem> GetCustomersSelectList()
     {
