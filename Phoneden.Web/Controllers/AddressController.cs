@@ -1,5 +1,6 @@
 namespace Phoneden.Web.Controllers
 {
+  using System.Threading.Tasks;
   using Base;
   using Microsoft.AspNetCore.Mvc;
   using Phoneden.Services;
@@ -14,52 +15,108 @@ namespace Phoneden.Web.Controllers
       _addressService = addressService;
     }
 
-    public ActionResult Create(int businessId, bool isSupplierAddress)
+    public ActionResult CreateForSupplier(int businessId)
     {
       AddressViewModel viewModel = new AddressViewModel
       {
         BusinessId = businessId,
-        IsSupplierAddress = isSupplierAddress
       };
+
+      return View(viewModel);
+    }
+
+    public ActionResult CreateForCustomer(int businessId)
+    {
+      AddressViewModel viewModel = new AddressViewModel
+      {
+        BusinessId = businessId,
+      };
+
       return View(viewModel);
     }
 
     [HttpPost]
-    public ActionResult Create(AddressViewModel addressVm)
+    public async Task<ActionResult> CreateForSupplier(AddressViewModel viewModel)
     {
-      if (!ModelState.IsValid) return View(addressVm);
+      if (!ModelState.IsValid) return View(viewModel);
 
-      _addressService.AddAddress(addressVm);
-      return RedirectToDetailedView(addressVm.IsSupplierAddress, addressVm.BusinessId);
-    }
+      await _addressService.AddSupplierAddressAsync(viewModel);
 
-    public ActionResult Edit(int id, bool isSupplierAddress)
-    {
-      AddressViewModel addressVm = _addressService.GetAddress(id, isSupplierAddress);
-      return View(addressVm);
+      return RedirectToRoute(new { controller = "Supplier", action = "Details", id = viewModel.BusinessId });
     }
 
     [HttpPost]
-    public ActionResult Edit(AddressViewModel addressVm)
+    public async Task<ActionResult> CreateForCustomer(AddressViewModel viewModel)
     {
-      if (!ModelState.IsValid) return View(addressVm);
+      if (!ModelState.IsValid) return View(viewModel);
 
-      _addressService.UpdateAddress(addressVm);
-      return RedirectToDetailedView(addressVm.IsSupplierAddress, addressVm.BusinessId);
+      await _addressService.AddCustomerAddressAsync(viewModel);
+
+      return RedirectToRoute(new { controller = "Customer", action = "Details", id = viewModel.BusinessId });
     }
 
-    public ActionResult Delete(int id, int businessId, bool isSupplierAddress)
+    public async Task<ActionResult> EditForSupplier(int id)
     {
-      if (!_addressService.CanAddressBeDeleted(id, isSupplierAddress)) return RedirectToDetailedView(isSupplierAddress, businessId);
-      _addressService.DeleteAddress(id, isSupplierAddress);
-      return RedirectToDetailedView(isSupplierAddress, businessId);
+      AddressViewModel viewModel = await _addressService
+        .GetSupplierAddressAsync(id);
+
+      return View(viewModel);
     }
 
-    #region Helpers
-    private RedirectToRouteResult RedirectToDetailedView(bool isSupplierAddress, int businessId)
+    [HttpPost]
+    public async Task<ActionResult> EditForSupplier(
+      AddressViewModel viewModel)
     {
-      return RedirectToRoute(new { controller = isSupplierAddress ? "Supplier" : "Customer", action = "Details", id = businessId });
+      if (!ModelState.IsValid) return View(viewModel);
+
+      await _addressService.UpdateSupplierAddressAsync(viewModel);
+
+      return RedirectToRoute(new { controller = "Supplier", action = "Details", id = viewModel.BusinessId });
     }
-    #endregion
+
+    public async Task<ActionResult> EditForCustomer(int id)
+    {
+      AddressViewModel viewModel = await _addressService
+        .GetCustomerAddressAsync(id);
+
+      return View(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> EditForCustomer(
+      AddressViewModel viewModel)
+    {
+      if (!ModelState.IsValid) return View(viewModel);
+
+      await _addressService.UpdateCustomerAddressAsync(viewModel);
+
+      return RedirectToRoute(new { controller = "Customer", action = "Details", id = viewModel.BusinessId });
+    }
+
+    public async Task<ActionResult> DeleteForSupplier(
+      int id,
+      int businessId)
+    {
+      bool addressCanBeDeleted = await _addressService.CanSupplierAddressBeDeletedAsync(id);
+
+      if (!addressCanBeDeleted) return RedirectToRoute(new { controller = "Supplier", action = "Details", id = businessId });
+
+      await _addressService.DeleteSupplierAddressAsync(id);
+
+      return RedirectToRoute(new { controller = "Supplier", action = "Details", id = businessId });
+    }
+
+    public async Task<ActionResult> DeleteForCustomer(
+      int id,
+      int businessId)
+    {
+      bool addressCanBeDeleted = await _addressService.CanCustomerAddressBeDeletedAsync(id);
+
+      if (!addressCanBeDeleted) return RedirectToRoute(new { controller = "Customer", action = "Details", id = businessId });
+
+      await _addressService.DeleteCustomerAddressAsync(id);
+
+      return RedirectToRoute(new { controller = "Customer", action = "Details", id = businessId });
+    }
   }
 }

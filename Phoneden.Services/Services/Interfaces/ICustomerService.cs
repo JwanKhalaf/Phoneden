@@ -6,16 +6,22 @@ namespace Phoneden.Services
 
   public interface ICustomerService
   {
-    CustomerPageViewModel GetPagedCustomers(bool showDeleted, int page);
+    Task<CustomerPageViewModel> GetPagedCustomersAsync(
+      bool showDeleted,
+      int page);
 
-    IEnumerable<CustomerViewModel> GetAllCustomers();
+    Task<IEnumerable<CustomerViewModel>> GetAllCustomersAsync();
 
-    Task<CustomerViewModel> GetCustomerAsync(int id);
+    Task<CustomerViewModel> GetCustomerAsync(
+      int id);
 
-    void AddCustomer(CustomerViewModel customerVm);
+    Task AddCustomerAsync(
+      CustomerViewModel viewModel);
 
-    void UpdateCustomer(CustomerViewModel customerVm);
+    Task UpdateCustomerAsync(
+      CustomerViewModel viewModel);
 
-    void DeleteCustomer(int id);
+    Task DeleteCustomerAsync(
+      int id);
   }
 }

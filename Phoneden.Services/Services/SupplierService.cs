@@ -13,15 +13,21 @@ namespace Phoneden.Services
   public class SupplierService : ISupplierService
   {
     private readonly PdContext _context;
+
     private readonly int _recordsPerPage;
 
-    public SupplierService(IPaginationConfiguration paginationSettings, PdContext context)
+    public SupplierService(
+      PdContext context,
+      IPaginationConfiguration paginationSettings)
     {
       _context = context ?? throw new ArgumentNullException(nameof(context));
+
       _recordsPerPage = paginationSettings.RecordsPerPage;
     }
 
-    public async Task<SupplierPageViewModel> GetPagedSuppliersAsync(bool showDeleted, int page)
+    public async Task<SupplierPageViewModel> GetPagedSuppliersAsync(
+      bool showDeleted,
+      int page)
     {
       IQueryable<Supplier> suppliers = _context
         .Suppliers
@@ -46,29 +52,30 @@ namespace Phoneden.Services
       PaginationViewModel paginationVm = new PaginationViewModel();
       paginationVm.CurrentPage = page;
       paginationVm.RecordsPerPage = _recordsPerPage;
-      paginationVm.TotalRecords = _context.Suppliers.Count(s => !s.IsDeleted);
+      paginationVm.TotalRecords = await _context.Suppliers.CountAsync(s => !s.IsDeleted);
 
-      SupplierPageViewModel supplierPageVm = new SupplierPageViewModel();
-      supplierPageVm.Suppliers = supplierVms;
-      supplierPageVm.Pagination = paginationVm;
+      SupplierPageViewModel viewModel = new SupplierPageViewModel();
+      viewModel.Suppliers = supplierVms;
+      viewModel.Pagination = paginationVm;
 
-      return supplierPageVm;
+      return viewModel;
     }
 
-    public List<SupplierViewModel> GetAllSuppliers()
+    public async Task<List<SupplierViewModel>> GetAllSuppliersAsync()
     {
       IQueryable<Supplier> suppliers = _context
         .Suppliers
         .AsNoTracking()
         .Where(s => !s.IsDeleted);
 
-      List<SupplierViewModel> supplierVms = SupplierViewModelFactory
-        .CreateList(suppliers.ToList());
+      List<SupplierViewModel> viewModel = SupplierViewModelFactory
+        .CreateList(await suppliers.ToListAsync());
 
-      return supplierVms;
+      return viewModel;
     }
 
-    public async Task<SupplierViewModel> GetSupplierAsync(int id)
+    public async Task<SupplierViewModel> GetSupplierAsync(
+      int id)
     {
       Supplier supplier = await _context
         .Suppliers
@@ -84,59 +91,64 @@ namespace Phoneden.Services
         .AsNoTracking()
         .FirstAsync(s => s.Id == id);
 
-      SupplierViewModel supplierViewModel = SupplierViewModelFactory
+      SupplierViewModel viewModel = SupplierViewModelFactory
         .Create(supplier);
 
-      return supplierViewModel;
+      return viewModel;
     }
 
-    public void AddSupplier(SupplierViewModel supplierVm)
+    public async Task AddSupplierAsync(
+      SupplierViewModel viewModel)
     {
       Supplier supplier = SupplierFactory
-        .BuildNewSupplierFromViewModel(supplierVm);
+        .BuildNewSupplierFromViewModel(viewModel);
 
       _context.Suppliers.Add(supplier);
-      _context.SaveChanges();
+
+      await _context.SaveChangesAsync();
     }
 
-    public void UpdateSupplier(SupplierViewModel supplierVm)
+    public async Task UpdateSupplierAsync(
+      SupplierViewModel viewModel)
     {
       Supplier supplier = _context
         .Suppliers
         .Include(s => s.Addresses)
         .Include(x => x.Contacts)
         .Where(s => !s.IsDeleted)
-        .First(s => s.Id == supplierVm.Id);
+        .First(s => s.Id == viewModel.Id);
 
       SupplierFactory
-        .MapViewModelToSupplier(supplierVm, supplier);
+        .MapViewModelToSupplier(viewModel, supplier);
 
       _context.Entry(supplier).State = EntityState.Modified;
-      _context.SaveChanges();
+
+      await _context.SaveChangesAsync();
     }
 
-    public void DeleteSupplier(int id)
+    public async Task DeleteSupplierAsync(
+      int id)
     {
-      Supplier supplier = _context
+      Supplier supplier = await _context
         .Suppliers
         .Include(c => c.Addresses)
         .Include(c => c.Contacts)
         .Where(s => !s.IsDeleted)
-        .First(s => s.Id == id);
+        .FirstAsync(s => s.Id == id);
 
       supplier.IsDeleted = true;
 
-      foreach (Address address in supplier.Addresses)
+      foreach (SupplierAddress address in supplier.Addresses)
       {
         address.IsDeleted = true;
       }
 
-      foreach (Contact contact in supplier.Contacts)
+      foreach (SupplierContact contact in supplier.Contacts)
       {
         contact.IsDeleted = true;
       }
 
-      _context.SaveChanges();
+      await _context.SaveChangesAsync();
     }
   }
 }

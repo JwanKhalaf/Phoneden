@@ -15,13 +15,16 @@ namespace Phoneden.Web.Controllers
   {
     private readonly ISupplierService _supplierService;
 
-    public SupplierController(ISupplierService supplierService)
+    public SupplierController(
+      ISupplierService supplierService)
 
     {
       _supplierService = supplierService ?? throw new ArgumentNullException(nameof(supplierService));
     }
 
-    public async Task<IActionResult> Page(bool showDeleted, int page = 1)
+    public async Task<IActionResult> Page(
+      bool showDeleted,
+      int page = 1)
     {
       SupplierPageViewModel viewModel = await _supplierService
         .GetPagedSuppliersAsync(showDeleted, page);
@@ -31,7 +34,8 @@ namespace Phoneden.Web.Controllers
       return View(viewModel);
     }
 
-    public async Task<ActionResult> Details(int? id)
+    public async Task<ActionResult> Details(
+      int? id)
     {
       if (id == null) return BadRequest();
 
@@ -54,14 +58,15 @@ namespace Phoneden.Web.Controllers
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Create(SupplierViewModel supplierVm)
+    public async Task<ActionResult> Create(
+      SupplierViewModel viewModel)
     {
       try
       {
-        if (!ModelState.IsValid) return View(supplierVm);
+        if (!ModelState.IsValid) return View(viewModel);
 
-        _supplierService
-          .AddSupplier(supplierVm);
+        await _supplierService
+          .AddSupplierAsync(viewModel);
 
         return RedirectToAction("Page", new { showDeleted = false });
       }
@@ -71,7 +76,8 @@ namespace Phoneden.Web.Controllers
       }
     }
 
-    public async Task<ActionResult> Edit(int? id)
+    public async Task<ActionResult> Edit(
+      int? id)
     {
       if (id == null) return BadRequest();
 
@@ -82,17 +88,20 @@ namespace Phoneden.Web.Controllers
     }
 
     [HttpPost]
-    public ActionResult Edit(SupplierViewModel supplier)
+    public async Task<ActionResult> Edit(
+      SupplierViewModel viewModel)
     {
-      if (!ModelState.IsValid) return View(supplier);
+      if (!ModelState.IsValid) return View(viewModel);
 
-      _supplierService
-        .UpdateSupplier(supplier);
+      await _supplierService
+        .UpdateSupplierAsync(viewModel);
 
       return RedirectToAction("Page", new { showDeleted = false });
     }
 
-    public async Task<ActionResult> Delete(int? id, bool? saveChangesError = false)
+    public async Task<ActionResult> Delete(
+      int? id,
+      bool? saveChangesError = false)
     {
       if (id == null) return BadRequest();
 
@@ -111,13 +120,15 @@ namespace Phoneden.Web.Controllers
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Delete(int id)
+    public async Task<ActionResult> Delete(
+      int id)
     {
       if (id == 0) return BadRequest();
 
       try
       {
-        _supplierService.DeleteSupplier(id);
+        await _supplierService
+          .DeleteSupplierAsync(id);
       }
       catch (RetryLimitExceededException)
       {

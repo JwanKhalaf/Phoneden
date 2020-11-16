@@ -1,17 +1,28 @@
 namespace Phoneden.Services
 {
+  using System.Threading.Tasks;
   using ViewModels;
 
   public interface IAddressService
   {
-    AddressViewModel GetAddress(int id, bool isSupplierAddress);
+    Task<AddressViewModel> GetSupplierAddressAsync(int id);
 
-    void AddAddress(AddressViewModel addressVm);
+    Task<AddressViewModel> GetCustomerAddressAsync(int id);
 
-    void UpdateAddress(AddressViewModel addressVm);
+    Task AddSupplierAddressAsync(AddressViewModel viewModel);
 
-    void DeleteAddress(int id, bool isSupplierAddress);
+    Task AddCustomerAddressAsync(AddressViewModel viewModel);
 
-    bool CanAddressBeDeleted(int id, bool isSupplierAddress);
+    Task UpdateSupplierAddressAsync(AddressViewModel viewModel);
+
+    Task UpdateCustomerAddressAsync(AddressViewModel viewModel);
+
+    Task DeleteSupplierAddressAsync(int id);
+
+    Task DeleteCustomerAddressAsync(int id);
+
+    Task<bool> CanSupplierAddressBeDeletedAsync(int id);
+
+    Task<bool> CanCustomerAddressBeDeletedAsync(int id);
   }
 }

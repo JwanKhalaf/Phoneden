@@ -160,14 +160,17 @@ namespace Phoneden.DataAccess.Initialisations
         Website = website
       };
 
-      AssignAddressToBusiness(name, supplier);
-      AssignContactToBusiness(contactFirstName, contactLastName, supplier);
+      AssignAddressToSupplier(name, supplier);
+
+      AssignContactToSupplier(contactFirstName, contactLastName, supplier);
+
       return supplier;
     }
 
     private static Customer CreateCustomer(string name, string email, string website, string contactFirstName, string contactLastName, ILogger<DbInitializer> logger)
     {
       logger.LogInformation($"Adding {name} Customer for test purposes");
+
       Customer customer = new Customer
       {
         Name = name,
@@ -180,15 +183,18 @@ namespace Phoneden.DataAccess.Initialisations
         Code = "CUS001"
       };
 
-      AssignAddressToBusiness(name, customer);
-      AssignContactToBusiness(contactFirstName, contactLastName, customer);
+      AssignAddressToCustomer(name, customer);
+
+      AssignContactToCustomer(contactFirstName, contactLastName, customer);
+
       return customer;
     }
 
-    private static void AssignContactToBusiness(string firstName, string lastName, Business business)
+    private static void AssignContactToSupplier(string firstName, string lastName, Supplier supplier)
     {
-      business.Contacts = new List<Contact>();
-      Contact contact = new Contact
+      supplier.Contacts = new List<SupplierContact>();
+
+      SupplierContact supplierContact = new SupplierContact
       {
         Title = "Mr",
         FirstName = firstName,
@@ -197,13 +203,33 @@ namespace Phoneden.DataAccess.Initialisations
         Email = firstName.ToLower() + "." + lastName.ToLower() + "@example.com",
         Phone = "0123456789"
       };
-      business.Contacts.Add(contact);
+
+      supplier.Contacts.Add(supplierContact);
     }
 
-    private static void AssignAddressToBusiness(string identifier, Business supplier)
+    private static void AssignContactToCustomer(string firstName, string lastName, Customer customer)
     {
-      supplier.Addresses = new List<Address>();
-      Address address = new Address
+      customer.Contacts = new List<CustomerContact>();
+
+      CustomerContact customerContact = new CustomerContact
+      {
+        Title = "Mr",
+        FirstName = firstName,
+        LastName = lastName,
+        Department = "Sales",
+        Email = firstName.ToLower() + "." + lastName.ToLower() + "@example.com",
+        Phone = "0123456789"
+      };
+
+      customer.Contacts.Add(customerContact);
+    }
+
+
+    private static void AssignAddressToSupplier(string identifier, Supplier supplier)
+    {
+      supplier.Addresses = new List<SupplierAddress>();
+
+      SupplierAddress supplierAddress = new SupplierAddress
       {
         AddressLine1 = identifier + " Some Road",
         AddressLine2 = identifier + " Something",
@@ -213,7 +239,26 @@ namespace Phoneden.DataAccess.Initialisations
         Country = "Country " + identifier,
         PostCode = "HD3 9LK"
       };
-      supplier.Addresses.Add(address);
+
+      supplier.Addresses.Add(supplierAddress);
+    }
+
+    private static void AssignAddressToCustomer(string identifier, Customer customer)
+    {
+      customer.Addresses = new List<CustomerAddress>();
+
+      CustomerAddress customerAddress = new CustomerAddress
+      {
+        AddressLine1 = identifier + " Some Road",
+        AddressLine2 = identifier + " Something",
+        Area = "Area " + identifier,
+        City = "City " + identifier,
+        County = "County " + identifier,
+        Country = "Country " + identifier,
+        PostCode = "HD3 9LK"
+      };
+
+      customer.Addresses.Add(customerAddress);
     }
 
     private static async Task CreateApplicationUsersWithRoles(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<DbInitializer> logger)

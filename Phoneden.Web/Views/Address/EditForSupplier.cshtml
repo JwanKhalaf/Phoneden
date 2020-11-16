@@ -1,19 +1,17 @@
-@using Phoneden.ViewModels
 @model Phoneden.ViewModels.AddressViewModel
 
-<form asp-controller="Address" asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post" role="form">
+@{
+  ViewBag.Title = "Edit Supplier Address";
+}
+
+<div class="page-title">
+  <h3>Edit Supplier Address</h3>
+</div>
+
+<form asp-controller="Address" asp-action="EditForSupplier" method="post" role="form">
   <div asp-validation-summary="All" class="text-danger"></div>
-  <input asp-for="IsSupplierAddress" type="hidden" />
 
-  @if (Model.Id != 0)
-  {
-    <input asp-for="Id" type="hidden" />
-  }
-
-  @if (Model.BusinessId != 0)
-  {
-    <input asp-for="BusinessId" type="hidden" />
-  }
+  <input asp-for="BusinessId" type="hidden" />
 
   <div class="row">
     <div class="col-md-12">

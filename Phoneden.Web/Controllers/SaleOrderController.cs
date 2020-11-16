@@ -47,13 +47,13 @@ namespace Phoneden.Web.Controllers
       return View(viewModel);
     }
 
-    public ActionResult Create()
+    public async Task<ActionResult> Create()
     {
       SaleOrderViewModel viewModel = new SaleOrderViewModel();
 
-      viewModel.Customers = GetCustomersSelectList();
+      viewModel.Customers = await GetCustomersSelectListAsync();
 
-      viewModel.LineItems = new List<SaleOrderLineItemViewModel> {new SaleOrderLineItemViewModel()};
+      viewModel.LineItems = new List<SaleOrderLineItemViewModel> { new SaleOrderLineItemViewModel() };
 
       return View(viewModel);
     }
@@ -64,7 +64,7 @@ namespace Phoneden.Web.Controllers
     {
       if (!ModelState.IsValid)
       {
-        newSaleOrder.Customers = GetCustomersSelectList();
+        newSaleOrder.Customers = await GetCustomersSelectListAsync();
 
         return View(newSaleOrder);
       }
@@ -77,7 +77,7 @@ namespace Phoneden.Web.Controllers
       }
       catch (LowStockException exception)
       {
-        newSaleOrder.Customers = GetCustomersSelectList();
+        newSaleOrder.Customers = await GetCustomersSelectListAsync();
 
         foreach (string productName in exception.NamesOfProductsNotInStock)
         {
@@ -96,7 +96,7 @@ namespace Phoneden.Web.Controllers
       SaleOrderViewModel viewModel = await _saleOrderService
         .GetSaleOrderAsync(id.Value);
 
-      viewModel.Customers = GetCustomersSelectList();
+      viewModel.Customers = await GetCustomersSelectListAsync();
 
       return View(viewModel);
     }
@@ -107,7 +107,7 @@ namespace Phoneden.Web.Controllers
     {
       if (!ModelState.IsValid)
       {
-        saleOrder.Customers = GetCustomersSelectList();
+        saleOrder.Customers = await GetCustomersSelectListAsync();
 
         return View(saleOrder);
       }
@@ -116,11 +116,11 @@ namespace Phoneden.Web.Controllers
       {
         await _saleOrderService.UpdateSaleOrderAsync(saleOrder);
 
-        return RedirectToAction("Page", new {showDeleted = false});
+        return RedirectToAction("Page", new { showDeleted = false });
       }
       catch (LowStockException)
       {
-        saleOrder.Customers = GetCustomersSelectList();
+        saleOrder.Customers = await GetCustomersSelectListAsync();
 
         ModelState.AddModelError("LowStock", @"Stock is too low for one or more" +
                                              " of the selected products. Order cannot be fulfilled.");
@@ -129,7 +129,7 @@ namespace Phoneden.Web.Controllers
       }
       catch (CreditLowException)
       {
-        saleOrder.Customers = GetCustomersSelectList();
+        saleOrder.Customers = await GetCustomersSelectListAsync();
 
         ModelState.AddModelError("CreditLow", @"Credit cannot cover the order value.");
 
@@ -180,14 +180,21 @@ namespace Phoneden.Web.Controllers
     {
       return PartialView("_SaleOrderLineItem");
     }
-    
-    private List<SelectListItem> GetCustomersSelectList()
+
+    private async Task<List<SelectListItem>> GetCustomersSelectListAsync()
     {
-      return _customerService.GetAllCustomers().Select(s => new SelectListItem
-      {
-        Text = s.Name,
-        Value = s.Id.ToString()
-      }).ToList();
+      IEnumerable<CustomerViewModel> customers = await _customerService
+        .GetAllCustomersAsync();
+
+      List<SelectListItem> customerSelectList = customers
+        .Select(s => new SelectListItem
+        {
+          Text = s.Name,
+          Value = s.Id.ToString()
+        })
+        .ToList();
+
+      return customerSelectList;
     }
   }
 }

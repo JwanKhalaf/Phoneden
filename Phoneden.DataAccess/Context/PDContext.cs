@@ -12,8 +12,6 @@ namespace Phoneden.DataAccess.Context
     public PdContext(DbContextOptions<PdContext> options)
       : base(options) { }
 
-    public DbSet<Business> Businesses { get; set; }
-
     public DbSet<Supplier> Suppliers { get; set; }
 
     public DbSet<Customer> Customers { get; set; }
@@ -24,13 +22,15 @@ namespace Phoneden.DataAccess.Context
 
     public DbSet<Quality> Qualities { get; set; }
 
-    public DbSet<Contact> Contacts { get; set; }
+    public DbSet<SupplierContact> SupplierContacts { get; set; }
 
-    public DbSet<Partner> Partners { get; set; }
+    public DbSet<CustomerContact> CustomerContacts { get; set; }
 
     public DbSet<Product> Products { get; set; }
 
-    public DbSet<Address> Addresses { get; set; }
+    public DbSet<SupplierAddress> SupplierAddresses { get; set; }
+
+    public DbSet<CustomerAddress> CustomerAddresses { get; set; }
 
     public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
 
@@ -61,32 +61,39 @@ namespace Phoneden.DataAccess.Context
       foreach (IMutableEntityType entity in builder.Model.GetEntityTypes())
       {
         // replace table names
-        entity.Relational().TableName = entity.Relational().TableName.ToSnakeCase();
+        string tableNameInSnakeCase = entity.GetTableName().ToSnakeCase();
+
+        entity.SetTableName(tableNameInSnakeCase);
 
         // replace column names
         foreach (IMutableProperty property in entity.GetProperties())
         {
-          property.Relational().ColumnName = property.Name.ToSnakeCase();
+          string propertyColumnNameInSnakeCase = property.GetColumnName().ToSnakeCase();
+
+          property.SetColumnName(propertyColumnNameInSnakeCase);
         }
 
         foreach (IMutableKey key in entity.GetKeys())
         {
-          key.Relational().Name = key.Relational().Name.ToSnakeCase();
+          string keyNameInSnakeCase = key.GetName().ToSnakeCase();
+
+          key.SetName(keyNameInSnakeCase);
         }
 
         foreach (IMutableForeignKey key in entity.GetForeignKeys())
         {
-          key.Relational().Name = key.Relational().Name.ToSnakeCase();
+          string foreignKeyNameInSnakeCase = key.GetConstraintName().ToSnakeCase();
+
+          key.SetConstraintName(foreignKeyNameInSnakeCase);
         }
 
         foreach (IMutableIndex index in entity.GetIndexes())
         {
-          index.Relational().Name = index.Relational().Name.ToSnakeCase();
+          string indexInSnakeCase = index.GetName().ToSnakeCase();
+
+          index.SetName(indexInSnakeCase);
         }
       }
-
-      builder.Entity<Business>()
-        .ToTable("businesses");
 
       builder.Entity<Customer>()
         .HasMany(c => c.SaleOrders)

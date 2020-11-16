@@ -147,17 +147,17 @@ namespace Phoneden.Services
 
       viewModel.Business.Name = order.Customer.Name;
 
-      Address address = order
+      CustomerAddress customerAddress = order
         .Customer
         .Addresses
         .First();
 
-      viewModel.Business.AddressLine1 = address.AddressLine1;
-      viewModel.Business.AddressLine2 = address.AddressLine2;
-      viewModel.Business.Area = address.Area;
-      viewModel.Business.City = address.City;
-      viewModel.Business.PostCode = address.PostCode;
-      viewModel.Business.Country = address.Country;
+      viewModel.Business.AddressLine1 = customerAddress.AddressLine1;
+      viewModel.Business.AddressLine2 = customerAddress.AddressLine2;
+      viewModel.Business.Area = customerAddress.Area;
+      viewModel.Business.City = customerAddress.City;
+      viewModel.Business.PostCode = customerAddress.PostCode;
+      viewModel.Business.Country = customerAddress.Country;
 
       viewModel.Business.ContactFullName =
         $"{order.Customer.Contacts.First().FirstName} {order.Customer.Contacts.First().LastName}";

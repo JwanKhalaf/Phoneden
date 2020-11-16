@@ -7,10 +7,10 @@ namespace Phoneden.Web
   using Microsoft.AspNetCore.Hosting;
   using Microsoft.Extensions.Configuration;
   using Microsoft.Extensions.DependencyInjection;
+  using Microsoft.Extensions.Hosting;
   using Entities;
   using Microsoft.AspNetCore.Http;
   using Microsoft.AspNetCore.HttpOverrides;
-  using Microsoft.AspNetCore.Mvc;
   using Phoneden.Services;
   using Phoneden.Services.Interfaces;
   using Services;
@@ -75,9 +75,6 @@ namespace Phoneden.Web
         .AddScoped<IPurchaseOrderInvoiceService, PurchaseOrderInvoiceService>();
 
       services
-        .AddScoped<IPartnerService, PartnerService>();
-
-      services
         .AddScoped<IPaymentService, PaymentService>();
 
       services
@@ -117,8 +114,7 @@ namespace Phoneden.Web
         .AddTransient<IEmailBuilderService, EmailBuilderService>();
 
       services
-        .AddMvc()
-        .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+        .AddControllersWithViews();
 
       services
         .AddCloudscribePagination();
@@ -126,7 +122,7 @@ namespace Phoneden.Web
 
     public void Configure(
       IApplicationBuilder app,
-      IHostingEnvironment env,
+      IWebHostEnvironment env,
       PdContext context)
     {
       if (env.IsDevelopment())
@@ -162,15 +158,19 @@ namespace Phoneden.Web
         });
 
       app
+        .UseRouting();
+
+      app
         .UseAuthentication();
 
-      app.UseMvc(routes =>
-      {
-        routes
-        .MapRoute(
-          "default",
-          "{controller=Home}/{action=Index}/{id?}");
-      });
+      app
+        .UseAuthorization();
+
+      app
+        .UseEndpoints(endpoints =>
+        {
+          endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+        });
     }
   }
 }

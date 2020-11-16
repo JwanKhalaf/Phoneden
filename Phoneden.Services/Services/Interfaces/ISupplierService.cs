@@ -6,16 +6,22 @@ namespace Phoneden.Services
 
   public interface ISupplierService
   {
-    Task<SupplierPageViewModel> GetPagedSuppliersAsync(bool showDeleted, int page);
+    Task<SupplierPageViewModel> GetPagedSuppliersAsync(
+      bool showDeleted,
+      int page);
 
-    List<SupplierViewModel> GetAllSuppliers();
+    Task<List<SupplierViewModel>> GetAllSuppliersAsync();
 
-    Task<SupplierViewModel> GetSupplierAsync(int id);
+    Task<SupplierViewModel> GetSupplierAsync(
+      int id);
 
-    void AddSupplier(SupplierViewModel supplierVm);
+    Task AddSupplierAsync(
+      SupplierViewModel viewModel);
 
-    void UpdateSupplier(SupplierViewModel supplierVm);
+    Task UpdateSupplierAsync(
+      SupplierViewModel viewModel);
 
-    void DeleteSupplier(int id);
+    Task DeleteSupplierAsync(
+      int id);
   }
 }

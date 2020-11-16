@@ -34,8 +34,8 @@ namespace Phoneden.ViewModels
       viewModel.Website = supplier.Website;
       viewModel.Email = supplier.Email;
       viewModel.IsDeleted = supplier.IsDeleted;
-      viewModel.Addresses = AddressViewModelFactory.BuildList(supplier.Addresses, true);
-      viewModel.Contacts = ContactViewModelFactory.BuildListOfContactViewModels(supplier.Contacts, true);
+      viewModel.Addresses = SupplierAddressViewModelFactory.BuildList(supplier.Addresses, true);
+      viewModel.Contacts = SupplierContactViewModelFactory.BuildListOfContactViewModels(supplier.Contacts, true);
       viewModel.PurchaseOrders = supplier.PurchaseOrders != null
         ? PurchaseOrderViewModelFactory.BuildList(supplier.PurchaseOrders)
         : new List<PurchaseOrderViewModel>();

@@ -39,10 +39,10 @@ namespace Phoneden.ViewModels
       viewModel.NumberOfDaysSinceCreditUsage = CalculateNumberOfDaysSinceCreditUsage(customer);
       viewModel.NumberOfDaysCreditIsOverdue = CalculateNumberOfDaysCreditIsOverdue(viewModel.NumberOfDaysSinceCreditUsage, viewModel.NumberOfDaysAllowedToBeOnMaxedOutCredit);
 
-      viewModel.Addresses = AddressViewModelFactory
+      viewModel.Addresses = CustomerAddressViewModelFactory
         .BuildList(customer.Addresses, false);
 
-      viewModel.Contacts = ContactViewModelFactory
+      viewModel.Contacts = CustomerContactViewModelFactory
         .BuildListOfContactViewModels(customer.Contacts, false);
 
       if (customer.SaleOrders == null)

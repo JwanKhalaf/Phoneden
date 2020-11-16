@@ -23,8 +23,8 @@ namespace Phoneden.Services
         Website = supplierViewModel.Website,
         Email = supplierViewModel.Email,
         IsDeleted = supplierViewModel.IsDeleted,
-        Addresses = AddressFactory.CreateList(supplierViewModel.Addresses),
-        Contacts = ContactFactory.BuildNewContactCollectionFromViewModel(supplierViewModel.Contacts),
+        Addresses = SupplierAddressFactory.CreateList(supplierViewModel.Addresses),
+        Contacts = SupplierContactFactory.BuildNewContactCollectionFromViewModel(supplierViewModel.Contacts),
         PurchaseOrders = PurchaseOrderFactory.BuildNewPurchaseOrderCollectionFromViewModel(supplierViewModel.PurchaseOrders)
       };
       return supplier;
@@ -58,19 +58,19 @@ namespace Phoneden.Services
         }
 
         {
-          Address updatedAddress = supplier.Addresses.FirstOrDefault(a => a.Id == address.Id);
-          if (updatedAddress == null)
+          SupplierAddress updatedSupplierAddress = supplier.Addresses.FirstOrDefault(a => a.Id == address.Id);
+          if (updatedSupplierAddress == null)
           {
             continue;
           }
 
-          updatedAddress.AddressLine1 = address.AddressLine1;
-          updatedAddress.AddressLine2 = address.AddressLine2;
-          updatedAddress.Area = address.Area;
-          updatedAddress.City = address.City;
-          updatedAddress.County = address.County;
-          updatedAddress.PostCode = address.PostCode;
-          updatedAddress.Country = address.Country;
+          updatedSupplierAddress.AddressLine1 = address.AddressLine1;
+          updatedSupplierAddress.AddressLine2 = address.AddressLine2;
+          updatedSupplierAddress.Area = address.Area;
+          updatedSupplierAddress.City = address.City;
+          updatedSupplierAddress.County = address.County;
+          updatedSupplierAddress.PostCode = address.PostCode;
+          updatedSupplierAddress.Country = address.Country;
         }
       }
 
@@ -82,18 +82,18 @@ namespace Phoneden.Services
         }
 
         {
-          Contact updatedContact = supplier.Contacts.FirstOrDefault(c => c.Id == contact.Id);
-          if (updatedContact == null)
+          SupplierContact updatedSupplierContact = supplier.Contacts.FirstOrDefault(c => c.Id == contact.Id);
+          if (updatedSupplierContact == null)
           {
             continue;
           }
 
-          updatedContact.Title = contact.Title;
-          updatedContact.FirstName = contact.FirstName;
-          updatedContact.LastName = contact.LastName;
-          updatedContact.Phone = contact.Phone;
-          updatedContact.Email = contact.Email;
-          updatedContact.Department = contact.Department;
+          updatedSupplierContact.Title = contact.Title;
+          updatedSupplierContact.FirstName = contact.FirstName;
+          updatedSupplierContact.LastName = contact.LastName;
+          updatedSupplierContact.Phone = contact.Phone;
+          updatedSupplierContact.Email = contact.Email;
+          updatedSupplierContact.Department = contact.Department;
         }
       }
     }

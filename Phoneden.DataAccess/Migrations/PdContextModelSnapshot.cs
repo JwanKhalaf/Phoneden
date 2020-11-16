@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Phoneden.DataAccess.Context;
 
@@ -14,26 +15,29 @@ namespace Phoneden.DataAccess.Migrations
     {
 #pragma warning disable 612, 618
       modelBuilder
-          .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
-          .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+          .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+          .HasAnnotation("ProductVersion", "3.1.10")
           .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
       modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
           {
             b.Property<string>("Id")
-                      .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("text");
 
             b.Property<string>("ConcurrencyStamp")
                       .IsConcurrencyToken()
-                      .HasColumnName("concurrency_stamp");
+                      .HasColumnName("concurrency_stamp")
+                      .HasColumnType("text");
 
             b.Property<string>("Name")
                       .HasColumnName("name")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.Property<string>("NormalizedName")
                       .HasColumnName("normalized_name")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.HasKey("Id")
@@ -50,17 +54,22 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<string>("ClaimType")
-                      .HasColumnName("claim_type");
+                      .HasColumnName("claim_type")
+                      .HasColumnType("text");
 
             b.Property<string>("ClaimValue")
-                      .HasColumnName("claim_value");
+                      .HasColumnName("claim_value")
+                      .HasColumnType("text");
 
             b.Property<string>("RoleId")
                       .IsRequired()
-                      .HasColumnName("role_id");
+                      .HasColumnName("role_id")
+                      .HasColumnType("text");
 
             b.HasKey("Id")
                       .HasName("pk_asp_net_role_claims");
@@ -75,17 +84,22 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<string>("ClaimType")
-                      .HasColumnName("claim_type");
+                      .HasColumnName("claim_type")
+                      .HasColumnType("text");
 
             b.Property<string>("ClaimValue")
-                      .HasColumnName("claim_value");
+                      .HasColumnName("claim_value")
+                      .HasColumnType("text");
 
             b.Property<string>("UserId")
                       .IsRequired()
-                      .HasColumnName("user_id");
+                      .HasColumnName("user_id")
+                      .HasColumnType("text");
 
             b.HasKey("Id")
                       .HasName("pk_asp_net_user_claims");
@@ -100,18 +114,22 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<string>("LoginProvider")
                       .HasColumnName("login_provider")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.Property<string>("ProviderKey")
                       .HasColumnName("provider_key")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.Property<string>("ProviderDisplayName")
-                      .HasColumnName("provider_display_name");
+                      .HasColumnName("provider_display_name")
+                      .HasColumnType("text");
 
             b.Property<string>("UserId")
                       .IsRequired()
-                      .HasColumnName("user_id");
+                      .HasColumnName("user_id")
+                      .HasColumnType("text");
 
             b.HasKey("LoginProvider", "ProviderKey")
                       .HasName("pk_asp_net_user_logins");
@@ -126,10 +144,12 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<string>("UserId")
                       .HasColumnName("user_id")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.Property<string>("RoleId")
                       .HasColumnName("role_id")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.HasKey("UserId", "RoleId")
@@ -145,18 +165,22 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<string>("UserId")
                       .HasColumnName("user_id")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.Property<string>("LoginProvider")
                       .HasColumnName("login_provider")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.Property<string>("Name")
                       .HasColumnName("name")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.Property<string>("Value")
-                      .HasColumnName("value");
+                      .HasColumnName("value")
+                      .HasColumnType("text");
 
             b.HasKey("UserId", "LoginProvider", "Name")
                       .HasName("pk_asp_net_user_tokens");
@@ -164,108 +188,75 @@ namespace Phoneden.DataAccess.Migrations
             b.ToTable("asp_net_user_tokens");
           });
 
-      modelBuilder.Entity("Phoneden.Entities.Address", b =>
-          {
-            b.Property<int>("Id")
-                      .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
-
-            b.Property<string>("AddressLine1")
-                      .HasColumnName("address_line1");
-
-            b.Property<string>("AddressLine2")
-                      .HasColumnName("address_line2");
-
-            b.Property<string>("Area")
-                      .HasColumnName("area");
-
-            b.Property<int>("BusinessId")
-                      .HasColumnName("business_id");
-
-            b.Property<string>("City")
-                      .HasColumnName("city");
-
-            b.Property<string>("Country")
-                      .HasColumnName("country");
-
-            b.Property<string>("County")
-                      .HasColumnName("county");
-
-            b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
-
-            b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
-
-            b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
-
-            b.Property<string>("PostCode")
-                      .HasColumnName("post_code");
-
-            b.HasKey("Id")
-                      .HasName("pk_addresses");
-
-            b.HasIndex("BusinessId")
-                      .HasName("ix_addresses_business_id");
-
-            b.ToTable("addresses");
-          });
-
       modelBuilder.Entity("Phoneden.Entities.ApplicationUser", b =>
           {
             b.Property<string>("Id")
-                      .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("text");
 
             b.Property<int>("AccessFailedCount")
-                      .HasColumnName("access_failed_count");
+                      .HasColumnName("access_failed_count")
+                      .HasColumnType("integer");
 
             b.Property<string>("ConcurrencyStamp")
                       .IsConcurrencyToken()
-                      .HasColumnName("concurrency_stamp");
+                      .HasColumnName("concurrency_stamp")
+                      .HasColumnType("text");
 
             b.Property<string>("DisplayUsername")
-                      .HasColumnName("display_username");
+                      .HasColumnName("display_username")
+                      .HasColumnType("text");
 
             b.Property<string>("Email")
                       .HasColumnName("email")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.Property<bool>("EmailConfirmed")
-                      .HasColumnName("email_confirmed");
+                      .HasColumnName("email_confirmed")
+                      .HasColumnType("boolean");
 
             b.Property<bool>("LockoutEnabled")
-                      .HasColumnName("lockout_enabled");
+                      .HasColumnName("lockout_enabled")
+                      .HasColumnType("boolean");
 
             b.Property<DateTimeOffset?>("LockoutEnd")
-                      .HasColumnName("lockout_end");
+                      .HasColumnName("lockout_end")
+                      .HasColumnType("timestamp with time zone");
 
             b.Property<string>("NormalizedEmail")
                       .HasColumnName("normalized_email")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.Property<string>("NormalizedUserName")
                       .HasColumnName("normalized_user_name")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.Property<string>("PasswordHash")
-                      .HasColumnName("password_hash");
+                      .HasColumnName("password_hash")
+                      .HasColumnType("text");
 
             b.Property<string>("PhoneNumber")
-                      .HasColumnName("phone_number");
+                      .HasColumnName("phone_number")
+                      .HasColumnType("text");
 
             b.Property<bool>("PhoneNumberConfirmed")
-                      .HasColumnName("phone_number_confirmed");
+                      .HasColumnName("phone_number_confirmed")
+                      .HasColumnType("boolean");
 
             b.Property<string>("SecurityStamp")
-                      .HasColumnName("security_stamp");
+                      .HasColumnName("security_stamp")
+                      .HasColumnType("text");
 
             b.Property<bool>("TwoFactorEnabled")
-                      .HasColumnName("two_factor_enabled");
+                      .HasColumnName("two_factor_enabled")
+                      .HasColumnType("boolean");
 
             b.Property<string>("UserName")
                       .HasColumnName("user_name")
+                      .HasColumnType("character varying(127)")
                       .HasMaxLength(127);
 
             b.HasKey("Id")
@@ -285,19 +276,25 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<string>("Name")
-                      .HasColumnName("name");
+                      .HasColumnName("name")
+                      .HasColumnType("text");
 
             b.HasKey("Id")
                       .HasName("pk_brands");
@@ -305,71 +302,33 @@ namespace Phoneden.DataAccess.Migrations
             b.ToTable("brands");
           });
 
-      modelBuilder.Entity("Phoneden.Entities.Business", b =>
-          {
-            b.Property<int>("Id")
-                      .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
-
-            b.Property<string>("Code")
-                      .HasColumnName("code");
-
-            b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
-
-            b.Property<string>("Description")
-                      .HasColumnName("description");
-
-            b.Property<string>("Discriminator")
-                      .IsRequired()
-                      .HasColumnName("discriminator");
-
-            b.Property<string>("Email")
-                      .HasColumnName("email");
-
-            b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
-
-            b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
-
-            b.Property<string>("Name")
-                      .HasColumnName("name");
-
-            b.Property<string>("Phone")
-                      .HasColumnName("phone");
-
-            b.Property<string>("Website")
-                      .HasColumnName("website");
-
-            b.HasKey("Id")
-                      .HasName("pk_businesses");
-
-            b.ToTable("businesses");
-
-            b.HasDiscriminator<string>("Discriminator").HasValue("Business");
-          });
-
       modelBuilder.Entity("Phoneden.Entities.Category", b =>
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<string>("Name")
-                      .HasColumnName("name");
+                      .HasColumnName("name")
+                      .HasColumnType("text");
 
             b.Property<int?>("ParentCategoryId")
-                      .HasColumnName("parent_category_id");
+                      .HasColumnName("parent_category_id")
+                      .HasColumnType("integer");
 
             b.HasKey("Id")
                       .HasName("pk_categories");
@@ -380,81 +339,225 @@ namespace Phoneden.DataAccess.Migrations
             b.ToTable("categories");
           });
 
-      modelBuilder.Entity("Phoneden.Entities.Contact", b =>
+      modelBuilder.Entity("Phoneden.Entities.Customer", b =>
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-            b.Property<int>("BusinessId")
-                      .HasColumnName("business_id");
+            b.Property<decimal>("AllowedCredit")
+                      .HasColumnName("allowed_credit")
+                      .HasColumnType("decimal(19, 8)");
+
+            b.Property<string>("Code")
+                      .HasColumnName("code")
+                      .HasColumnType("text");
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
-            b.Property<string>("Department")
-                      .HasColumnName("department");
+            b.Property<decimal>("CreditUsed")
+                      .HasColumnName("credit_used")
+                      .HasColumnType("decimal(19, 8)");
+
+            b.Property<string>("Description")
+                      .HasColumnName("description")
+                      .HasColumnType("text");
 
             b.Property<string>("Email")
-                      .HasColumnName("email");
-
-            b.Property<string>("FirstName")
-                      .HasColumnName("first_name");
+                      .HasColumnName("email")
+                      .HasColumnType("text");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
-
-            b.Property<string>("LastName")
-                      .HasColumnName("last_name");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
+
+            b.Property<string>("Name")
+                      .HasColumnName("name")
+                      .HasColumnType("text");
+
+            b.Property<int>("NumberOfDaysAllowedToBeOnMaxedOutCredit")
+                      .HasColumnName("number_of_days_allowed_to_be_on_maxed_out_credit")
+                      .HasColumnType("integer");
 
             b.Property<string>("Phone")
-                      .HasColumnName("phone");
+                      .HasColumnName("phone")
+                      .HasColumnType("text");
 
-            b.Property<string>("Title")
-                      .HasColumnName("title");
+            b.Property<string>("Website")
+                      .HasColumnName("website")
+                      .HasColumnType("text");
 
             b.HasKey("Id")
-                      .HasName("pk_contacts");
+                      .HasName("pk_customers");
 
-            b.HasIndex("BusinessId")
-                      .HasName("ix_contacts_business_id");
+            b.ToTable("customers");
+          });
 
-            b.ToTable("contacts");
+      modelBuilder.Entity("Phoneden.Entities.CustomerAddress", b =>
+          {
+            b.Property<int>("Id")
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+            b.Property<string>("AddressLine1")
+                      .HasColumnName("address_line1")
+                      .HasColumnType("text");
+
+            b.Property<string>("AddressLine2")
+                      .HasColumnName("address_line2")
+                      .HasColumnType("text");
+
+            b.Property<string>("Area")
+                      .HasColumnName("area")
+                      .HasColumnType("text");
+
+            b.Property<string>("City")
+                      .HasColumnName("city")
+                      .HasColumnType("text");
+
+            b.Property<string>("Country")
+                      .HasColumnName("country")
+                      .HasColumnType("text");
+
+            b.Property<string>("County")
+                      .HasColumnName("county")
+                      .HasColumnType("text");
+
+            b.Property<DateTime>("CreatedOn")
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
+
+            b.Property<int>("CustomerId")
+                      .HasColumnName("customer_id")
+                      .HasColumnType("integer");
+
+            b.Property<bool>("IsDeleted")
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
+
+            b.Property<DateTime?>("ModifiedOn")
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
+
+            b.Property<string>("PostCode")
+                      .HasColumnName("post_code")
+                      .HasColumnType("text");
+
+            b.HasKey("Id")
+                      .HasName("pk_customer_addresses");
+
+            b.HasIndex("CustomerId")
+                      .HasName("ix_customer_addresses_customer_id");
+
+            b.ToTable("customer_addresses");
+          });
+
+      modelBuilder.Entity("Phoneden.Entities.CustomerContact", b =>
+          {
+            b.Property<int>("Id")
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+            b.Property<DateTime>("CreatedOn")
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
+
+            b.Property<int>("CustomerId")
+                      .HasColumnName("customer_id")
+                      .HasColumnType("integer");
+
+            b.Property<string>("Department")
+                      .HasColumnName("department")
+                      .HasColumnType("text");
+
+            b.Property<string>("Email")
+                      .HasColumnName("email")
+                      .HasColumnType("text");
+
+            b.Property<string>("FirstName")
+                      .HasColumnName("first_name")
+                      .HasColumnType("text");
+
+            b.Property<bool>("IsDeleted")
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
+
+            b.Property<string>("LastName")
+                      .HasColumnName("last_name")
+                      .HasColumnType("text");
+
+            b.Property<DateTime?>("ModifiedOn")
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
+
+            b.Property<string>("Phone")
+                      .HasColumnName("phone")
+                      .HasColumnType("text");
+
+            b.Property<string>("Title")
+                      .HasColumnName("title")
+                      .HasColumnType("text");
+
+            b.HasKey("Id")
+                      .HasName("pk_customer_contacts");
+
+            b.HasIndex("CustomerId")
+                      .HasName("ix_customer_contacts_customer_id");
+
+            b.ToTable("customer_contacts");
           });
 
       modelBuilder.Entity("Phoneden.Entities.Expense", b =>
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<decimal>("Amount")
                       .HasColumnName("amount")
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<string>("ApplicationUserId")
-                      .HasColumnName("application_user_id");
+                      .HasColumnName("application_user_id")
+                      .HasColumnType("text");
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<DateTime>("Date")
-                      .HasColumnName("date");
+                      .HasColumnName("date")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<int>("Method")
-                      .HasColumnName("method");
+                      .HasColumnName("method")
+                      .HasColumnType("integer");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<string>("Reason")
-                      .HasColumnName("reason");
+                      .HasColumnName("reason")
+                      .HasColumnType("text");
 
             b.HasKey("Id")
                       .HasName("pk_expenses");
@@ -465,110 +568,69 @@ namespace Phoneden.DataAccess.Migrations
             b.ToTable("expenses");
           });
 
-      modelBuilder.Entity("Phoneden.Entities.Partner", b =>
-          {
-            b.Property<int>("Id")
-                      .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
-
-            b.Property<string>("AddressLine1")
-                      .HasColumnName("address_line1");
-
-            b.Property<string>("AddressLine2")
-                      .HasColumnName("address_line2");
-
-            b.Property<string>("Area")
-                      .HasColumnName("area");
-
-            b.Property<string>("City")
-                      .HasColumnName("city");
-
-            b.Property<string>("Country")
-                      .HasColumnName("country");
-
-            b.Property<string>("County")
-                      .HasColumnName("county");
-
-            b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
-
-            b.Property<string>("Email")
-                      .HasColumnName("email");
-
-            b.Property<string>("FirstName")
-                      .HasColumnName("first_name");
-
-            b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
-
-            b.Property<string>("LastName")
-                      .HasColumnName("last_name");
-
-            b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
-
-            b.Property<string>("Phone")
-                      .HasColumnName("phone");
-
-            b.Property<string>("PostCode")
-                      .HasColumnName("post_code");
-
-            b.Property<string>("Title")
-                      .HasColumnName("title");
-
-            b.HasKey("Id")
-                      .HasName("pk_partners");
-
-            b.ToTable("partners");
-          });
-
       modelBuilder.Entity("Phoneden.Entities.Product", b =>
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<int>("AlertThreshold")
-                      .HasColumnName("alert_threshold");
+                      .HasColumnName("alert_threshold")
+                      .HasColumnType("integer");
 
             b.Property<string>("Barcode")
-                      .HasColumnName("barcode");
+                      .HasColumnName("barcode")
+                      .HasColumnType("text");
 
             b.Property<int>("BrandId")
-                      .HasColumnName("brand_id");
+                      .HasColumnName("brand_id")
+                      .HasColumnType("integer");
 
             b.Property<int>("CategoryId")
-                      .HasColumnName("category_id");
+                      .HasColumnName("category_id")
+                      .HasColumnType("integer");
 
             b.Property<int>("Colour")
-                      .HasColumnName("colour");
+                      .HasColumnName("colour")
+                      .HasColumnType("integer");
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<string>("Description")
-                      .HasColumnName("description");
+                      .HasColumnName("description")
+                      .HasColumnType("text");
 
             b.Property<string>("ImagePath")
-                      .HasColumnName("image_path");
+                      .HasColumnName("image_path")
+                      .HasColumnType("text");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<string>("Name")
-                      .HasColumnName("name");
+                      .HasColumnName("name")
+                      .HasColumnType("text");
 
             b.Property<int>("QualityId")
-                      .HasColumnName("quality_id");
+                      .HasColumnName("quality_id")
+                      .HasColumnType("integer");
 
             b.Property<int>("Quantity")
-                      .HasColumnName("quantity");
+                      .HasColumnName("quantity")
+                      .HasColumnType("integer");
 
             b.Property<string>("Sku")
-                      .HasColumnName("sku");
+                      .HasColumnName("sku")
+                      .HasColumnType("text");
 
             b.Property<decimal>("UnitCostPrice")
                       .HasColumnName("unit_cost_price")
@@ -597,13 +659,17 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<DateTime>("Date")
-                      .HasColumnName("date");
+                      .HasColumnName("date")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<decimal>("Discount")
                       .HasColumnName("discount")
@@ -614,10 +680,12 @@ namespace Phoneden.DataAccess.Migrations
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<decimal>("ShippingConversionRate")
                       .HasColumnName("shipping_conversion_rate")
@@ -628,16 +696,20 @@ namespace Phoneden.DataAccess.Migrations
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<int>("ShippingCurrency")
-                      .HasColumnName("shipping_currency");
+                      .HasColumnName("shipping_currency")
+                      .HasColumnType("integer");
 
             b.Property<int>("Status")
-                      .HasColumnName("status");
+                      .HasColumnName("status")
+                      .HasColumnType("integer");
 
             b.Property<int>("SupplierId")
-                      .HasColumnName("supplier_id");
+                      .HasColumnName("supplier_id")
+                      .HasColumnType("integer");
 
             b.Property<int>("SupplierOrderNumber")
-                      .HasColumnName("supplier_order_number");
+                      .HasColumnName("supplier_order_number")
+                      .HasColumnType("integer");
 
             b.Property<decimal>("Vat")
                       .HasColumnName("vat")
@@ -656,29 +728,37 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<decimal>("Amount")
                       .HasColumnName("amount")
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<DateTime>("DueDate")
-                      .HasColumnName("due_date");
+                      .HasColumnName("due_date")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<int>("PurchaseOrderId")
-                      .HasColumnName("purchase_order_id");
+                      .HasColumnName("purchase_order_id")
+                      .HasColumnType("integer");
 
             b.Property<int>("Status")
-                      .HasColumnName("status");
+                      .HasColumnName("status")
+                      .HasColumnType("integer");
 
             b.HasKey("Id")
                       .HasName("pk_purchase_order_invoices");
@@ -694,43 +774,57 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<decimal>("ConversionRate")
-                      .HasColumnName("conversion_rate");
+                      .HasColumnName("conversion_rate")
+                      .HasColumnType("numeric");
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<int>("Currency")
-                      .HasColumnName("currency");
+                      .HasColumnName("currency")
+                      .HasColumnType("integer");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<decimal>("Price")
-                      .HasColumnName("price");
+                      .HasColumnName("price")
+                      .HasColumnType("numeric");
 
             b.Property<string>("ProductColour")
-                      .HasColumnName("product_colour");
+                      .HasColumnName("product_colour")
+                      .HasColumnType("text");
 
             b.Property<int>("ProductId")
-                      .HasColumnName("product_id");
+                      .HasColumnName("product_id")
+                      .HasColumnType("integer");
 
             b.Property<string>("ProductName")
-                      .HasColumnName("product_name");
+                      .HasColumnName("product_name")
+                      .HasColumnType("text");
 
             b.Property<string>("ProductQuality")
-                      .HasColumnName("product_quality");
+                      .HasColumnName("product_quality")
+                      .HasColumnType("text");
 
             b.Property<int>("PurchaseOrderInvoiceId")
-                      .HasColumnName("purchase_order_invoice_id");
+                      .HasColumnName("purchase_order_invoice_id")
+                      .HasColumnType("integer");
 
             b.Property<int>("Quantity")
-                      .HasColumnName("quantity");
+                      .HasColumnName("quantity")
+                      .HasColumnType("integer");
 
             b.HasKey("Id")
                       .HasName("pk_purchase_order_invoice_line_items");
@@ -745,7 +839,9 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<decimal>("Amount")
                       .HasColumnName("amount")
@@ -756,28 +852,36 @@ namespace Phoneden.DataAccess.Migrations
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<int>("Currency")
-                      .HasColumnName("currency");
+                      .HasColumnName("currency")
+                      .HasColumnType("integer");
 
             b.Property<DateTime>("Date")
-                      .HasColumnName("date");
+                      .HasColumnName("date")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<int>("Method")
-                      .HasColumnName("method");
+                      .HasColumnName("method")
+                      .HasColumnType("integer");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<int>("PurchaseOrderInvoiceId")
-                      .HasColumnName("purchase_order_invoice_id");
+                      .HasColumnName("purchase_order_invoice_id")
+                      .HasColumnType("integer");
 
             b.Property<string>("Reference")
-                      .HasColumnName("reference");
+                      .HasColumnName("reference")
+                      .HasColumnType("text");
 
             b.HasKey("Id")
                       .HasName("pk_purchase_order_invoice_payments");
@@ -792,48 +896,61 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<string>("Barcode")
-                      .HasColumnName("barcode");
+                      .HasColumnName("barcode")
+                      .HasColumnType("text");
 
             b.Property<string>("Colour")
-                      .HasColumnName("colour");
+                      .HasColumnName("colour")
+                      .HasColumnType("text");
 
             b.Property<decimal>("ConversionRate")
                       .HasColumnName("conversion_rate")
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<int>("Currency")
-                      .HasColumnName("currency");
+                      .HasColumnName("currency")
+                      .HasColumnType("integer");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<string>("Name")
-                      .HasColumnName("name");
+                      .HasColumnName("name")
+                      .HasColumnType("text");
 
             b.Property<decimal>("Price")
                       .HasColumnName("price")
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<int>("ProductId")
-                      .HasColumnName("product_id");
+                      .HasColumnName("product_id")
+                      .HasColumnType("integer");
 
             b.Property<int>("PurchaseOrderId")
-                      .HasColumnName("purchase_order_id");
+                      .HasColumnName("purchase_order_id")
+                      .HasColumnType("integer");
 
             b.Property<string>("Quality")
-                      .HasColumnName("quality");
+                      .HasColumnName("quality")
+                      .HasColumnType("text");
 
             b.Property<int>("Quantity")
-                      .HasColumnName("quantity");
+                      .HasColumnName("quantity")
+                      .HasColumnType("integer");
 
             b.HasKey("Id")
                       .HasName("pk_purchase_order_line_items");
@@ -851,22 +968,29 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<int>("PurchaseOrderId")
-                      .HasColumnName("purchase_order_id");
+                      .HasColumnName("purchase_order_id")
+                      .HasColumnType("integer");
 
             b.Property<string>("Text")
-                      .HasColumnName("text");
+                      .HasColumnName("text")
+                      .HasColumnType("text");
 
             b.HasKey("Id")
                       .HasName("pk_purchase_order_note");
@@ -881,19 +1005,25 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<string>("Name")
-                      .HasColumnName("name");
+                      .HasColumnName("name")
+                      .HasColumnType("text");
 
             b.HasKey("Id")
                       .HasName("pk_qualities");
@@ -905,33 +1035,41 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<int>("CustomerId")
-                      .HasColumnName("customer_id");
+                      .HasColumnName("customer_id")
+                      .HasColumnType("integer");
 
             b.Property<DateTime>("Date")
-                      .HasColumnName("date");
+                      .HasColumnName("date")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<decimal>("Discount")
                       .HasColumnName("discount")
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<decimal>("PostageCost")
                       .HasColumnName("postage_cost")
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<int>("Status")
-                      .HasColumnName("status");
+                      .HasColumnName("status")
+                      .HasColumnType("integer");
 
             b.HasKey("Id")
                       .HasName("pk_sale_orders");
@@ -946,7 +1084,9 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<decimal>("Amount")
                       .HasColumnName("amount")
@@ -957,22 +1097,28 @@ namespace Phoneden.DataAccess.Migrations
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<DateTime>("DueDate")
-                      .HasColumnName("due_date");
+                      .HasColumnName("due_date")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<int>("SaleOrderId")
-                      .HasColumnName("sale_order_id");
+                      .HasColumnName("sale_order_id")
+                      .HasColumnType("integer");
 
             b.Property<int>("Status")
-                      .HasColumnName("status");
+                      .HasColumnName("status")
+                      .HasColumnType("integer");
 
             b.HasKey("Id")
                       .HasName("pk_sale_order_invoices");
@@ -988,40 +1134,53 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<decimal>("Cost")
-                      .HasColumnName("cost");
+                      .HasColumnName("cost")
+                      .HasColumnType("numeric");
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<decimal>("Price")
-                      .HasColumnName("price");
+                      .HasColumnName("price")
+                      .HasColumnType("numeric");
 
             b.Property<string>("ProductColour")
-                      .HasColumnName("product_colour");
+                      .HasColumnName("product_colour")
+                      .HasColumnType("text");
 
             b.Property<int>("ProductId")
-                      .HasColumnName("product_id");
+                      .HasColumnName("product_id")
+                      .HasColumnType("integer");
 
             b.Property<string>("ProductName")
-                      .HasColumnName("product_name");
+                      .HasColumnName("product_name")
+                      .HasColumnType("text");
 
             b.Property<string>("ProductQuality")
-                      .HasColumnName("product_quality");
+                      .HasColumnName("product_quality")
+                      .HasColumnType("text");
 
             b.Property<int>("Quantity")
-                      .HasColumnName("quantity");
+                      .HasColumnName("quantity")
+                      .HasColumnType("integer");
 
             b.Property<int>("SaleOrderInvoiceId")
-                      .HasColumnName("sale_order_invoice_id");
+                      .HasColumnName("sale_order_invoice_id")
+                      .HasColumnType("integer");
 
             b.HasKey("Id")
                       .HasName("pk_sale_order_invoice_line_items");
@@ -1036,32 +1195,41 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<decimal>("Amount")
                       .HasColumnName("amount")
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<DateTime>("Date")
-                      .HasColumnName("date");
+                      .HasColumnName("date")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<int>("Method")
-                      .HasColumnName("method");
+                      .HasColumnName("method")
+                      .HasColumnType("integer");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<string>("Reference")
-                      .HasColumnName("reference");
+                      .HasColumnName("reference")
+                      .HasColumnType("text");
 
             b.Property<int>("SaleOrderInvoiceId")
-                      .HasColumnName("sale_order_invoice_id");
+                      .HasColumnName("sale_order_invoice_id")
+                      .HasColumnType("integer");
 
             b.HasKey("Id")
                       .HasName("pk_sale_order_invoice_payments");
@@ -1076,51 +1244,65 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<string>("Barcode")
-                      .HasColumnName("barcode");
+                      .HasColumnName("barcode")
+                      .HasColumnType("text");
 
             b.Property<string>("Colour")
-                      .HasColumnName("colour");
+                      .HasColumnName("colour")
+                      .HasColumnType("text");
 
             b.Property<decimal>("ConversionRate")
                       .HasColumnName("conversion_rate")
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<decimal>("Cost")
-                      .HasColumnName("cost");
+                      .HasColumnName("cost")
+                      .HasColumnType("numeric");
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<int>("Currency")
-                      .HasColumnName("currency");
+                      .HasColumnName("currency")
+                      .HasColumnType("integer");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<string>("Name")
-                      .HasColumnName("name");
+                      .HasColumnName("name")
+                      .HasColumnType("text");
 
             b.Property<decimal>("Price")
                       .HasColumnName("price")
                       .HasColumnType("decimal(19, 8)");
 
             b.Property<int>("ProductId")
-                      .HasColumnName("product_id");
+                      .HasColumnName("product_id")
+                      .HasColumnType("integer");
 
             b.Property<string>("Quality")
-                      .HasColumnName("quality");
+                      .HasColumnName("quality")
+                      .HasColumnType("text");
 
             b.Property<int>("Quantity")
-                      .HasColumnName("quantity");
+                      .HasColumnName("quantity")
+                      .HasColumnType("integer");
 
             b.Property<int>("SaleOrderId")
-                      .HasColumnName("sale_order_id");
+                      .HasColumnName("sale_order_id")
+                      .HasColumnType("integer");
 
             b.HasKey("Id")
                       .HasName("pk_sale_order_line_items");
@@ -1138,25 +1320,33 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<int>("PurchaseOrderId")
-                      .HasColumnName("purchase_order_id");
+                      .HasColumnName("purchase_order_id")
+                      .HasColumnType("integer");
 
             b.Property<int?>("SaleOrderId")
-                      .HasColumnName("sale_order_id");
+                      .HasColumnName("sale_order_id")
+                      .HasColumnType("integer");
 
             b.Property<string>("Text")
-                      .HasColumnName("text");
+                      .HasColumnName("text")
+                      .HasColumnType("text");
 
             b.HasKey("Id")
                       .HasName("pk_sale_order_note");
@@ -1174,37 +1364,49 @@ namespace Phoneden.DataAccess.Migrations
           {
             b.Property<int>("Id")
                       .ValueGeneratedOnAdd()
-                      .HasColumnName("id");
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             b.Property<DateTime>("CreatedOn")
-                      .HasColumnName("created_on");
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<DateTime>("Date")
-                      .HasColumnName("date");
+                      .HasColumnName("date")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<string>("Description")
-                      .HasColumnName("description");
+                      .HasColumnName("description")
+                      .HasColumnType("text");
 
             b.Property<bool>("IsDeleted")
-                      .HasColumnName("is_deleted");
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
 
             b.Property<bool>("IsVerified")
-                      .HasColumnName("is_verified");
+                      .HasColumnName("is_verified")
+                      .HasColumnType("boolean");
 
             b.Property<DateTime?>("ModifiedOn")
-                      .HasColumnName("modified_on");
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
 
             b.Property<int>("ProductId")
-                      .HasColumnName("product_id");
+                      .HasColumnName("product_id")
+                      .HasColumnType("integer");
 
             b.Property<int>("Quantity")
-                      .HasColumnName("quantity");
+                      .HasColumnName("quantity")
+                      .HasColumnType("integer");
 
             b.Property<int>("Resolution")
-                      .HasColumnName("resolution");
+                      .HasColumnName("resolution")
+                      .HasColumnType("integer");
 
             b.Property<int>("SaleOrderInvoiceId")
-                      .HasColumnName("sale_order_invoice_id");
+                      .HasColumnName("sale_order_invoice_id")
+                      .HasColumnType("integer");
 
             b.Property<decimal>("Value")
                       .HasColumnName("value")
@@ -1222,93 +1424,229 @@ namespace Phoneden.DataAccess.Migrations
             b.ToTable("sale_order_returns");
           });
 
-      modelBuilder.Entity("Phoneden.Entities.Customer", b =>
-          {
-            b.HasBaseType("Phoneden.Entities.Business");
-
-            b.Property<decimal>("AllowedCredit")
-                      .HasColumnName("allowed_credit")
-                      .HasColumnType("decimal(19, 8)");
-
-            b.Property<decimal>("CreditUsed")
-                      .HasColumnName("credit_used")
-                      .HasColumnType("decimal(19, 8)");
-
-            b.Property<int>("NumberOfDaysAllowedToBeOnMaxedOutCredit")
-                      .HasColumnName("number_of_days_allowed_to_be_on_maxed_out_credit");
-
-            b.ToTable("businesses");
-
-            b.HasDiscriminator().HasValue("Customer");
-          });
-
       modelBuilder.Entity("Phoneden.Entities.Supplier", b =>
           {
-            b.HasBaseType("Phoneden.Entities.Business");
+            b.Property<int>("Id")
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-            b.ToTable("businesses");
+            b.Property<string>("Code")
+                      .HasColumnName("code")
+                      .HasColumnType("text");
 
-            b.HasDiscriminator().HasValue("Supplier");
+            b.Property<DateTime>("CreatedOn")
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
+
+            b.Property<string>("Description")
+                      .HasColumnName("description")
+                      .HasColumnType("text");
+
+            b.Property<string>("Email")
+                      .HasColumnName("email")
+                      .HasColumnType("text");
+
+            b.Property<bool>("IsDeleted")
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
+
+            b.Property<DateTime?>("ModifiedOn")
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
+
+            b.Property<string>("Name")
+                      .HasColumnName("name")
+                      .HasColumnType("text");
+
+            b.Property<string>("Phone")
+                      .HasColumnName("phone")
+                      .HasColumnType("text");
+
+            b.Property<string>("Website")
+                      .HasColumnName("website")
+                      .HasColumnType("text");
+
+            b.HasKey("Id")
+                      .HasName("pk_suppliers");
+
+            b.ToTable("suppliers");
+          });
+
+      modelBuilder.Entity("Phoneden.Entities.SupplierAddress", b =>
+          {
+            b.Property<int>("Id")
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+            b.Property<string>("AddressLine1")
+                      .HasColumnName("address_line1")
+                      .HasColumnType("text");
+
+            b.Property<string>("AddressLine2")
+                      .HasColumnName("address_line2")
+                      .HasColumnType("text");
+
+            b.Property<string>("Area")
+                      .HasColumnName("area")
+                      .HasColumnType("text");
+
+            b.Property<string>("City")
+                      .HasColumnName("city")
+                      .HasColumnType("text");
+
+            b.Property<string>("Country")
+                      .HasColumnName("country")
+                      .HasColumnType("text");
+
+            b.Property<string>("County")
+                      .HasColumnName("county")
+                      .HasColumnType("text");
+
+            b.Property<DateTime>("CreatedOn")
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
+
+            b.Property<bool>("IsDeleted")
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
+
+            b.Property<DateTime?>("ModifiedOn")
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
+
+            b.Property<string>("PostCode")
+                      .HasColumnName("post_code")
+                      .HasColumnType("text");
+
+            b.Property<int>("SupplierId")
+                      .HasColumnName("supplier_id")
+                      .HasColumnType("integer");
+
+            b.HasKey("Id")
+                      .HasName("pk_supplier_addresses");
+
+            b.HasIndex("SupplierId")
+                      .HasName("ix_supplier_addresses_supplier_id");
+
+            b.ToTable("supplier_addresses");
+          });
+
+      modelBuilder.Entity("Phoneden.Entities.SupplierContact", b =>
+          {
+            b.Property<int>("Id")
+                      .ValueGeneratedOnAdd()
+                      .HasColumnName("id")
+                      .HasColumnType("integer")
+                      .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+            b.Property<DateTime>("CreatedOn")
+                      .HasColumnName("created_on")
+                      .HasColumnType("timestamp without time zone");
+
+            b.Property<string>("Department")
+                      .HasColumnName("department")
+                      .HasColumnType("text");
+
+            b.Property<string>("Email")
+                      .HasColumnName("email")
+                      .HasColumnType("text");
+
+            b.Property<string>("FirstName")
+                      .HasColumnName("first_name")
+                      .HasColumnType("text");
+
+            b.Property<bool>("IsDeleted")
+                      .HasColumnName("is_deleted")
+                      .HasColumnType("boolean");
+
+            b.Property<string>("LastName")
+                      .HasColumnName("last_name")
+                      .HasColumnType("text");
+
+            b.Property<DateTime?>("ModifiedOn")
+                      .HasColumnName("modified_on")
+                      .HasColumnType("timestamp without time zone");
+
+            b.Property<string>("Phone")
+                      .HasColumnName("phone")
+                      .HasColumnType("text");
+
+            b.Property<int>("SupplierId")
+                      .HasColumnName("supplier_id")
+                      .HasColumnType("integer");
+
+            b.Property<string>("Title")
+                      .HasColumnName("title")
+                      .HasColumnType("text");
+
+            b.HasKey("Id")
+                      .HasName("pk_supplier_contacts");
+
+            b.HasIndex("SupplierId")
+                      .HasName("ix_supplier_contacts_supplier_id");
+
+            b.ToTable("supplier_contacts");
           });
 
       modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
           {
-            b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+            b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                       .WithMany()
                       .HasForeignKey("RoleId")
                       .HasConstraintName("fk_asp_net_role_claims_asp_net_roles_role_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
           {
-            b.HasOne("Phoneden.Entities.ApplicationUser")
+            b.HasOne("Phoneden.Entities.ApplicationUser", null)
                       .WithMany()
                       .HasForeignKey("UserId")
                       .HasConstraintName("fk_asp_net_user_claims_asp_net_users_user_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
           {
-            b.HasOne("Phoneden.Entities.ApplicationUser")
+            b.HasOne("Phoneden.Entities.ApplicationUser", null)
                       .WithMany()
                       .HasForeignKey("UserId")
                       .HasConstraintName("fk_asp_net_user_logins_asp_net_users_user_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
           {
-            b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
+            b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                       .WithMany()
                       .HasForeignKey("RoleId")
                       .HasConstraintName("fk_asp_net_user_roles_asp_net_roles_role_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
 
-            b.HasOne("Phoneden.Entities.ApplicationUser")
+            b.HasOne("Phoneden.Entities.ApplicationUser", null)
                       .WithMany()
                       .HasForeignKey("UserId")
                       .HasConstraintName("fk_asp_net_user_roles_asp_net_users_user_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
           {
-            b.HasOne("Phoneden.Entities.ApplicationUser")
+            b.HasOne("Phoneden.Entities.ApplicationUser", null)
                       .WithMany()
                       .HasForeignKey("UserId")
                       .HasConstraintName("fk_asp_net_user_tokens_asp_net_users_user_id")
-                      .OnDelete(DeleteBehavior.Cascade);
-          });
-
-      modelBuilder.Entity("Phoneden.Entities.Address", b =>
-          {
-            b.HasOne("Phoneden.Entities.Business", "Business")
-                      .WithMany("Addresses")
-                      .HasForeignKey("BusinessId")
-                      .HasConstraintName("fk_addresses_businesses_business_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.Category", b =>
@@ -1319,13 +1657,24 @@ namespace Phoneden.DataAccess.Migrations
                       .HasConstraintName("fk_categories_categories_parent_category_id");
           });
 
-      modelBuilder.Entity("Phoneden.Entities.Contact", b =>
+      modelBuilder.Entity("Phoneden.Entities.CustomerAddress", b =>
           {
-            b.HasOne("Phoneden.Entities.Business", "Business")
+            b.HasOne("Phoneden.Entities.Customer", "Customer")
+                      .WithMany("Addresses")
+                      .HasForeignKey("CustomerId")
+                      .HasConstraintName("fk_customer_addresses_customers_customer_id")
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
+          });
+
+      modelBuilder.Entity("Phoneden.Entities.CustomerContact", b =>
+          {
+            b.HasOne("Phoneden.Entities.Customer", "Customer")
                       .WithMany("Contacts")
-                      .HasForeignKey("BusinessId")
-                      .HasConstraintName("fk_contacts_businesses_business_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .HasForeignKey("CustomerId")
+                      .HasConstraintName("fk_customer_contacts_customers_customer_id")
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.Expense", b =>
@@ -1342,19 +1691,22 @@ namespace Phoneden.DataAccess.Migrations
                       .WithMany()
                       .HasForeignKey("BrandId")
                       .HasConstraintName("fk_products_brands_brand_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
 
             b.HasOne("Phoneden.Entities.Category", "Category")
                       .WithMany("Products")
                       .HasForeignKey("CategoryId")
                       .HasConstraintName("fk_products_categories_category_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
 
             b.HasOne("Phoneden.Entities.Quality", "Quality")
                       .WithMany()
                       .HasForeignKey("QualityId")
                       .HasConstraintName("fk_products_qualities_quality_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.PurchaseOrder", b =>
@@ -1362,8 +1714,9 @@ namespace Phoneden.DataAccess.Migrations
             b.HasOne("Phoneden.Entities.Supplier", "Supplier")
                       .WithMany("PurchaseOrders")
                       .HasForeignKey("SupplierId")
-                      .HasConstraintName("fk_purchase_orders_businesses_supplier_id")
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .HasConstraintName("fk_purchase_orders_suppliers_supplier_id")
+                      .OnDelete(DeleteBehavior.Restrict)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.PurchaseOrderInvoice", b =>
@@ -1372,7 +1725,8 @@ namespace Phoneden.DataAccess.Migrations
                       .WithOne("Invoice")
                       .HasForeignKey("Phoneden.Entities.PurchaseOrderInvoice", "PurchaseOrderId")
                       .HasConstraintName("fk_purchase_order_invoices_purchase_orders_purchase_order_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.PurchaseOrderInvoiceLineItem", b =>
@@ -1381,7 +1735,8 @@ namespace Phoneden.DataAccess.Migrations
                       .WithMany("InvoicedLineItems")
                       .HasForeignKey("PurchaseOrderInvoiceId")
                       .HasConstraintName("fk_purchase_order_invoice_line_items_purchase_order_invoices_p~")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.PurchaseOrderInvoicePayment", b =>
@@ -1390,7 +1745,8 @@ namespace Phoneden.DataAccess.Migrations
                       .WithMany("Payments")
                       .HasForeignKey("PurchaseOrderInvoiceId")
                       .HasConstraintName("fk_purchase_order_invoice_payments_purchase_order_invoices_pur~")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.PurchaseOrderLineItem", b =>
@@ -1399,13 +1755,15 @@ namespace Phoneden.DataAccess.Migrations
                       .WithMany()
                       .HasForeignKey("ProductId")
                       .HasConstraintName("fk_purchase_order_line_items_products_product_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
 
             b.HasOne("Phoneden.Entities.PurchaseOrder", "PurchaseOrder")
                       .WithMany("LineItems")
                       .HasForeignKey("PurchaseOrderId")
                       .HasConstraintName("fk_purchase_order_line_items_purchase_orders_purchase_order_id")
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Restrict)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.PurchaseOrderNote", b =>
@@ -1414,7 +1772,8 @@ namespace Phoneden.DataAccess.Migrations
                       .WithMany("Notes")
                       .HasForeignKey("PurchaseOrderId")
                       .HasConstraintName("fk_purchase_order_note_purchase_orders_purchase_order_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.SaleOrder", b =>
@@ -1422,8 +1781,9 @@ namespace Phoneden.DataAccess.Migrations
             b.HasOne("Phoneden.Entities.Customer", "Customer")
                       .WithMany("SaleOrders")
                       .HasForeignKey("CustomerId")
-                      .HasConstraintName("fk_sale_orders_businesses_customer_id")
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .HasConstraintName("fk_sale_orders_customers_customer_id")
+                      .OnDelete(DeleteBehavior.Restrict)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.SaleOrderInvoice", b =>
@@ -1432,7 +1792,8 @@ namespace Phoneden.DataAccess.Migrations
                       .WithOne("Invoice")
                       .HasForeignKey("Phoneden.Entities.SaleOrderInvoice", "SaleOrderId")
                       .HasConstraintName("fk_sale_order_invoices_sale_orders_sale_order_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.SaleOrderInvoiceLineItem", b =>
@@ -1441,7 +1802,8 @@ namespace Phoneden.DataAccess.Migrations
                       .WithMany("InvoicedLineItems")
                       .HasForeignKey("SaleOrderInvoiceId")
                       .HasConstraintName("fk_sale_order_invoice_line_items_sale_order_invoices_sale_orde~")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.SaleOrderInvoicePayment", b =>
@@ -1450,7 +1812,8 @@ namespace Phoneden.DataAccess.Migrations
                       .WithMany("Payments")
                       .HasForeignKey("SaleOrderInvoiceId")
                       .HasConstraintName("fk_sale_order_invoice_payments_sale_order_invoices_sale_order_~")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.SaleOrderLineItem", b =>
@@ -1459,13 +1822,15 @@ namespace Phoneden.DataAccess.Migrations
                       .WithMany()
                       .HasForeignKey("ProductId")
                       .HasConstraintName("fk_sale_order_line_items_products_product_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
 
             b.HasOne("Phoneden.Entities.SaleOrder", "SaleOrder")
                       .WithMany("LineItems")
                       .HasForeignKey("SaleOrderId")
                       .HasConstraintName("fk_sale_order_line_items_sale_orders_sale_order_id")
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.Restrict)
+                      .IsRequired();
           });
 
       modelBuilder.Entity("Phoneden.Entities.SaleOrderNote", b =>
@@ -1474,9 +1839,10 @@ namespace Phoneden.DataAccess.Migrations
                       .WithMany()
                       .HasForeignKey("PurchaseOrderId")
                       .HasConstraintName("fk_sale_order_note_purchase_orders_purchase_order_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
 
-            b.HasOne("Phoneden.Entities.SaleOrder")
+            b.HasOne("Phoneden.Entities.SaleOrder", null)
                       .WithMany("Notes")
                       .HasForeignKey("SaleOrderId")
                       .HasConstraintName("fk_sale_order_note_sale_orders_sale_order_id");
@@ -1488,13 +1854,35 @@ namespace Phoneden.DataAccess.Migrations
                       .WithMany()
                       .HasForeignKey("ProductId")
                       .HasConstraintName("fk_sale_order_returns_products_product_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
 
             b.HasOne("Phoneden.Entities.SaleOrderInvoice", "SaleOrderInvoice")
                       .WithMany("Returns")
                       .HasForeignKey("SaleOrderInvoiceId")
                       .HasConstraintName("fk_sale_order_returns_sale_order_invoices_sale_order_invoice_id")
-                      .OnDelete(DeleteBehavior.Cascade);
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
+          });
+
+      modelBuilder.Entity("Phoneden.Entities.SupplierAddress", b =>
+          {
+            b.HasOne("Phoneden.Entities.Supplier", "Supplier")
+                      .WithMany("Addresses")
+                      .HasForeignKey("SupplierId")
+                      .HasConstraintName("fk_supplier_addresses_suppliers_supplier_id")
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
+          });
+
+      modelBuilder.Entity("Phoneden.Entities.SupplierContact", b =>
+          {
+            b.HasOne("Phoneden.Entities.Supplier", "Supplier")
+                      .WithMany("Contacts")
+                      .HasForeignKey("SupplierId")
+                      .HasConstraintName("fk_supplier_contacts_suppliers_supplier_id")
+                      .OnDelete(DeleteBehavior.Cascade)
+                      .IsRequired();
           });
 #pragma warning restore 612, 618
     }
