@@ -132,7 +132,6 @@ namespace Phoneden.Web.Controllers
       return View(viewModel);
     }
 
-
     private async Task<List<SelectListItem>> GetCustomersSelectListAsync()
     {
       IEnumerable<CustomerViewModel> customers = await _customerService

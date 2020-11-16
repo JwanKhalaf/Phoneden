@@ -35,5 +35,9 @@ namespace Phoneden.ViewModels
     public decimal TotalProfit { get; set; }
 
     public decimal TotalProfitAfterExpenses { get; set; }
+
+    public string Labels { get; set; }
+
+    public string Data { get; set; }
   }
 }
