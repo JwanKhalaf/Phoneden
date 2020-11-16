@@ -1,11 +1,13 @@
 namespace Phoneden.Entities
 {
   using System;
+  using System.ComponentModel.DataAnnotations.Schema;
   using Shared;
 
-  public class Address : IEntity
+  [Table("Supplier_Addresses")]
+  public class SupplierAddress : IEntity
   {
-    public Address()
+    public SupplierAddress()
     {
       CreatedOn = DateTime.UtcNow;
     }
@@ -32,8 +34,8 @@ namespace Phoneden.Entities
 
     public DateTime? ModifiedOn { get; set; }
 
-    public int BusinessId { get; set; }
+    public int SupplierId { get; set; }
 
-    public Business Business { get; set; }
+    public Supplier Supplier { get; set; }
   }
 }

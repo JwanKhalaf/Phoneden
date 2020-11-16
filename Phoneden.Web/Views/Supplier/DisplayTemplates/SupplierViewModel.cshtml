@@ -209,9 +209,8 @@
                         @if (!address.IsDeleted)
                         {
                           <a asp-controller="Address"
-                             asp-action="Edit"
+                             asp-action="EditForSupplier"
                              asp-route-id="@address.Id"
-                             asp-route-isSupplierAddress="true"
                              class="btn btn-mini btn-warning pull-right">
                             Edit
                           </a>
@@ -219,10 +218,9 @@
                           if (Model.ShowAddressesDeleteButton)
                           {
                             <a asp-controller="Address"
-                               asp-action="Delete"
+                               asp-action="DeleteForSupplier"
                                asp-route-id="@address.Id"
                                asp-route-businessId="@Model.Id"
-                               asp-route-isSupplierAddress="true"
                                class="btn btn-mini btn-danger pull-right">
                               Delete
                             </a>
@@ -240,9 +238,8 @@
           {
             <div class="col-md-12">
               <a asp-controller="Address"
-                 asp-action="Create"
+                 asp-action="CreateForSupplier"
                  asp-route-businessId="@Model.Id"
-                 asp-route-isSupplierAddress="true"
                  class="btn btn-primary pull-right">
                 Add New Address
               </a>

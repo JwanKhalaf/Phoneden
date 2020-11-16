@@ -19,14 +19,20 @@ namespace Phoneden.Web.Controllers
                          throw new ArgumentNullException(nameof(customerServiceService));
     }
 
-    public ActionResult Page(bool showDeleted, int page = 1)
+    public async Task<ActionResult> Page(
+      bool showDeleted,
+      int page = 1)
     {
-      CustomerPageViewModel viewModel = _customerService.GetPagedCustomers(showDeleted, page);
+      CustomerPageViewModel viewModel = await _customerService
+        .GetPagedCustomersAsync(showDeleted, page);
+
       ViewBag.ShowDeleted = showDeleted;
+
       return View(viewModel);
     }
 
-    public async Task<ActionResult> Details(int? id)
+    public async Task<ActionResult> Details(
+      int? id)
     {
       if (id == null) return BadRequest();
 
@@ -43,22 +49,27 @@ namespace Phoneden.Web.Controllers
         Addresses = new List<AddressViewModel> { new AddressViewModel() },
         Contacts = new List<ContactViewModel> { new ContactViewModel() }
       };
+
       return View(viewModel);
     }
 
     [HttpPost]
-    public ActionResult Create(CustomerViewModel customer)
+    public async Task<ActionResult> Create(
+      CustomerViewModel viewModel)
     {
       if (!ModelState.IsValid)
       {
-        return View(customer);
+        return View(viewModel);
       }
 
-      _customerService.AddCustomer(customer);
+      await _customerService
+        .AddCustomerAsync(viewModel);
+
       return RedirectToAction("Page", new { showDeleted = false });
     }
 
-    public async Task<ActionResult> Edit(int? id)
+    public async Task<ActionResult> Edit(
+      int? id)
     {
       if (id == null) return BadRequest();
       CustomerViewModel viewModel = await _customerService.GetCustomerAsync(id.Value);
@@ -66,15 +77,20 @@ namespace Phoneden.Web.Controllers
     }
 
     [HttpPost]
-    public ActionResult Edit(CustomerViewModel customer)
+    public async Task<ActionResult> Edit(
+      CustomerViewModel viewModel)
     {
-      if (!ModelState.IsValid) return View(customer);
+      if (!ModelState.IsValid) return View(viewModel);
 
-      _customerService.UpdateCustomer(customer);
+      await _customerService
+        .UpdateCustomerAsync(viewModel);
+
       return RedirectToAction("Page", new { showDeleted = false });
     }
 
-    public async Task<ActionResult> Delete(int? id, bool? saveChangesError = false)
+    public async Task<ActionResult> Delete(
+      int? id,
+      bool? saveChangesError = false)
     {
       if (id == null) return BadRequest();
 
@@ -90,7 +106,8 @@ namespace Phoneden.Web.Controllers
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Delete(int id)
+    public async Task<ActionResult> Delete(
+      int id)
     {
       if (id == 0)
       {
@@ -99,7 +116,8 @@ namespace Phoneden.Web.Controllers
 
       try
       {
-        _customerService.DeleteCustomer(id);
+        await _customerService
+          .DeleteCustomerAsync(id);
       }
       catch (RetryLimitExceededException)
       {

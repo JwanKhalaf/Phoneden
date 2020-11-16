@@ -5,13 +5,12 @@ namespace Phoneden.Web
   using DataAccess.Context;
   using DataAccess.Initialisations;
   using Entities;
-  using Microsoft.AspNetCore;
   using Microsoft.AspNetCore.Hosting;
   using Microsoft.AspNetCore.Identity;
   using Microsoft.Extensions.DependencyInjection;
-  using Microsoft.Extensions.Configuration;
   using Microsoft.Extensions.Logging;
   using System.Threading.Tasks;
+  using Microsoft.Extensions.Hosting;
   using Npgsql;
   using Polly;
   using Polly.Retry;
@@ -20,15 +19,11 @@ namespace Phoneden.Web
   {
     public static async Task Main(string[] args)
     {
-      IWebHost host = BuildWebHost(args);
+      IHost hostBuilder = CreateHostBuilder(args).Build();
 
-      using (IServiceScope scope = host.Services.CreateScope())
+      using (IServiceScope scope = hostBuilder.Services.CreateScope())
       {
         IServiceProvider services = scope.ServiceProvider;
-
-        Console
-          .WriteLine(services.GetService<IConfiguration>()
-          .GetConnectionString("DefaultConnection"));
 
         try
         {
@@ -63,13 +58,15 @@ namespace Phoneden.Web
         }
       }
 
-      host.Run();
+      await hostBuilder.RunAsync();
     }
 
-    public static IWebHost BuildWebHost(string[] args) =>
-      WebHost
-      .CreateDefaultBuilder(args)
-      .UseStartup<Startup>()
-      .Build();
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+      Host
+        .CreateDefaultBuilder(args)
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+          webBuilder.UseStartup<Startup>();
+        });
   }
 }

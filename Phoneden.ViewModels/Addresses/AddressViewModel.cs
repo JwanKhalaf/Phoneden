@@ -26,8 +26,6 @@ namespace Phoneden.ViewModels
     [Display(Name = "Status")]
     public bool IsDeleted { get; set; }
 
-    public bool IsSupplierAddress { get; set; }
-
     public int BusinessId { get; set; }
 
     public string ButtonText => Id != 0 ? "Update Address" : "Add Address";

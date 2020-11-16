@@ -26,8 +26,8 @@ namespace Phoneden.Services
         CreditUsed = customerViewModel.CreditUsed,
         NumberOfDaysAllowedToBeOnMaxedOutCredit = customerViewModel.NumberOfDaysAllowedToBeOnMaxedOutCredit,
         IsDeleted = false,
-        Addresses = AddressFactory.CreateList(customerViewModel.Addresses),
-        Contacts = ContactFactory.BuildNewContactCollectionFromViewModel(customerViewModel.Contacts),
+        Addresses = CustomerAddressFactory.CreateList(customerViewModel.Addresses),
+        Contacts = CustomerContactFactory.BuildNewContactCollectionFromViewModel(customerViewModel.Contacts),
         SaleOrders = SaleOrderFactory.BuildListOfNewSaleOrders(customerViewModel.SaleOrders)
       };
       return customer;
@@ -63,19 +63,22 @@ namespace Phoneden.Services
         }
 
         {
-          Address updatedAddress = customer.Addresses.FirstOrDefault(a => a.Id == address.Id);
-          if (updatedAddress == null)
+          CustomerAddress updatedCustomerAddress = customer
+            .Addresses
+            .FirstOrDefault(a => a.Id == address.Id);
+
+          if (updatedCustomerAddress == null)
           {
             continue;
           }
 
-          updatedAddress.AddressLine1 = address.AddressLine1;
-          updatedAddress.AddressLine2 = address.AddressLine2;
-          updatedAddress.Area = address.Area;
-          updatedAddress.City = address.City;
-          updatedAddress.County = address.County;
-          updatedAddress.PostCode = address.PostCode;
-          updatedAddress.Country = address.Country;
+          updatedCustomerAddress.AddressLine1 = address.AddressLine1;
+          updatedCustomerAddress.AddressLine2 = address.AddressLine2;
+          updatedCustomerAddress.Area = address.Area;
+          updatedCustomerAddress.City = address.City;
+          updatedCustomerAddress.County = address.County;
+          updatedCustomerAddress.PostCode = address.PostCode;
+          updatedCustomerAddress.Country = address.Country;
         }
       }
 
@@ -87,18 +90,19 @@ namespace Phoneden.Services
         }
 
         {
-          Contact updatedContact = customer.Contacts.FirstOrDefault(c => c.Id == contact.Id);
-          if (updatedContact == null)
+          CustomerContact updatedCustomerContact = customer.Contacts.FirstOrDefault(c => c.Id == contact.Id);
+
+          if (updatedCustomerContact == null)
           {
             continue;
           }
 
-          updatedContact.Title = contact.Title;
-          updatedContact.FirstName = contact.FirstName;
-          updatedContact.LastName = contact.LastName;
-          updatedContact.Phone = contact.Phone;
-          updatedContact.Email = contact.Email;
-          updatedContact.Department = contact.Department;
+          updatedCustomerContact.Title = contact.Title;
+          updatedCustomerContact.FirstName = contact.FirstName;
+          updatedCustomerContact.LastName = contact.LastName;
+          updatedCustomerContact.Phone = contact.Phone;
+          updatedCustomerContact.Email = contact.Email;
+          updatedCustomerContact.Department = contact.Department;
         }
       }
     }

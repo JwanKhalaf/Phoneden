@@ -53,7 +53,7 @@ namespace Phoneden.DataAccess.Migrations
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             name = table.Column<string>(nullable: true),
             is_deleted = table.Column<bool>(nullable: false),
             created_on = table.Column<DateTime>(nullable: false),
@@ -65,36 +65,11 @@ namespace Phoneden.DataAccess.Migrations
           });
 
       migrationBuilder.CreateTable(
-          name: "businesses",
-          columns: table => new
-          {
-            id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-            name = table.Column<string>(nullable: true),
-            code = table.Column<string>(nullable: true),
-            description = table.Column<string>(nullable: true),
-            phone = table.Column<string>(nullable: true),
-            website = table.Column<string>(nullable: true),
-            email = table.Column<string>(nullable: true),
-            is_deleted = table.Column<bool>(nullable: false),
-            created_on = table.Column<DateTime>(nullable: false),
-            modified_on = table.Column<DateTime>(nullable: true),
-            discriminator = table.Column<string>(nullable: false),
-            allowed_credit = table.Column<decimal>(type: "decimal(19, 8)", nullable: true),
-            credit_used = table.Column<decimal>(type: "decimal(19, 8)", nullable: true),
-            number_of_days_allowed_to_be_on_maxed_out_credit = table.Column<int>(nullable: true)
-          },
-          constraints: table =>
-          {
-            table.PrimaryKey("pk_businesses", x => x.id);
-          });
-
-      migrationBuilder.CreateTable(
           name: "categories",
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             name = table.Column<string>(nullable: true),
             is_deleted = table.Column<bool>(nullable: false),
             created_on = table.Column<DateTime>(nullable: false),
@@ -113,30 +88,27 @@ namespace Phoneden.DataAccess.Migrations
           });
 
       migrationBuilder.CreateTable(
-          name: "partners",
+          name: "customers",
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-            title = table.Column<string>(nullable: true),
-            first_name = table.Column<string>(nullable: true),
-            last_name = table.Column<string>(nullable: true),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            name = table.Column<string>(nullable: true),
+            code = table.Column<string>(nullable: true),
+            description = table.Column<string>(nullable: true),
             phone = table.Column<string>(nullable: true),
+            website = table.Column<string>(nullable: true),
             email = table.Column<string>(nullable: true),
             is_deleted = table.Column<bool>(nullable: false),
             created_on = table.Column<DateTime>(nullable: false),
             modified_on = table.Column<DateTime>(nullable: true),
-            address_line1 = table.Column<string>(nullable: true),
-            address_line2 = table.Column<string>(nullable: true),
-            area = table.Column<string>(nullable: true),
-            city = table.Column<string>(nullable: true),
-            county = table.Column<string>(nullable: true),
-            post_code = table.Column<string>(nullable: true),
-            country = table.Column<string>(nullable: true)
+            allowed_credit = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
+            credit_used = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
+            number_of_days_allowed_to_be_on_maxed_out_credit = table.Column<int>(nullable: false)
           },
           constraints: table =>
           {
-            table.PrimaryKey("pk_partners", x => x.id);
+            table.PrimaryKey("pk_customers", x => x.id);
           });
 
       migrationBuilder.CreateTable(
@@ -144,7 +116,7 @@ namespace Phoneden.DataAccess.Migrations
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             name = table.Column<string>(nullable: true),
             is_deleted = table.Column<bool>(nullable: false),
             created_on = table.Column<DateTime>(nullable: false),
@@ -156,11 +128,32 @@ namespace Phoneden.DataAccess.Migrations
           });
 
       migrationBuilder.CreateTable(
+          name: "suppliers",
+          columns: table => new
+          {
+            id = table.Column<int>(nullable: false)
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            name = table.Column<string>(nullable: true),
+            code = table.Column<string>(nullable: true),
+            description = table.Column<string>(nullable: true),
+            phone = table.Column<string>(nullable: true),
+            website = table.Column<string>(nullable: true),
+            email = table.Column<string>(nullable: true),
+            is_deleted = table.Column<bool>(nullable: false),
+            created_on = table.Column<DateTime>(nullable: false),
+            modified_on = table.Column<DateTime>(nullable: true)
+          },
+          constraints: table =>
+          {
+            table.PrimaryKey("pk_suppliers", x => x.id);
+          });
+
+      migrationBuilder.CreateTable(
           name: "asp_net_role_claims",
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             role_id = table.Column<string>(nullable: false),
             claim_type = table.Column<string>(nullable: true),
             claim_value = table.Column<string>(nullable: true)
@@ -181,7 +174,7 @@ namespace Phoneden.DataAccess.Migrations
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             user_id = table.Column<string>(nullable: false),
             claim_type = table.Column<string>(nullable: true),
             claim_value = table.Column<string>(nullable: true)
@@ -266,7 +259,7 @@ namespace Phoneden.DataAccess.Migrations
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             date = table.Column<DateTime>(nullable: false),
             method = table.Column<int>(nullable: false),
             amount = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
@@ -288,11 +281,11 @@ namespace Phoneden.DataAccess.Migrations
           });
 
       migrationBuilder.CreateTable(
-          name: "addresses",
+          name: "customer_addresses",
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             address_line1 = table.Column<string>(nullable: true),
             address_line2 = table.Column<string>(nullable: true),
             area = table.Column<string>(nullable: true),
@@ -303,25 +296,25 @@ namespace Phoneden.DataAccess.Migrations
             is_deleted = table.Column<bool>(nullable: false),
             created_on = table.Column<DateTime>(nullable: false),
             modified_on = table.Column<DateTime>(nullable: true),
-            business_id = table.Column<int>(nullable: false)
+            customer_id = table.Column<int>(nullable: false)
           },
           constraints: table =>
           {
-            table.PrimaryKey("pk_addresses", x => x.id);
+            table.PrimaryKey("pk_customer_addresses", x => x.id);
             table.ForeignKey(
-                      name: "fk_addresses_businesses_business_id",
-                      column: x => x.business_id,
-                      principalTable: "businesses",
+                      name: "fk_customer_addresses_customers_customer_id",
+                      column: x => x.customer_id,
+                      principalTable: "customers",
                       principalColumn: "id",
                       onDelete: ReferentialAction.Cascade);
           });
 
       migrationBuilder.CreateTable(
-          name: "contacts",
+          name: "customer_contacts",
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             title = table.Column<string>(nullable: true),
             first_name = table.Column<string>(nullable: true),
             last_name = table.Column<string>(nullable: true),
@@ -331,48 +324,17 @@ namespace Phoneden.DataAccess.Migrations
             created_on = table.Column<DateTime>(nullable: false),
             modified_on = table.Column<DateTime>(nullable: true),
             department = table.Column<string>(nullable: true),
-            business_id = table.Column<int>(nullable: false)
+            customer_id = table.Column<int>(nullable: false)
           },
           constraints: table =>
           {
-            table.PrimaryKey("pk_contacts", x => x.id);
+            table.PrimaryKey("pk_customer_contacts", x => x.id);
             table.ForeignKey(
-                      name: "fk_contacts_businesses_business_id",
-                      column: x => x.business_id,
-                      principalTable: "businesses",
+                      name: "fk_customer_contacts_customers_customer_id",
+                      column: x => x.customer_id,
+                      principalTable: "customers",
                       principalColumn: "id",
                       onDelete: ReferentialAction.Cascade);
-          });
-
-      migrationBuilder.CreateTable(
-          name: "purchase_orders",
-          columns: table => new
-          {
-            id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-            date = table.Column<DateTime>(nullable: false),
-            shipping_cost = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
-            shipping_currency = table.Column<int>(nullable: false),
-            shipping_conversion_rate = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
-            discount = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
-            supplier_order_number = table.Column<int>(nullable: false),
-            status = table.Column<int>(nullable: false),
-            vat = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
-            import_duty = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
-            supplier_id = table.Column<int>(nullable: false),
-            is_deleted = table.Column<bool>(nullable: false),
-            created_on = table.Column<DateTime>(nullable: false),
-            modified_on = table.Column<DateTime>(nullable: true)
-          },
-          constraints: table =>
-          {
-            table.PrimaryKey("pk_purchase_orders", x => x.id);
-            table.ForeignKey(
-                      name: "fk_purchase_orders_businesses_supplier_id",
-                      column: x => x.supplier_id,
-                      principalTable: "businesses",
-                      principalColumn: "id",
-                      onDelete: ReferentialAction.Restrict);
           });
 
       migrationBuilder.CreateTable(
@@ -380,7 +342,7 @@ namespace Phoneden.DataAccess.Migrations
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             date = table.Column<DateTime>(nullable: false),
             postage_cost = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
             discount = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
@@ -394,9 +356,9 @@ namespace Phoneden.DataAccess.Migrations
           {
             table.PrimaryKey("pk_sale_orders", x => x.id);
             table.ForeignKey(
-                      name: "fk_sale_orders_businesses_customer_id",
+                      name: "fk_sale_orders_customers_customer_id",
                       column: x => x.customer_id,
-                      principalTable: "businesses",
+                      principalTable: "customers",
                       principalColumn: "id",
                       onDelete: ReferentialAction.Restrict);
           });
@@ -406,7 +368,7 @@ namespace Phoneden.DataAccess.Migrations
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             name = table.Column<string>(nullable: true),
             sku = table.Column<string>(nullable: true),
             barcode = table.Column<string>(nullable: true),
@@ -448,49 +410,89 @@ namespace Phoneden.DataAccess.Migrations
           });
 
       migrationBuilder.CreateTable(
-          name: "purchase_order_invoices",
+          name: "purchase_orders",
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-            amount = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
-            due_date = table.Column<DateTime>(nullable: false),
-            is_deleted = table.Column<bool>(nullable: false),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            date = table.Column<DateTime>(nullable: false),
+            shipping_cost = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
+            shipping_currency = table.Column<int>(nullable: false),
+            shipping_conversion_rate = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
+            discount = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
+            supplier_order_number = table.Column<int>(nullable: false),
             status = table.Column<int>(nullable: false),
+            vat = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
+            import_duty = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
+            supplier_id = table.Column<int>(nullable: false),
+            is_deleted = table.Column<bool>(nullable: false),
             created_on = table.Column<DateTime>(nullable: false),
-            modified_on = table.Column<DateTime>(nullable: true),
-            purchase_order_id = table.Column<int>(nullable: false)
+            modified_on = table.Column<DateTime>(nullable: true)
           },
           constraints: table =>
           {
-            table.PrimaryKey("pk_purchase_order_invoices", x => x.id);
+            table.PrimaryKey("pk_purchase_orders", x => x.id);
             table.ForeignKey(
-                      name: "fk_purchase_order_invoices_purchase_orders_purchase_order_id",
-                      column: x => x.purchase_order_id,
-                      principalTable: "purchase_orders",
+                      name: "fk_purchase_orders_suppliers_supplier_id",
+                      column: x => x.supplier_id,
+                      principalTable: "suppliers",
+                      principalColumn: "id",
+                      onDelete: ReferentialAction.Restrict);
+          });
+
+      migrationBuilder.CreateTable(
+          name: "supplier_addresses",
+          columns: table => new
+          {
+            id = table.Column<int>(nullable: false)
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            address_line1 = table.Column<string>(nullable: true),
+            address_line2 = table.Column<string>(nullable: true),
+            area = table.Column<string>(nullable: true),
+            city = table.Column<string>(nullable: true),
+            county = table.Column<string>(nullable: true),
+            post_code = table.Column<string>(nullable: true),
+            country = table.Column<string>(nullable: true),
+            is_deleted = table.Column<bool>(nullable: false),
+            created_on = table.Column<DateTime>(nullable: false),
+            modified_on = table.Column<DateTime>(nullable: true),
+            supplier_id = table.Column<int>(nullable: false)
+          },
+          constraints: table =>
+          {
+            table.PrimaryKey("pk_supplier_addresses", x => x.id);
+            table.ForeignKey(
+                      name: "fk_supplier_addresses_suppliers_supplier_id",
+                      column: x => x.supplier_id,
+                      principalTable: "suppliers",
                       principalColumn: "id",
                       onDelete: ReferentialAction.Cascade);
           });
 
       migrationBuilder.CreateTable(
-          name: "purchase_order_note",
+          name: "supplier_contacts",
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-            text = table.Column<string>(nullable: true),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            title = table.Column<string>(nullable: true),
+            first_name = table.Column<string>(nullable: true),
+            last_name = table.Column<string>(nullable: true),
+            phone = table.Column<string>(nullable: true),
+            email = table.Column<string>(nullable: true),
             is_deleted = table.Column<bool>(nullable: false),
             created_on = table.Column<DateTime>(nullable: false),
             modified_on = table.Column<DateTime>(nullable: true),
-            purchase_order_id = table.Column<int>(nullable: false)
+            department = table.Column<string>(nullable: true),
+            supplier_id = table.Column<int>(nullable: false)
           },
           constraints: table =>
           {
-            table.PrimaryKey("pk_purchase_order_note", x => x.id);
+            table.PrimaryKey("pk_supplier_contacts", x => x.id);
             table.ForeignKey(
-                      name: "fk_purchase_order_note_purchase_orders_purchase_order_id",
-                      column: x => x.purchase_order_id,
-                      principalTable: "purchase_orders",
+                      name: "fk_supplier_contacts_suppliers_supplier_id",
+                      column: x => x.supplier_id,
+                      principalTable: "suppliers",
                       principalColumn: "id",
                       onDelete: ReferentialAction.Cascade);
           });
@@ -500,7 +502,7 @@ namespace Phoneden.DataAccess.Migrations
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             amount = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
             due_date = table.Column<DateTime>(nullable: false),
             is_deleted = table.Column<bool>(nullable: false),
@@ -522,78 +524,11 @@ namespace Phoneden.DataAccess.Migrations
           });
 
       migrationBuilder.CreateTable(
-          name: "sale_order_note",
-          columns: table => new
-          {
-            id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-            text = table.Column<string>(nullable: true),
-            is_deleted = table.Column<bool>(nullable: false),
-            created_on = table.Column<DateTime>(nullable: false),
-            modified_on = table.Column<DateTime>(nullable: true),
-            purchase_order_id = table.Column<int>(nullable: false),
-            sale_order_id = table.Column<int>(nullable: true)
-          },
-          constraints: table =>
-          {
-            table.PrimaryKey("pk_sale_order_note", x => x.id);
-            table.ForeignKey(
-                      name: "fk_sale_order_note_purchase_orders_purchase_order_id",
-                      column: x => x.purchase_order_id,
-                      principalTable: "purchase_orders",
-                      principalColumn: "id",
-                      onDelete: ReferentialAction.Cascade);
-            table.ForeignKey(
-                      name: "fk_sale_order_note_sale_orders_sale_order_id",
-                      column: x => x.sale_order_id,
-                      principalTable: "sale_orders",
-                      principalColumn: "id",
-                      onDelete: ReferentialAction.Restrict);
-          });
-
-      migrationBuilder.CreateTable(
-          name: "purchase_order_line_items",
-          columns: table => new
-          {
-            id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-            name = table.Column<string>(nullable: true),
-            price = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
-            currency = table.Column<int>(nullable: false),
-            conversion_rate = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
-            quality = table.Column<string>(nullable: true),
-            colour = table.Column<string>(nullable: true),
-            quantity = table.Column<int>(nullable: false),
-            is_deleted = table.Column<bool>(nullable: false),
-            created_on = table.Column<DateTime>(nullable: false),
-            modified_on = table.Column<DateTime>(nullable: true),
-            purchase_order_id = table.Column<int>(nullable: false),
-            product_id = table.Column<int>(nullable: false),
-            barcode = table.Column<string>(nullable: true)
-          },
-          constraints: table =>
-          {
-            table.PrimaryKey("pk_purchase_order_line_items", x => x.id);
-            table.ForeignKey(
-                      name: "fk_purchase_order_line_items_products_product_id",
-                      column: x => x.product_id,
-                      principalTable: "products",
-                      principalColumn: "id",
-                      onDelete: ReferentialAction.Cascade);
-            table.ForeignKey(
-                      name: "fk_purchase_order_line_items_purchase_orders_purchase_order_id",
-                      column: x => x.purchase_order_id,
-                      principalTable: "purchase_orders",
-                      principalColumn: "id",
-                      onDelete: ReferentialAction.Restrict);
-          });
-
-      migrationBuilder.CreateTable(
           name: "sale_order_line_items",
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             name = table.Column<string>(nullable: true),
             price = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
             currency = table.Column<int>(nullable: false),
@@ -627,61 +562,118 @@ namespace Phoneden.DataAccess.Migrations
           });
 
       migrationBuilder.CreateTable(
-          name: "purchase_order_invoice_line_items",
+          name: "purchase_order_invoices",
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-            product_id = table.Column<int>(nullable: false),
-            product_name = table.Column<string>(nullable: true),
-            product_colour = table.Column<string>(nullable: true),
-            product_quality = table.Column<string>(nullable: true),
-            quantity = table.Column<int>(nullable: false),
-            price = table.Column<decimal>(nullable: false),
-            currency = table.Column<int>(nullable: false),
-            conversion_rate = table.Column<decimal>(nullable: false),
-            purchase_order_invoice_id = table.Column<int>(nullable: false),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            amount = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
+            due_date = table.Column<DateTime>(nullable: false),
             is_deleted = table.Column<bool>(nullable: false),
+            status = table.Column<int>(nullable: false),
             created_on = table.Column<DateTime>(nullable: false),
-            modified_on = table.Column<DateTime>(nullable: true)
+            modified_on = table.Column<DateTime>(nullable: true),
+            purchase_order_id = table.Column<int>(nullable: false)
           },
           constraints: table =>
           {
-            table.PrimaryKey("pk_purchase_order_invoice_line_items", x => x.id);
+            table.PrimaryKey("pk_purchase_order_invoices", x => x.id);
             table.ForeignKey(
-                      name: "fk_purchase_order_invoice_line_items_purchase_order_invoices_p~",
-                      column: x => x.purchase_order_invoice_id,
-                      principalTable: "purchase_order_invoices",
+                      name: "fk_purchase_order_invoices_purchase_orders_purchase_order_id",
+                      column: x => x.purchase_order_id,
+                      principalTable: "purchase_orders",
                       principalColumn: "id",
                       onDelete: ReferentialAction.Cascade);
           });
 
       migrationBuilder.CreateTable(
-          name: "purchase_order_invoice_payments",
+          name: "purchase_order_line_items",
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-            amount = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
-            method = table.Column<int>(nullable: false),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            name = table.Column<string>(nullable: true),
+            price = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
             currency = table.Column<int>(nullable: false),
             conversion_rate = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
-            reference = table.Column<string>(nullable: true),
-            date = table.Column<DateTime>(nullable: false),
-            purchase_order_invoice_id = table.Column<int>(nullable: false),
+            quality = table.Column<string>(nullable: true),
+            colour = table.Column<string>(nullable: true),
+            quantity = table.Column<int>(nullable: false),
             is_deleted = table.Column<bool>(nullable: false),
             created_on = table.Column<DateTime>(nullable: false),
-            modified_on = table.Column<DateTime>(nullable: true)
+            modified_on = table.Column<DateTime>(nullable: true),
+            purchase_order_id = table.Column<int>(nullable: false),
+            product_id = table.Column<int>(nullable: false),
+            barcode = table.Column<string>(nullable: true)
           },
           constraints: table =>
           {
-            table.PrimaryKey("pk_purchase_order_invoice_payments", x => x.id);
+            table.PrimaryKey("pk_purchase_order_line_items", x => x.id);
             table.ForeignKey(
-                      name: "fk_purchase_order_invoice_payments_purchase_order_invoices_pur~",
-                      column: x => x.purchase_order_invoice_id,
-                      principalTable: "purchase_order_invoices",
+                      name: "fk_purchase_order_line_items_products_product_id",
+                      column: x => x.product_id,
+                      principalTable: "products",
                       principalColumn: "id",
                       onDelete: ReferentialAction.Cascade);
+            table.ForeignKey(
+                      name: "fk_purchase_order_line_items_purchase_orders_purchase_order_id",
+                      column: x => x.purchase_order_id,
+                      principalTable: "purchase_orders",
+                      principalColumn: "id",
+                      onDelete: ReferentialAction.Restrict);
+          });
+
+      migrationBuilder.CreateTable(
+          name: "purchase_order_note",
+          columns: table => new
+          {
+            id = table.Column<int>(nullable: false)
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            text = table.Column<string>(nullable: true),
+            is_deleted = table.Column<bool>(nullable: false),
+            created_on = table.Column<DateTime>(nullable: false),
+            modified_on = table.Column<DateTime>(nullable: true),
+            purchase_order_id = table.Column<int>(nullable: false)
+          },
+          constraints: table =>
+          {
+            table.PrimaryKey("pk_purchase_order_note", x => x.id);
+            table.ForeignKey(
+                      name: "fk_purchase_order_note_purchase_orders_purchase_order_id",
+                      column: x => x.purchase_order_id,
+                      principalTable: "purchase_orders",
+                      principalColumn: "id",
+                      onDelete: ReferentialAction.Cascade);
+          });
+
+      migrationBuilder.CreateTable(
+          name: "sale_order_note",
+          columns: table => new
+          {
+            id = table.Column<int>(nullable: false)
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            text = table.Column<string>(nullable: true),
+            is_deleted = table.Column<bool>(nullable: false),
+            created_on = table.Column<DateTime>(nullable: false),
+            modified_on = table.Column<DateTime>(nullable: true),
+            purchase_order_id = table.Column<int>(nullable: false),
+            sale_order_id = table.Column<int>(nullable: true)
+          },
+          constraints: table =>
+          {
+            table.PrimaryKey("pk_sale_order_note", x => x.id);
+            table.ForeignKey(
+                      name: "fk_sale_order_note_purchase_orders_purchase_order_id",
+                      column: x => x.purchase_order_id,
+                      principalTable: "purchase_orders",
+                      principalColumn: "id",
+                      onDelete: ReferentialAction.Cascade);
+            table.ForeignKey(
+                      name: "fk_sale_order_note_sale_orders_sale_order_id",
+                      column: x => x.sale_order_id,
+                      principalTable: "sale_orders",
+                      principalColumn: "id",
+                      onDelete: ReferentialAction.Restrict);
           });
 
       migrationBuilder.CreateTable(
@@ -689,7 +681,7 @@ namespace Phoneden.DataAccess.Migrations
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             product_id = table.Column<int>(nullable: false),
             product_name = table.Column<string>(nullable: true),
             product_colour = table.Column<string>(nullable: true),
@@ -718,7 +710,7 @@ namespace Phoneden.DataAccess.Migrations
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             amount = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
             method = table.Column<int>(nullable: false),
             reference = table.Column<string>(nullable: true),
@@ -744,7 +736,7 @@ namespace Phoneden.DataAccess.Migrations
           columns: table => new
           {
             id = table.Column<int>(nullable: false)
-                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
             date = table.Column<DateTime>(nullable: false),
             quantity = table.Column<int>(nullable: false),
             resolution = table.Column<int>(nullable: false),
@@ -774,10 +766,63 @@ namespace Phoneden.DataAccess.Migrations
                       onDelete: ReferentialAction.Cascade);
           });
 
-      migrationBuilder.CreateIndex(
-          name: "ix_addresses_business_id",
-          table: "addresses",
-          column: "business_id");
+      migrationBuilder.CreateTable(
+          name: "purchase_order_invoice_line_items",
+          columns: table => new
+          {
+            id = table.Column<int>(nullable: false)
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            product_id = table.Column<int>(nullable: false),
+            product_name = table.Column<string>(nullable: true),
+            product_colour = table.Column<string>(nullable: true),
+            product_quality = table.Column<string>(nullable: true),
+            quantity = table.Column<int>(nullable: false),
+            price = table.Column<decimal>(nullable: false),
+            currency = table.Column<int>(nullable: false),
+            conversion_rate = table.Column<decimal>(nullable: false),
+            purchase_order_invoice_id = table.Column<int>(nullable: false),
+            is_deleted = table.Column<bool>(nullable: false),
+            created_on = table.Column<DateTime>(nullable: false),
+            modified_on = table.Column<DateTime>(nullable: true)
+          },
+          constraints: table =>
+          {
+            table.PrimaryKey("pk_purchase_order_invoice_line_items", x => x.id);
+            table.ForeignKey(
+                      name: "fk_purchase_order_invoice_line_items_purchase_order_invoices_p~",
+                      column: x => x.purchase_order_invoice_id,
+                      principalTable: "purchase_order_invoices",
+                      principalColumn: "id",
+                      onDelete: ReferentialAction.Cascade);
+          });
+
+      migrationBuilder.CreateTable(
+          name: "purchase_order_invoice_payments",
+          columns: table => new
+          {
+            id = table.Column<int>(nullable: false)
+                  .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            amount = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
+            method = table.Column<int>(nullable: false),
+            currency = table.Column<int>(nullable: false),
+            conversion_rate = table.Column<decimal>(type: "decimal(19, 8)", nullable: false),
+            reference = table.Column<string>(nullable: true),
+            date = table.Column<DateTime>(nullable: false),
+            purchase_order_invoice_id = table.Column<int>(nullable: false),
+            is_deleted = table.Column<bool>(nullable: false),
+            created_on = table.Column<DateTime>(nullable: false),
+            modified_on = table.Column<DateTime>(nullable: true)
+          },
+          constraints: table =>
+          {
+            table.PrimaryKey("pk_purchase_order_invoice_payments", x => x.id);
+            table.ForeignKey(
+                      name: "fk_purchase_order_invoice_payments_purchase_order_invoices_pur~",
+                      column: x => x.purchase_order_invoice_id,
+                      principalTable: "purchase_order_invoices",
+                      principalColumn: "id",
+                      onDelete: ReferentialAction.Cascade);
+          });
 
       migrationBuilder.CreateIndex(
           name: "ix_asp_net_role_claims_role_id",
@@ -822,9 +867,14 @@ namespace Phoneden.DataAccess.Migrations
           column: "parent_category_id");
 
       migrationBuilder.CreateIndex(
-          name: "ix_contacts_business_id",
-          table: "contacts",
-          column: "business_id");
+          name: "ix_customer_addresses_customer_id",
+          table: "customer_addresses",
+          column: "customer_id");
+
+      migrationBuilder.CreateIndex(
+          name: "ix_customer_contacts_customer_id",
+          table: "customer_contacts",
+          column: "customer_id");
 
       migrationBuilder.CreateIndex(
           name: "ix_expenses_application_user_id",
@@ -932,13 +982,20 @@ namespace Phoneden.DataAccess.Migrations
           name: "ix_sale_orders_customer_id",
           table: "sale_orders",
           column: "customer_id");
+
+      migrationBuilder.CreateIndex(
+          name: "ix_supplier_addresses_supplier_id",
+          table: "supplier_addresses",
+          column: "supplier_id");
+
+      migrationBuilder.CreateIndex(
+          name: "ix_supplier_contacts_supplier_id",
+          table: "supplier_contacts",
+          column: "supplier_id");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
-      migrationBuilder.DropTable(
-          name: "addresses");
-
       migrationBuilder.DropTable(
           name: "asp_net_role_claims");
 
@@ -955,13 +1012,13 @@ namespace Phoneden.DataAccess.Migrations
           name: "asp_net_user_tokens");
 
       migrationBuilder.DropTable(
-          name: "contacts");
+          name: "customer_addresses");
+
+      migrationBuilder.DropTable(
+          name: "customer_contacts");
 
       migrationBuilder.DropTable(
           name: "expenses");
-
-      migrationBuilder.DropTable(
-          name: "partners");
 
       migrationBuilder.DropTable(
           name: "purchase_order_invoice_line_items");
@@ -989,6 +1046,12 @@ namespace Phoneden.DataAccess.Migrations
 
       migrationBuilder.DropTable(
           name: "sale_order_returns");
+
+      migrationBuilder.DropTable(
+          name: "supplier_addresses");
+
+      migrationBuilder.DropTable(
+          name: "supplier_contacts");
 
       migrationBuilder.DropTable(
           name: "asp_net_roles");
@@ -1021,7 +1084,10 @@ namespace Phoneden.DataAccess.Migrations
           name: "sale_orders");
 
       migrationBuilder.DropTable(
-          name: "businesses");
+          name: "suppliers");
+
+      migrationBuilder.DropTable(
+          name: "customers");
     }
   }
 }

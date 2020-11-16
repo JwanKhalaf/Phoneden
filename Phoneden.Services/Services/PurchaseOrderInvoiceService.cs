@@ -139,17 +139,17 @@ namespace Phoneden.Services
 
       viewModel.Business.Name = order.Supplier.Name;
 
-      Address address = order
+      SupplierAddress supplierAddress = order
         .Supplier
         .Addresses
         .First();
 
-      viewModel.Business.AddressLine1 = address.AddressLine1;
-      viewModel.Business.AddressLine2 = address.AddressLine2;
-      viewModel.Business.Area = address.Area;
-      viewModel.Business.City = address.City;
-      viewModel.Business.PostCode = address.PostCode;
-      viewModel.Business.Country = address.Country;
+      viewModel.Business.AddressLine1 = supplierAddress.AddressLine1;
+      viewModel.Business.AddressLine2 = supplierAddress.AddressLine2;
+      viewModel.Business.Area = supplierAddress.Area;
+      viewModel.Business.City = supplierAddress.City;
+      viewModel.Business.PostCode = supplierAddress.PostCode;
+      viewModel.Business.Country = supplierAddress.Country;
 
       viewModel.Business.ContactFullName =
         $"{order.Supplier.Contacts.First().FirstName} {order.Supplier.Contacts.First().LastName}";

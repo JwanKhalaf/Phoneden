@@ -48,43 +48,64 @@ namespace Phoneden.Services
           throw new OrderNotFoundException($"Order with Id {orderId} could not be found.");
         }
 
-        Contact companyContact = order.Customer.Contacts.First();
+        CustomerContact contact = order
+          .Customer
+          .Contacts
+          .First();
 
         MailboxAddress recipientEmailDetails =
           new MailboxAddress(
-            $"{companyContact.FirstName} {companyContact.LastName}",
+            $"{contact.FirstName} {contact.LastName}",
             order.Customer.Email);
 
         email.To.Add(recipientEmailDetails);
+
         email.From.Add(senderEmailDetails);
+
         email.Subject = "Invoice for Order #" + order.Id;
 
         string emailTemplateFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmailTemplates");
+
         string reportEmailTemplatePath = Path.Combine(emailTemplateFolderPath, "SaleOrderInvoice.cshtml");
+
         IRazorLightEngine engine = new RazorLightEngineBuilder()
-          .UseFilesystemProject(emailTemplateFolderPath)
+          .UseFileSystemProject(emailTemplateFolderPath)
           .UseMemoryCachingProvider()
           .Build();
+
         InvoiceEmailViewModel emailData = new InvoiceEmailViewModel();
-        emailData.CustomerFullName = $"{companyContact.FirstName} {companyContact.LastName}";
+
+        emailData.CustomerFullName = $"{contact.FirstName} {contact.LastName}";
+
         emailData.OrderId = order.Id;
+
         emailData.OrderDate = order.Date;
+
         emailData.LineItems = new List<InvoiceLineItemViewModel>();
 
         foreach (SaleOrderLineItem lineItem in order.LineItems)
         {
           InvoiceLineItemViewModel emailLineItem = new InvoiceLineItemViewModel();
+
           emailLineItem.Quantity = lineItem.Quantity;
+
           emailLineItem.Name = $"{lineItem.Name} - {lineItem.Colour} - {lineItem.Quality}";
+
           emailLineItem.Price = lineItem.Price;
+
           emailLineItem.LineTotal = lineItem.Price * lineItem.Quantity;
+
           emailData.LineItems.Add(emailLineItem);
         }
 
         emailData.ShippingCost = order.PostageCost;
+
         decimal lineItemsTotal = order.LineItems.Sum(lineItem => lineItem.CalculateTotal());
+
         emailData.InvoiceTotal = lineItemsTotal + order.PostageCost;
+
         string emailHtmlBody = await engine.CompileRenderAsync(reportEmailTemplatePath, emailData);
+
         email.Body = new TextPart(TextFormat.Html)
         {
           Text = emailHtmlBody

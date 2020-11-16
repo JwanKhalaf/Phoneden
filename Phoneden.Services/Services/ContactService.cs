@@ -17,43 +17,43 @@ namespace Phoneden.Services
 
     public ContactViewModel GetContact(int id, bool isSupplierContact)
     {
-      Contact contact = _context.Contacts.AsNoTracking().First(c => c.Id == id);
-      ContactViewModel addressVm = ContactViewModelFactory.BuildContactViewModel(contact, isSupplierContact);
+      SupplierContact supplierContact = _context.SupplierContacts.AsNoTracking().First(c => c.Id == id);
+      ContactViewModel addressVm = SupplierContactViewModelFactory.BuildContactViewModel(supplierContact, isSupplierContact);
       return addressVm;
     }
 
     public void AddContact(ContactViewModel contactVm)
     {
-      Contact contact = ContactFactory.BuildNewContactFromViewModel(contactVm);
-      _context.Contacts.Add(contact);
+      SupplierContact supplierContact = SupplierContactFactory.BuildNewContactFromViewModel(contactVm);
+      _context.SupplierContacts.Add(supplierContact);
       _context.SaveChanges();
     }
 
     public void UpdateContact(ContactViewModel contactVm)
     {
-      Contact contact = _context.Contacts.Where(c => !c.IsDeleted).First(c => c.Id == contactVm.Id);
-      ContactFactory.MapViewModelToContact(contactVm, contact);
-      _context.Entry(contact).State = EntityState.Modified;
+      SupplierContact supplierContact = _context.SupplierContacts.Where(c => !c.IsDeleted).First(c => c.Id == contactVm.Id);
+      SupplierContactFactory.MapViewModelToContact(contactVm, supplierContact);
+      _context.Entry(supplierContact).State = EntityState.Modified;
       _context.SaveChanges();
     }
 
     public void DeleteContact(int id, bool isSupplierContact)
     {
-      Contact contact = _context.Contacts.Where(c => !c.IsDeleted).First(c => c.Id == id);
-      contact.IsDeleted = true;
-      _context.Entry(contact).State = EntityState.Modified;
+      SupplierContact supplierContact = _context.SupplierContacts.Where(c => !c.IsDeleted).First(c => c.Id == id);
+      supplierContact.IsDeleted = true;
+      _context.Entry(supplierContact).State = EntityState.Modified;
       _context.SaveChanges();
     }
 
     public bool CanContactBeDeleted(int id, bool isSupplierContact)
     {
-      Contact contact = _context.Contacts.Where(c => !c.IsDeleted).First(c => c.Id == id);
+      SupplierContact supplierContact = _context.SupplierContacts.Where(c => !c.IsDeleted).First(c => c.Id == id);
       if (isSupplierContact)
       {
         Supplier supplier = _context.Suppliers
                         .Include(s => s.Contacts)
                         .Where(s => !s.IsDeleted)
-                        .First(s => s.Id == contact.BusinessId);
+                        .First(s => s.Id == supplierContact.SupplierId);
         if (supplier.Contacts.Where(a => !a.IsDeleted).ToList().Count > 1)
         {
           return true;
@@ -64,7 +64,7 @@ namespace Phoneden.Services
         Customer customer = _context.Customers
                         .Include(c => c.Contacts)
                         .Where(c => !c.IsDeleted)
-                        .First(c => c.Id == contact.BusinessId);
+                        .First(c => c.Id == supplierContact.SupplierId);
         if (customer.Contacts.Where(a => !a.IsDeleted).ToList().Count > 1)
         {
           return true;

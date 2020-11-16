@@ -13,25 +13,41 @@ namespace Phoneden.Services
   public class CustomerService : ICustomerService
   {
     private readonly PdContext _context;
+
     private readonly int _recordsPerPage;
 
-    public CustomerService(IPaginationConfiguration paginationSettings, PdContext context)
+    public CustomerService(
+      PdContext context,
+      IPaginationConfiguration paginationSettings)
     {
       _context = context ?? throw new ArgumentNullException(nameof(context));
+
       _recordsPerPage = paginationSettings.RecordsPerPage;
     }
 
-    public CustomerPageViewModel GetPagedCustomers(bool showDeleted, int page = 1)
+    public async Task<CustomerPageViewModel> GetPagedCustomersAsync(
+      bool showDeleted,
+      int page = 1)
     {
-      IQueryable<Customer> customers = _context.Customers.AsNoTracking().AsQueryable();
+      IQueryable<Customer> customers = _context
+        .Customers
+        .AsNoTracking()
+        .AsQueryable();
+
       if (!showDeleted)
       {
         customers = customers.Where(c => !c.IsDeleted);
       }
 
-      List<Customer> customerList = customers.OrderByDescending(s => s.CreatedOn).Skip(_recordsPerPage * (page - 1)).Take(_recordsPerPage).ToList();
+      List<Customer> customerList = await customers
+        .OrderByDescending(s => s.CreatedOn)
+        .Skip(_recordsPerPage * (page - 1))
+        .Take(_recordsPerPage)
+        .ToListAsync();
+
       IEnumerable<CustomerViewModel> customerVms = CustomerViewModelFactory.BuildList(customerList);
-      CustomerPageViewModel customerPagedVm = new CustomerPageViewModel
+
+      CustomerPageViewModel viewModel = new CustomerPageViewModel
       {
         Customers = customerVms,
         Pagination = new PaginationViewModel
@@ -41,19 +57,24 @@ namespace Phoneden.Services
           TotalRecords = _context.Customers.Count(c => !c.IsDeleted)
         }
       };
-      return customerPagedVm;
+      return viewModel;
     }
 
-    public IEnumerable<CustomerViewModel> GetAllCustomers()
+    public async Task<IEnumerable<CustomerViewModel>> GetAllCustomersAsync()
     {
-      IQueryable<Customer> customers = _context.Customers
+      IQueryable<Customer> customers = _context
+        .Customers
         .AsNoTracking()
         .Where(c => !c.IsDeleted);
-      IEnumerable<CustomerViewModel> customerVms = CustomerViewModelFactory.BuildList(customers.ToList());
-      return customerVms;
+
+      IEnumerable<CustomerViewModel> viewModel = CustomerViewModelFactory
+        .BuildList(await customers.ToListAsync());
+
+      return viewModel;
     }
 
-    public async Task<CustomerViewModel> GetCustomerAsync(int id)
+    public async Task<CustomerViewModel> GetCustomerAsync(
+      int id)
     {
       Customer customer = await _context.Customers
         .Include(c => c.SaleOrders)
@@ -70,52 +91,60 @@ namespace Phoneden.Services
         .AsNoTracking()
         .FirstAsync(c => c.Id == id);
 
-      CustomerViewModel customerViewModel = CustomerViewModelFactory
+      CustomerViewModel viewModel = CustomerViewModelFactory
         .Build(customer);
 
-      return customerViewModel;
+      return viewModel;
     }
 
-    public void AddCustomer(CustomerViewModel customerVm)
+    public async Task AddCustomerAsync(
+      CustomerViewModel viewModel)
     {
-      Customer customer = CustomerFactory.BuildNewCustomer(customerVm);
+      Customer customer = CustomerFactory
+        .BuildNewCustomer(viewModel);
+
       _context.Customers.Add(customer);
-      _context.SaveChanges();
+
+      await _context.SaveChangesAsync();
     }
 
-    public void UpdateCustomer(CustomerViewModel customerVm)
+    public async Task UpdateCustomerAsync(
+      CustomerViewModel viewModel)
     {
-      Customer customer = _context
+      Customer customer = await _context
         .Customers
-        .First(c => c.Id == customerVm.Id && !c.IsDeleted);
+        .FirstAsync(c => c.Id == viewModel.Id && !c.IsDeleted);
 
-      CustomerFactory.MapViewModelToCustomer(customerVm, customer);
+      CustomerFactory.MapViewModelToCustomer(viewModel, customer);
+
       _context.Entry(customer).State = EntityState.Modified;
-      _context.SaveChanges();
+
+      await _context.SaveChangesAsync();
     }
 
-    public void DeleteCustomer(int id)
+    public async Task DeleteCustomerAsync(
+      int id)
     {
-      Customer customer = _context
+      Customer customer = await _context
         .Customers
         .Include(c => c.Addresses)
         .Include(c => c.Contacts)
         .Where(c => !c.IsDeleted)
-        .First(c => c.Id == id);
+        .FirstAsync(c => c.Id == id);
 
       customer.IsDeleted = true;
 
-      foreach (Address address in customer.Addresses)
+      foreach (CustomerAddress address in customer.Addresses)
       {
         address.IsDeleted = true;
       }
 
-      foreach (Contact contact in customer.Contacts)
+      foreach (CustomerContact contact in customer.Contacts)
       {
         contact.IsDeleted = true;
       }
 
-      _context.SaveChanges();
+      await _context.SaveChangesAsync();
     }
   }
 }

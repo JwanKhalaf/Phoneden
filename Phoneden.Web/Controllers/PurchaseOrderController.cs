@@ -29,7 +29,9 @@ namespace Phoneden.Web.Controllers
       _supplierService = supplierService ?? throw new ArgumentNullException(nameof(supplierService));
     }
 
-    public async Task<ActionResult> Page(bool showDeleted, int page = 1)
+    public async Task<ActionResult> Page(
+      bool showDeleted,
+      int page = 1)
     {
       PurchaseOrderPageViewModel viewModel = await _purchaseOrderService
         .GetPagedPurchaseOrdersAsync(showDeleted, page);
@@ -39,7 +41,8 @@ namespace Phoneden.Web.Controllers
       return View(viewModel);
     }
 
-    public async Task<ActionResult> Details(int? id)
+    public async Task<ActionResult> Details(
+      int? id)
     {
       if (id == null) return BadRequest();
 
@@ -48,11 +51,11 @@ namespace Phoneden.Web.Controllers
       return View(viewModel);
     }
 
-    public ActionResult Create()
+    public async Task<ActionResult> Create()
     {
       PurchaseOrderViewModel viewModel = new PurchaseOrderViewModel
       {
-        Suppliers = GetSuppliers(),
+        Suppliers = await GetSuppliersSelectListAsync(),
         LineItems = ReturnAnEmptyList()
       };
 
@@ -60,49 +63,54 @@ namespace Phoneden.Web.Controllers
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create(PurchaseOrderViewModel newPurchaseOrder)
+    public async Task<ActionResult> Create(
+      PurchaseOrderViewModel viewModel)
     {
       if (!ModelState.IsValid)
       {
-        newPurchaseOrder.Suppliers = GetSuppliers();
+        viewModel.Suppliers = await GetSuppliersSelectListAsync();
 
-        return View(newPurchaseOrder);
+        return View(viewModel);
       }
 
       await _purchaseOrderService
-        .AddPurchaseOrderAsync(newPurchaseOrder);
+        .AddPurchaseOrderAsync(viewModel);
 
       return RedirectToAction("Page", new { showDeleted = false });
     }
 
-    public async Task<ActionResult> Edit(int? id)
+    public async Task<ActionResult> Edit(
+      int? id)
     {
       if (id == null) return BadRequest();
 
       PurchaseOrderViewModel viewModel = await _purchaseOrderService.GetPurchaseOrderAsync(id.Value);
 
-      viewModel.Suppliers = GetSuppliers();
+      viewModel.Suppliers = await GetSuppliersSelectListAsync();
 
       return View(viewModel);
     }
 
     [HttpPost]
-    public async Task<ActionResult> Edit(PurchaseOrderViewModel updatedPurchaseOrder)
+    public async Task<ActionResult> Edit(
+      PurchaseOrderViewModel viewModel)
     {
       if (!ModelState.IsValid)
       {
-        updatedPurchaseOrder.Suppliers = GetSuppliers();
+        viewModel.Suppliers = await GetSuppliersSelectListAsync();
 
-        return View(updatedPurchaseOrder);
+        return View(viewModel);
       }
 
       await _purchaseOrderService
-        .UpdatePurchaseOrderAsync(updatedPurchaseOrder);
+        .UpdatePurchaseOrderAsync(viewModel);
 
       return RedirectToAction("Page", new { showDeleted = false });
     }
 
-    public async Task<ActionResult> Delete(int? id, bool? saveChangesError = false)
+    public async Task<ActionResult> Delete(
+      int? id,
+      bool? saveChangesError = false)
     {
       if (id == null) return BadRequest();
 
@@ -120,7 +128,8 @@ namespace Phoneden.Web.Controllers
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<ActionResult> Delete(int id)
+    public async Task<ActionResult> Delete(
+      int id)
     {
       if (id == 0) return BadRequest();
 
@@ -151,13 +160,20 @@ namespace Phoneden.Web.Controllers
       return Json(purchaseOrders);
     }
 
-    private List<SelectListItem> GetSuppliers()
+    private async Task<List<SelectListItem>> GetSuppliersSelectListAsync()
     {
-      return _supplierService.GetAllSuppliers().Select(s => new SelectListItem
-      {
-        Text = s.Name,
-        Value = s.Id.ToString()
-      }).ToList();
+      IEnumerable<SupplierViewModel> suppliers = await _supplierService
+        .GetAllSuppliersAsync();
+
+      List<SelectListItem> supplierSelectList = suppliers
+        .Select(s => new SelectListItem
+        {
+          Text = s.Name,
+          Value = s.Id.ToString()
+        })
+        .ToList();
+
+      return supplierSelectList;
     }
 
     private static List<PurchaseOrderLineItemViewModel> ReturnAnEmptyList()

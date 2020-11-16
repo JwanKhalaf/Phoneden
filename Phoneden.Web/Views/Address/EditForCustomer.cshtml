@@ -1,0 +1,103 @@
+@model Phoneden.ViewModels.AddressViewModel
+
+@{
+  ViewBag.Title = "Edit Customer Address";
+}
+
+<div class="page-title">
+  <h3>Edit Customer Address</h3>
+</div>
+
+<form asp-controller="Address" asp-action="EditForCustomer" method="post" role="form">
+  <div asp-validation-summary="All" class="text-danger"></div>
+
+  <input asp-for="BusinessId" type="hidden" />
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="grid simple">
+        <div class="grid-body no-border">
+          <br />
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="all-caps">
+                <span class="semi-bold">Primary</span> Address
+              </h3>
+              <hr />
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label asp-for="AddressLine1" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="AddressLine1" class="form-control" />
+                  <span asp-validation-for="AddressLine1" class="text-danger"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label asp-for="AddressLine2" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="AddressLine2" class="form-control" />
+                  <span asp-validation-for="AddressLine2" class="text-danger"></span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="Area" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="Area" class="form-control" />
+                      <span asp-validation-for="Area" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label asp-for="City" class="form-label"></label>
+                    <div class="controls">
+                      <input asp-for="City" class="form-control" />
+                      <span asp-validation-for="City" class="text-danger"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label asp-for="County" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="County" class="form-control" />
+                  <span asp-validation-for="County" class="text-danger"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label asp-for="PostCode" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="PostCode" class="form-control" />
+                  <span asp-validation-for="PostCode" class="text-danger"></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label asp-for="Country" class="form-label"></label>
+                <div class="controls">
+                  <input asp-for="Country" class="form-control" />
+                  <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <input type="submit" value="@Model.ButtonText" class="btn btn-primary pull-right" />
+    </div>
+  </div>
+</form>

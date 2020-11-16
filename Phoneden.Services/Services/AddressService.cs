@@ -1,6 +1,8 @@
 namespace Phoneden.Services
 {
+  using System.Collections.Generic;
   using System.Linq;
+  using System.Threading.Tasks;
   using DataAccess.Context;
   using Entities;
   using Microsoft.EntityFrameworkCore;
@@ -15,63 +17,140 @@ namespace Phoneden.Services
       _context = context;
     }
 
-    public AddressViewModel GetAddress(int id, bool isSupplierAddress)
+    public async Task<AddressViewModel> GetSupplierAddressAsync(int id)
     {
-      Address address = _context.Addresses.First(a => a.Id == id);
-      AddressViewModel addressVm = AddressViewModelFactory.Build(address, isSupplierAddress);
-      return addressVm;
+      SupplierAddress address = await _context
+        .SupplierAddresses
+        .FirstAsync(a => a.Id == id);
+
+      AddressViewModel viewModel = SupplierAddressViewModelFactory
+        .Build(address);
+
+      return viewModel;
     }
 
-    public void AddAddress(AddressViewModel addressVm)
+    public async Task<AddressViewModel> GetCustomerAddressAsync(int id)
     {
-      Address address = AddressFactory.BuildNewAddressFromViewModel(addressVm);
-      _context.Addresses.Add(address);
-      _context.SaveChanges();
+      CustomerAddress address = await _context
+        .CustomerAddresses
+        .FirstAsync(a => a.Id == id);
+
+      AddressViewModel viewModel = CustomerAddressViewModelFactory
+        .Build(address);
+
+      return viewModel;
     }
 
-    public void UpdateAddress(AddressViewModel addressVm)
+    public async Task AddSupplierAddressAsync(AddressViewModel viewModel)
     {
-      Address address = _context.Addresses.Where(a => !a.IsDeleted).First(a => a.Id == addressVm.Id);
-      AddressFactory.MapViewModelToAddress(addressVm, address);
+      SupplierAddress address = SupplierAddressFactory
+        .BuildNewAddressFromViewModel(viewModel);
+
+      _context.SupplierAddresses.Add(address);
+
+      await _context.SaveChangesAsync();
+    }
+
+    public async Task AddCustomerAddressAsync(AddressViewModel viewModel)
+    {
+      CustomerAddress address = CustomerAddressFactory
+        .BuildNewAddressFromViewModel(viewModel);
+
+      _context.CustomerAddresses.Add(address);
+
+      await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateSupplierAddressAsync(AddressViewModel viewModel)
+    {
+      SupplierAddress address = await _context
+        .SupplierAddresses
+        .Where(a => !a.IsDeleted)
+        .FirstAsync(a => a.Id == viewModel.Id);
+
+      SupplierAddressFactory
+        .MapViewModelToAddress(viewModel, address);
+
       _context.Entry(address).State = EntityState.Modified;
-      _context.SaveChanges();
+
+      await _context.SaveChangesAsync();
     }
 
-    public void DeleteAddress(int id, bool isSupplierAddress)
+    public async Task UpdateCustomerAddressAsync(AddressViewModel viewModel)
     {
-      Address address = _context.Addresses.Where(a => !a.IsDeleted).First(a => a.Id == id);
+      CustomerAddress address = await _context
+        .CustomerAddresses
+        .Where(a => !a.IsDeleted)
+        .FirstAsync(a => a.Id == viewModel.Id);
+
+      CustomerAddressFactory
+        .MapViewModelToAddress(viewModel, address);
+
+      _context.Entry(address).State = EntityState.Modified;
+
+      await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteSupplierAddressAsync(int id)
+    {
+      SupplierAddress address = await _context
+        .SupplierAddresses
+        .Where(a => !a.IsDeleted)
+        .FirstAsync(a => a.Id == id);
+
       address.IsDeleted = true;
+
       _context.Entry(address).State = EntityState.Modified;
-      _context.SaveChanges();
+
+      await _context.SaveChangesAsync();
     }
 
-    public bool CanAddressBeDeleted(int id, bool isSupplierAddress)
+    public async Task DeleteCustomerAddressAsync(int id)
     {
-      Address address = _context.Addresses.Where(a => !a.IsDeleted).First(a => a.Id == id);
-      if (isSupplierAddress)
-      {
-        Supplier supplier = _context.Suppliers
-                        .Include(s => s.Addresses)
-                        .Where(s => !s.IsDeleted)
-                        .First(s => s.Id == address.BusinessId);
-        if (supplier.Addresses.Where(a => !a.IsDeleted).ToList().Count > 1)
-        {
-          return true;
-        }
-      }
-      else
-      {
-        Customer customer = _context.Customers
-                        .Include(c => c.Addresses)
-                        .Where(c => !c.IsDeleted)
-                        .First(c => c.Id == address.BusinessId);
-        if (customer.Addresses.Where(a => !a.IsDeleted).ToList().Count > 1)
-        {
-          return true;
-        }
-      }
+      CustomerAddress address = await _context
+        .CustomerAddresses
+        .Where(a => !a.IsDeleted)
+        .FirstAsync(a => a.Id == id);
 
-      return false;
+      address.IsDeleted = true;
+
+      _context.Entry(address).State = EntityState.Modified;
+
+      await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> CanSupplierAddressBeDeletedAsync(int id)
+    {
+      SupplierAddress address = await _context
+        .SupplierAddresses
+        .Where(a => !a.IsDeleted)
+        .FirstAsync(a => a.Id == id);
+
+      List<SupplierAddress> supplierAddresses = _context
+        .SupplierAddresses
+        .Where(a => a.SupplierId == address.SupplierId && !a.IsDeleted)
+        .ToList();
+
+      bool supplierHasMoreThanOneAddress = supplierAddresses.Count > 1;
+
+      return supplierHasMoreThanOneAddress;
+    }
+
+    public async Task<bool> CanCustomerAddressBeDeletedAsync(int id)
+    {
+      CustomerAddress address = await _context
+        .CustomerAddresses
+        .Where(a => !a.IsDeleted)
+        .FirstAsync(a => a.Id == id);
+
+      List<CustomerAddress> customerAddresses = _context
+        .CustomerAddresses
+        .Where(a => a.CustomerId == address.CustomerId && !a.IsDeleted)
+        .ToList();
+
+      bool customerHasMoreThanOneAddress = customerAddresses.Count > 1;
+
+      return customerHasMoreThanOneAddress;
     }
   }
 }

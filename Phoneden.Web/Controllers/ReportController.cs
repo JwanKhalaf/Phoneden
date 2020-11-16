@@ -9,7 +9,6 @@ namespace Phoneden.Web.Controllers
   using Microsoft.AspNetCore.Mvc.Rendering;
   using Phoneden.Services;
   using ViewModels;
-  using ViewModels.Reports;
 
   public class ReportController : BaseController
   {
@@ -77,7 +76,7 @@ namespace Phoneden.Web.Controllers
       CustomerSalesReportViewModel viewModel = await _reportService
         .GetCustomerSaleOrdersAsync(page, startDate.Value, endDate.Value, customerId);
 
-      viewModel.Customers = GetCustomersSelectList();
+      viewModel.Customers = await GetCustomersSelectListAsync();
 
       return View(viewModel);
     }
@@ -88,7 +87,7 @@ namespace Phoneden.Web.Controllers
     {
       if (!ModelState.IsValid)
       {
-        salesReportVm.Customers = GetCustomersSelectList();
+        salesReportVm.Customers = await GetCustomersSelectListAsync();
 
         return View(salesReportVm);
       }
@@ -96,7 +95,7 @@ namespace Phoneden.Web.Controllers
       CustomerSalesReportViewModel viewModel = await _reportService
         .GetCustomerSaleOrdersAsync(1, salesReportVm.StartDate, salesReportVm.EndDate, salesReportVm.CustomerId);
 
-      viewModel.Customers = GetCustomersSelectList();
+      viewModel.Customers = await GetCustomersSelectListAsync();
 
       return View(viewModel);
     }
@@ -134,16 +133,20 @@ namespace Phoneden.Web.Controllers
     }
 
 
-    private List<SelectListItem> GetCustomersSelectList()
+    private async Task<List<SelectListItem>> GetCustomersSelectListAsync()
     {
-      return _customerService
-        .GetAllCustomers()
+      IEnumerable<CustomerViewModel> customers = await _customerService
+        .GetAllCustomersAsync();
+
+      List<SelectListItem> customerSelectList = customers
         .Select(s => new SelectListItem
         {
           Text = s.Name,
           Value = s.Id.ToString()
         })
         .ToList();
+
+      return customerSelectList;
     }
   }
 }
