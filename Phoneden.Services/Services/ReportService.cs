@@ -10,6 +10,8 @@ namespace Phoneden.Services
   using Interfaces;
   using Microsoft.AspNetCore.Mvc.Rendering;
   using Microsoft.EntityFrameworkCore;
+  using Newtonsoft.Json;
+  using Newtonsoft.Json.Serialization;
   using ViewModels;
 
   public class ReportService : IReportService
@@ -167,8 +169,11 @@ namespace Phoneden.Services
         .SaleOrderInvoices
         .Include(i => i.SaleOrder)
         .ThenInclude(i => i.LineItems)
+        .ThenInclude(i => i.Product)
+        .ThenInclude(i => i.Category)
         .Include(i => i.SaleOrder)
         .ThenInclude(i => i.Customer)
+        .Include(i => i.SaleOrder)
         .Include(soi => soi.InvoicedLineItems)
         .AsNoTracking()
         .Where(soi => soi.SaleOrder.Date >= startDate && soi.SaleOrder.Date <= endDate && !soi.IsDeleted);
@@ -187,8 +192,30 @@ namespace Phoneden.Services
       decimal expensePerItem = await _expenseService
         .GetAverageExpensePerItemForPeriodAsync(startDate, endDate);
 
+      List<SaleOrderInvoice> invoices = await saleOrderInvoices
+        .ToListAsync();
+
       List<CustomerSalesItemReportViewModel> reportItems = CustomerSalesItemReportViewModelFactory
-        .BuildList(await saleOrderInvoices.ToListAsync(), expensePerItem);
+        .BuildList(invoices, expensePerItem);
+
+      Dictionary<string, int> salesPerCategory = new Dictionary<string, int>();
+
+      foreach (SaleOrderInvoice invoice in invoices)
+      {
+        foreach (SaleOrderLineItem lineItem in invoice.SaleOrder.LineItems)
+        {
+          string categoryName = lineItem.Product.Category.Name;
+
+          if (!salesPerCategory.ContainsKey(categoryName))
+          {
+            salesPerCategory.Add(categoryName, lineItem.Quantity);
+          }
+          else
+          {
+            salesPerCategory[categoryName] = salesPerCategory[categoryName] + lineItem.Quantity;
+          }
+        }
+      }
 
       PaginationViewModel pagination = new PaginationViewModel();
       pagination.CurrentPage = 1;
@@ -197,29 +224,66 @@ namespace Phoneden.Services
         .SaleOrders
         .CountAsync(so => so.Date >= startDate && so.Date <= endDate && !so.IsDeleted);
 
-      CustomerSalesReportViewModel saleReport = new CustomerSalesReportViewModel();
-      saleReport.StartDate = startDate;
-      saleReport.EndDate = endDate;
-      saleReport.SettledSaleOrders = reportItems;
-      saleReport.Pagination = pagination;
+      List<string> productCategoryNames = await _context
+        .Categories
+        .Where(i => !i.IsDeleted)
+        .Select(i => i.Name)
+        .ToListAsync();
 
-      if (!saleReport.SettledSaleOrders.Any())
+      List<int> productsSoldPerCategory = new List<int>();
+
+      foreach (string productCategoryName in productCategoryNames)
       {
-        saleReport.TotalSales = 0;
+        int numberSold = salesPerCategory.ContainsKey(productCategoryName)
+          ? salesPerCategory[productCategoryName]
+          : 0;
+
+        productsSoldPerCategory.Add(numberSold);
+      }
+
+      DefaultContractResolver contractResolver = new DefaultContractResolver
+      {
+        NamingStrategy = new CamelCaseNamingStrategy(),
+      };
+
+      string productCategoryNamesAsJson = JsonConvert
+        .SerializeObject(productCategoryNames,
+          new JsonSerializerSettings
+          {
+            ContractResolver = contractResolver,
+            NullValueHandling = NullValueHandling.Ignore,
+          });
+
+      string productsSoldPerCategoryAsJson = JsonConvert
+        .SerializeObject(productsSoldPerCategory);
+
+      CustomerSalesReportViewModel viewModel = new CustomerSalesReportViewModel();
+      viewModel.StartDate = startDate;
+      viewModel.EndDate = endDate;
+      viewModel.SettledSaleOrders = reportItems;
+      viewModel.Pagination = pagination;
+
+      if (!viewModel.SettledSaleOrders.Any())
+      {
+        viewModel.TotalSales = 0;
       }
       else
       {
-        saleReport.TotalSales = reportItems
+        viewModel.TotalSales = reportItems
           .Sum(i => i.InvoiceTotal);
       }
 
-      saleReport.TotalProfit = reportItems
+      viewModel.TotalProfit = reportItems
         .Sum(so => so.Profit);
 
-      saleReport.TotalProfitAfterExpenses = reportItems
+      viewModel.TotalProfitAfterExpenses = reportItems
         .Sum(s => s.ProfitAfterExpenses);
 
-      return saleReport;
+      viewModel.Labels = productCategoryNamesAsJson;
+
+      viewModel.Data = productsSoldPerCategoryAsJson;
+
+      return viewModel;
     }
 
     public async Task<OutstandingInvoicesReportViewModel> GetOutstandingInvoicesAsync(
