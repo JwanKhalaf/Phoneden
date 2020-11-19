@@ -29,6 +29,9 @@ namespace Phoneden.Web
       string databaseConnectionString = Configuration["Database:DefaultConnectionString"];
 
       services
+        .AddDatabaseDeveloperPageExceptionFilter();
+
+      services
         .AddSingleton<ISmtpConfiguration>(Configuration.GetSection("SmtpConfiguration").Get<SmtpConfiguration>());
 
       services
@@ -129,9 +132,6 @@ namespace Phoneden.Web
       {
         app
           .UseDeveloperExceptionPage();
-
-        app
-          .UseDatabaseErrorPage();
       }
       else
       {
