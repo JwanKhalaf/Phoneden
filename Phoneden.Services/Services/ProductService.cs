@@ -119,10 +119,27 @@ namespace Phoneden.Services
         .AsNoTracking()
         .ToList();
 
-      IEnumerable<ProductViewModel> productsVm = ProductViewModelFactory
+      IEnumerable<ProductViewModel> viewModel = ProductViewModelFactory
         .BuildList(products);
 
-      return productsVm;
+      return viewModel;
+    }
+
+    public IEnumerable<ProductViewModel> GetAllProducts(string searchTerm)
+    {
+      List<Product> products = _context
+        .Products
+        .Include(p => p.Brand)
+        .Include(p => p.Category)
+        .Include(p => p.Quality)
+        .Where(p => !p.IsDeleted && (EF.Functions.Like(p.Name.ToLower(), $"%{searchTerm}%") || EF.Functions.Like(p.Barcode, $"%{searchTerm}%")))
+        .AsNoTracking()
+        .ToList();
+
+      IEnumerable<ProductViewModel> viewModel = ProductViewModelFactory
+        .BuildList(products);
+
+      return viewModel;
     }
 
     public ProductViewModel GetProduct(int id)
@@ -137,17 +154,17 @@ namespace Phoneden.Services
       return productVm;
     }
 
-    public void AddProduct(ProductViewModel productVm)
+    public void AddProduct(ProductViewModel viewModel)
     {
-      Product product = ProductFactory.BuildNewProductFromViewModel(productVm);
+      Product product = ProductFactory.BuildNewProductFromViewModel(viewModel);
       _context.Products.Add(product);
       _context.SaveChanges();
     }
 
-    public void UpdateProduct(ProductViewModel productVm)
+    public void UpdateProduct(ProductViewModel viewModel)
     {
-      Product product = _context.Products.First(p => p.Id == productVm.Id && !p.IsDeleted);
-      ProductFactory.MapViewModelToProduct(productVm, product);
+      Product product = _context.Products.First(p => p.Id == viewModel.Id && !p.IsDeleted);
+      ProductFactory.MapViewModelToProduct(viewModel, product);
       _context.Entry(product).State = EntityState.Modified;
       _context.SaveChanges();
     }

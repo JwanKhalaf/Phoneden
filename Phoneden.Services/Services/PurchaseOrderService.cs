@@ -222,16 +222,7 @@ namespace Phoneden.Services
         Product product = await _context
           .Products
           .Include(p => p.Quality)
-          .FirstAsync(p => (p.Id == lineItem.ProductId || p.Barcode == lineItem.Barcode) && !p.IsDeleted);
-
-        if (lineItem.ProductId == 0)
-        {
-          lineItem.ProductId = product.Id;
-        }
-        else
-        {
-          lineItem.Barcode = product.Barcode;
-        }
+          .FirstAsync(p => p.Id == lineItem.ProductId && !p.IsDeleted);
 
         lineItem.Name = product.Name;
 
@@ -316,7 +307,7 @@ namespace Phoneden.Services
       {
         Product product = await _context
           .Products
-          .FirstAsync(p => (p.Id == lineItem.ProductId || p.Barcode == lineItem.Barcode) && !p.IsDeleted);
+          .FirstAsync(p => p.Id == lineItem.ProductId && !p.IsDeleted);
 
         if (lineItem.ProductId == 0)
         {

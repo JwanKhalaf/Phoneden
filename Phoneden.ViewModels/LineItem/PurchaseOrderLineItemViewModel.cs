@@ -1,7 +1,6 @@
 namespace Phoneden.ViewModels
 {
   using System.ComponentModel.DataAnnotations;
-  using CustomValidation;
   using Entities.Shared;
 
   public class PurchaseOrderLineItemViewModel
@@ -39,12 +38,10 @@ namespace Phoneden.ViewModels
 
     public int OrderId { get; set; }
 
-    [RequiredIf("Barcode", "", "A Barcode needs to be supplied or a product selected")]
+    [Required]
+    [Range(1, int.MaxValue, ErrorMessage = "You must select a product")]
     [Display(Name = "Product")]
     public int ProductId { get; set; }
-
-    [RequiredIf("ProductId", 0, "A Barcode needs to be supplied or a product selected")]
-    public string Barcode { get; set; }
 
     public decimal CalculateTotal()
     {

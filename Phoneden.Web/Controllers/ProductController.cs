@@ -115,8 +115,11 @@ namespace Phoneden.Web.Controllers
           "Delete failed. Try again, and if the problem persists," +
           " see your system administrator.";
       }
+
       ProductViewModel viewModel = _productService.GetProduct(id.Value);
+
       if (viewModel == null) return NotFound();
+
       return View(viewModel);
     }
 
@@ -139,11 +142,12 @@ namespace Phoneden.Web.Controllers
     }
 
     [HttpPost]
-    public JsonResult GetProductsWithName(string productName)
+    public JsonResult GetProductsWithName(string productSearchTerm)
     {
-      IEnumerable<ProductViewModel> products = _productService.GetAllProducts();
-      IEnumerable<ProductViewModel> filtered = products.Where(x => x.Name.ToLower().Contains(productName.ToLower()));
-      return Json(filtered);
+      IEnumerable<ProductViewModel> products = _productService
+        .GetAllProducts(productSearchTerm);
+
+      return Json(products);
     }
 
     #region helpers
