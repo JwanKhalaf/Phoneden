@@ -7,7 +7,7 @@ $('.line-order-items')
           serviceUrl: '/Product/GetProductsWithName',
           minChars: 3,
           type: 'POST',
-          paramName: 'productName',
+          paramName: 'productSearchTerm',
           transformResult: function (response) {
             return {
               suggestions: $.map(JSON.parse(response),
@@ -29,9 +29,9 @@ $('.add-line-item')
   .on('click',
     function () {
       $.ajax({
-        async: false,
-        url: '/SaleOrder/LineOrderItem'
-      })
+          async: false,
+          url: '/SaleOrder/LineOrderItem'
+        })
         .done(function (partialView) {
           $('.line-order-items tbody').append(partialView);
           updateNameAttributeForAllLineOrderItems();
@@ -92,7 +92,7 @@ function updateForInputs(lineOrder, index) {
   updateNameAttributeForSaleOrderIdField(lineOrder, index);
   updateNameAttributeForLineOrderIdField(lineOrder, index);
   updateNameAttributeForProductIdField(lineOrder, index);
-  updateNameAttributeForProductNameField(lineOrder, index);
+  updateNameAttributeForproductSearchTermField(lineOrder, index);
   updateNameAttributeForProductQuantityField(lineOrder, index);
 }
 

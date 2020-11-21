@@ -30,7 +30,6 @@ namespace Phoneden.Services
         Colour = purchaseOrderLineItemViewModel.Colour,
         Quantity = purchaseOrderLineItemViewModel.Quantity,
         ProductId = purchaseOrderLineItemViewModel.ProductId,
-        Barcode = purchaseOrderLineItemViewModel.Barcode,
       };
     }
 

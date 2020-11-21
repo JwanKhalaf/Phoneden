@@ -1,6 +1,5 @@
 @using Phoneden.Entities
 @using Phoneden.Entities.Shared
-@using Phoneden.ViewModels.PurchaseOrders
 @using SelectList = Microsoft.AspNetCore.Mvc.Rendering.SelectList
 @model Phoneden.ViewModels.PurchaseOrders.PurchaseOrderViewModel
 
@@ -190,10 +189,7 @@
 
                     </th>
                     <th>
-                      Barcode
-                    </th>
-                    <th>
-                      Product Id
+                      Product
                     </th>
                     <th>
                       Unit Price
@@ -223,13 +219,8 @@
                       </td>
                       <td>
                         <div class="form-group">
-                          <input asp-for="@Model.LineItems[counter].Barcode" class="form-control" />
-                        </div>
-                      </td>
-                      <td>
-                        <div class="form-group">
                           @{ string name = string.IsNullOrEmpty(Model.LineItems[counter].Name) ? "" : $"{Model.LineItems[counter].Name} - {Model.LineItems[counter].Colour} - {Model.LineItems[counter].Quality}"; }
-                          <input asp-for="LineItems[counter].Name" class="form-control poli-product-name" value="@name" />
+                          <input asp-for="LineItems[counter].Name" class="form-control poli-product-name" value="@name" placeholder="name or barcode" />
                           <span asp-validation-for="LineItems[counter].Name" class="text-danger"></span>
                           <input asp-for="LineItems[counter].ProductId" type="hidden" class="poli-product-id" />
                         </div>

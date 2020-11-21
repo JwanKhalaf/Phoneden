@@ -5,16 +5,24 @@ namespace Phoneden.Services
 
   public interface IProductService
   {
-    ProductPageViewModel GetPagedProducts(ProductSearchViewModel search, int page);
+    ProductPageViewModel GetPagedProducts(
+      ProductSearchViewModel search,
+      int page);
 
     IEnumerable<ProductViewModel> GetAllProducts();
 
-    ProductViewModel GetProduct(int id);
+    IEnumerable<ProductViewModel> GetAllProducts(string searchTerm);
 
-    void AddProduct(ProductViewModel productVm);
+    ProductViewModel GetProduct(
+      int id);
 
-    void UpdateProduct(ProductViewModel productVm);
+    void AddProduct(
+      ProductViewModel viewModel);
 
-    void DeleteProduct(int id);
+    void UpdateProduct(
+      ProductViewModel viewModel);
+
+    void DeleteProduct(
+      int id);
   }
 }

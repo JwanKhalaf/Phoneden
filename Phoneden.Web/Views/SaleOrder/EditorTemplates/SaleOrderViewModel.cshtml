@@ -1,4 +1,3 @@
-@using Phoneden.ViewModels.SaleOrders
 @model Phoneden.ViewModels.SaleOrders.SaleOrderViewModel
 
 @if (!ViewData.ModelState.IsValid)
@@ -90,10 +89,7 @@
 
                     </th>
                     <th>
-                      Barcode
-                    </th>
-                    <th>
-                      Product Id
+                      Product
                     </th>
                     <th>
                       Quantity
@@ -110,18 +106,11 @@
                       <td>
                         <div class="form-group">
                           <div class="controls">
-                            <input asp-for="LineItems[counter].Barcode" class="form-control" />
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="form-group">
-                          <div class="controls">
                             <input asp-for="LineItems[counter].ProductId" type="hidden" class="soli-product-id" />
                             <input asp-for="LineItems[counter].Id" type="hidden" class="soli-id" />
                             <input asp-for="LineItems[counter].SaleOrderId" type="hidden" class="soli-order-id" />
 
-                            <input asp-for="LineItems[counter].Name" class="form-control soli-product-name" />
+                            <input asp-for="LineItems[counter].Name" class="form-control soli-product-name" placeholder="name or barcode" />
                           </div>
                         </div>
                       </td>

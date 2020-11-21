@@ -7,7 +7,7 @@ $('.line-order-items')
         serviceUrl: '/Product/GetProductsWithName',
         minChars: 3,
         type: 'POST',
-        paramName: 'productName',
+        paramName: 'productSearchTerm',
         transformResult: function (response) {
           return {
             suggestions: $.map(JSON.parse(response),

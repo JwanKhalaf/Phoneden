@@ -29,7 +29,6 @@ namespace Phoneden.ViewModels
       viewModel.Id = lineItem.Id;
       viewModel.OrderId = lineItem.PurchaseOrderId;
       viewModel.ProductId = lineItem.ProductId;
-      viewModel.Barcode = lineItem.Barcode;
       viewModel.Name = lineItem.Name;
       viewModel.Price = lineItem.Price;
       viewModel.Currency = lineItem.Currency;
