@@ -25,12 +25,14 @@ namespace Phoneden.Services
       IQueryable<Quality> qualities = _context.Qualities
         .AsNoTracking()
         .AsQueryable();
+
       if (!showDeleted)
       {
         qualities = qualities.Where(s => !s.IsDeleted);
       }
 
       List<QualityViewModel> qualityVms = QualityViewModelFactory.BuildListOfQualityViewModels(qualities);
+
       QualityPageViewModel qualityPageVm = new QualityPageViewModel
       {
         Qualities = qualityVms,
@@ -41,6 +43,7 @@ namespace Phoneden.Services
           TotalRecords = _context.Qualities.Count(b => !b.IsDeleted)
         }
       };
+
       return qualityPageVm;
     }
 
@@ -80,14 +83,17 @@ namespace Phoneden.Services
     public void DeleteQuality(int id)
     {
       Quality quality = _context.Qualities.First(q => q.Id == id && !q.IsDeleted);
+
       quality.IsDeleted = true;
+
       _context.Entry(quality).State = EntityState.Modified;
+
       _context.SaveChanges();
     }
 
     public bool QualityIsInUse(int id)
     {
-      return _context.Products.Any(p => p.QualityId == id);
+      return _context.Products.Any(p => p.QualityId == id && p.IsDeleted == false);
     }
 
     private static void MapFromViewModel(QualityViewModel viewModel, Quality quality)
