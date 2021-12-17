@@ -84,7 +84,7 @@ namespace Phoneden.Services
 
     public bool BrandIsInUse(int id)
     {
-      return _context.Products.Any(p => p.BrandId == id);
+      return _context.Products.Any(p => p.BrandId == id && p.IsDeleted == false);
     }
   }
 }

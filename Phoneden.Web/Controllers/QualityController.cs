@@ -54,6 +54,7 @@ namespace Phoneden.Web.Controllers
       if (!ModelState.IsValid) return View(quality);
 
       _qualityService.UpdateQuality(quality);
+
       return RedirectToAction("Page", new { showDeleted = false });
     }
 
@@ -78,6 +79,7 @@ namespace Phoneden.Web.Controllers
         viewModel = _qualityService.GetQuality(id.Value);
         if (viewModel == null) return NotFound();
       }      
+
       return View(viewModel);
     }
 

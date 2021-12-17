@@ -99,7 +99,7 @@ namespace Phoneden.Services
 
     public bool CategoryIsInUse(int id)
     {
-      return _context.Products.Any(p => p.CategoryId == id);
+      return _context.Products.Any(p => p.CategoryId == id && p.IsDeleted == false);
     }
   }
 }
